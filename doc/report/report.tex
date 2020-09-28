@@ -1,0 +1,113 @@
+\documentclass[a4paper, 11pt]{report}
+\usepackage[top=35mm,bottom=35mm,left=25mm,right=25mm]{geometry} % Margins
+
+% Change section numbers
+\renewcommand{\thesection}{\arabic{section}}
+
+% Appendix
+\usepackage{appendix}
+
+% Decent underlines
+\usepackage[normalem]{ulem}
+
+% Hyperreferences
+\usepackage{hyperref}
+
+% Imports
+\usepackage{import}
+
+% Graphics and images
+\usepackage{graphicx} \graphicspath{{./images/}}
+\usepackage{subcaption}
+\usepackage{float}
+
+% Encodings (to render letters with diacritics and special characters)
+\usepackage[utf8]{inputenc}
+
+% Language
+\usepackage[english]{babel}
+
+% Source code and algorithms
+%\usepackage{amsmath}
+\usepackage{algorithm}
+\usepackage[noend]{algpseudocode}
+\usepackage{listings}
+
+% Tables with bold rows
+\usepackage{tabularx}
+\newcommand\setrow[1]{\gdef\rowmac{#1}#1\ignorespaces}
+\newcommand\clearrow{\global\let\rowmac\relax}
+\clearrow
+\usepackage{multirow}
+
+% Lists and items
+\usepackage{enumitem}
+
+% Math stuff
+\usepackage[mathscr]{euscript}
+\usepackage{amssymb, latexsym} %Load math symbols like \blacksquare, but also load normal \leadsto arrows
+\usepackage{mathtools} % For \text{...}
+% \usepackage{enumitem}
+% \usepackage{xcolor}
+\newcommand{\expnumber}[2]{{#1}\mathrm{e}{#2}} % scientific notation
+\usepackage{siunitx} %SI units
+\newcommand{\degree}{^{\circ}}
+
+% Headers and footers
+\usepackage{fancyhdr}
+\pagestyle{fancyplain}
+\fancyhf{}
+\lhead{\fancyplain{}{Serial port data protocol — Report (RCOM 2020/21)}}
+\rhead{\fancyplain{}{Class 6, group 5}}
+\lfoot{\fancyplain{}{\leftmark}}
+\rfoot{\thepage}
+
+% Email
+\newcommand{\email}[1]{
+{\texttt{\href{mailto:#1}{#1}} }
+}
+
+% Metadata
+\title{\Huge Serial port data protocol \\ \Large Report \\ \vspace*{4pt} \large RCOM 2020/21}
+\author{
+Class 2, group 4 \vspace{0.5em} \\
+\begin{tabular}{r l}
+	\email{up201800170@fe.up.pt} & Breno Accioly de Barros Pimentel \\
+	\email{up201806429@fe.up.pt} & Diogo Miguel Ferreira Rodrigues  \\
+\end{tabular}
+}
+\date{25th of May, 2020}
+
+% Document
+\begin{document}
+\maketitle
+\clearpage
+
+\section*{Summary}
+
+\section{Introduction}
+
+\section{Architecture}
+
+\section{Code structure}
+
+\section{Main use cases}
+
+\section{Logical link protocol}
+
+\section{Application protocol}
+
+\section{Validation}
+
+\section{Efficiency of the data link protocol}
+
+\section{Conclusion}
+
+\pagebreak
+
+\appendix
+\appendixpage
+\addappheadtotoc
+\section{Source code}
+
+\end{document}
