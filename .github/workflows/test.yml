@@ -10,8 +10,13 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - name: apt
-      run: sudo apt install -y texlive-latex-extra texlive-science latexmk curl
+    - name: Install socat
+      run: sudo apt install -y socat
+
+    - name: Create virtual serial ports
+      run: |
+        sudo socat -d -d PTY,link=/dev/ttyS10,mode=777 PTY,link=/dev/ttyS11,mode=777 &
+        sleep 1
 
     - name: Checkout submodules
       shell: bash
@@ -21,14 +26,6 @@ jobs:
         auth_header="$(git config --local --get http.https://github.com/.extraheader)"
         git submodule sync --recursive
         git -c "http.extraheader=$auth_header" -c protocol.version=2 submodule update --init --force --recursive --depth=1
-
-    - name: Install socat
-      run: sudo apt install -y socat
-
-    - name: Create virtual serial ports
-      run: |
-        sudo socat -d -d PTY,link=/dev/ttyS10,mode=777 PTY,link=/dev/ttyS11,mode=777 &
-        sleep 1
 
     - name: make
       run: make

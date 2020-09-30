@@ -10,7 +10,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - name: apt
+    - name: Install latex and related packages
       run: sudo apt install -y texlive-latex-extra texlive-science latexmk curl
 
     - name: Checkout submodules
