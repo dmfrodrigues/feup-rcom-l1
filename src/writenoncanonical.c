@@ -14,8 +14,6 @@
 #define FALSE 0
 #define TRUE 1
 
-volatile int STOP = FALSE;
-
 int main(int argc, char** argv){
     // CHECK ARGUMENTS
     if(argc < 2){
@@ -47,20 +45,34 @@ int main(int argc, char** argv){
     tcflush(port_fd, TCIOFLUSH);    // flush data received but not read, and data written but not transmitted
 
     if(tcsetattr(port_fd, TCSANOW, &newtio) == -1) { perror("tcsetattr"); exit(-1); }
-    printf("New termios structure set\n");
 
     // GET INPUT
-    char buf[255];
-    printf("Write here whatever you want to send the other computer:\n");
-    scanf("%s", buf);
+    char *buf = malloc(255*sizeof(char)); size_t n = 255;
+    fprintf(stderr, "Write here whatever you want to send the other computer:\n");
+    if(getline(&buf, &n, stdin) == -1){ perror("getline"); exit(-1); }
+    buf[strlen(buf)-1] = '\0';
     // WRITE TO PORT
-    int res = write(port_fd, buf, 255);
-    printf("%d bytes written\n", res);
+    int res = write(port_fd, buf, strlen(buf)+1);
+    fprintf(stderr, "Wrote to port: \"%s\" (%d bytes)\n", buf, res);
+
+    // GET RESEND
+    char resend_buf[255];
+    int i = 0;
+    do {
+        int res = read(port_fd, resend_buf+i, 1);
+    } while(buf[i++] != '\0');
+    fprintf(stderr, "Got resend: \"%s\" (%d bytes)\n", resend_buf, i);
+
+    // VALIDATION
+    if(strcmp(buf, resend_buf) == 0) fprintf(stderr, "Resend is correct\n");
+    else                             fprintf(stderr, "Resend is not correct\n");
 
     // RESTORE INITIAL PORT SETTINGS
     if(tcsetattr(port_fd, TCSANOW, &oldtio) == -1) { perror("tcsetattr"); exit(-1); }
     // CLOSE PORT
     close(port_fd);
+
+    free(buf);
 
     return 0;
 }
