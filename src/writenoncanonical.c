@@ -35,7 +35,7 @@ int main(int argc, char** argv)  /* fazer write da serial port */
   */
 
 
-    fd = open(argv[1], O_RDWR | O_NOCTTY );/* porta série  */
+    fd = open(argv[1], O_RDWR | O_NOCTTY );/* porta sï¿½rie  */
     if (fd <0) {perror(argv[1]); exit(-1); } /* erro na leitura da porta */
 
     if ( tcgetattr(fd,&oldtio) == -1) { /* save current port settings */
@@ -58,7 +58,7 @@ int main(int argc, char** argv)  /* fazer write da serial port */
 
   /* FEITO
     VTIME e VMIN devem ser alterados de forma a proteger com um temporizador a 
-    leitura do(s) próximo(s) caracter(es)
+    leitura do(s) prï¿½ximo(s) caracter(es)
   */
 
 
@@ -77,7 +77,7 @@ int main(int argc, char** argv)  /* fazer write da serial port */
 	gets(buf);
 	
 	/*
-    for (i = 0; i < 255; i++) {  queremos que o buf leia da consola o que é suposto enviar
+    for (i = 0; i < 255; i++) {  queremos que o buf leia da consola o que ï¿½ suposto enviar
 		
 		
 		
@@ -93,8 +93,8 @@ int main(int argc, char** argv)  /* fazer write da serial port */
  
 
   /* 
-    O ciclo FOR e as instruções seguintes devem ser alterados de modo a respeitar 
-    o indicado no guião 
+    O ciclo FOR e as instruï¿½ï¿½es seguintes devem ser alterados de modo a respeitar 
+    o indicado no guiï¿½o 
   */
 
 
