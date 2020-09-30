@@ -16,69 +16,51 @@
 
 volatile int STOP = FALSE;
 
-int main(int argc, char** argv){ /*fazer read da serial port */
-    int fd, c, res;
-    struct termios oldtio, newtio;
-    char buf[255];
-
+int main(int argc, char** argv){
+    // CHECK ARGUMENTS
     if(argc < 2) {
         printf("Usage:\tnserial SerialPort\n\tex: nserial /dev/ttyS1\n");
         exit(1);
     }
 
-    /*
-    Open serial port device for reading and writing and not as controlling tty
-    because we don't want to get killed if linenoise sends CTRL-C.
-     */
+    // OPEN SERIAL PORT
+    // O_RDWR   - Open for reading and writing
+    // O_NOCTTY - Open serial port not as controlling tty, because we don't want to get killed if linenoise sends CTRL-C
+    int port_fd = open(argv[1], O_RDWR | O_NOCTTY);
+    if(port_fd < 0) { perror(argv[1]); exit(-1); }
 
-    fd = open(argv[1], O_RDWR | O_NOCTTY); /*abrir porta serie para ler e escrever */
-    if(fd < 0) {
-        perror(argv[1]);
-        exit(-1);
-    }
+    // SAVE INITIAL PORT SETTINGS
+    struct termios oldtio;
+    if(tcgetattr(port_fd, &oldtio) == -1) { perror("tcgetattr"); exit(-1); }
 
-    if(tcgetattr(fd, &oldtio) == -1) { /* save current port settings */
-        perror("tcgetattr");
-        exit(-1);
-    }
+    // SET PORT SETTINGS
+    // VTIME and VMIN should be changed to protect reads of the following character(s) with a timer
+    struct termios newtio;
+    bzero(&newtio, sizeof(newtio)); // fills struct newtio with zeros
+    newtio.c_cflag      = BAUDRATE | CS8 | CLOCAL | CREAD;
+    newtio.c_iflag      = IGNPAR;
+    newtio.c_oflag      = 0;
+    newtio.c_lflag      = 0; // set input mode (non-canonical, no echo,...)
+    newtio.c_cc[VTIME]  = 0; // inter-character timer unused
+    newtio.c_cc[VMIN]   = 5; // blocking read until 5 chars received
 
-    bzero(&newtio, sizeof(newtio));
-    newtio.c_cflag = BAUDRATE | CS8 | CLOCAL | CREAD;
-    newtio.c_iflag = IGNPAR;
-    newtio.c_oflag = 0;
+    tcflush(port_fd, TCIOFLUSH);    // flush data received but not read, and data written but not transmitted
 
-    /* set input mode (non-canonical, no echo,...) */
-    newtio.c_lflag = 0;
-
-    newtio.c_cc[VTIME] = 0; /* inter-character timer unused */
-    newtio.c_cc[VMIN] = 5;  /* blocking read until 5 chars received */
-
-    /* 
-    VTIME e VMIN devem ser alterados de forma a proteger com um temporizador a 
-    leitura do(s) pr�ximo(s) caracter(es)
-  */
-
-    tcflush(fd, TCIOFLUSH);
-
-    if(tcsetattr(fd, TCSANOW, &newtio) == -1) {
-        perror("tcsetattr");
-        exit(-1);
-    }
-
+    if(tcsetattr(port_fd, TCSANOW, &newtio) == -1) { perror("tcsetattr"); exit(-1); }
     printf("New termios structure set\n");
 
-    while(STOP == FALSE) {        /* loop for input */
-        res = read(fd, buf, 255); /* returns after 5 chars have been input */
-        buf[res] = 0;             /* so we can printf... */
+    // OUTPUT
+    while(STOP == FALSE) {
+        char buf[255];
+        int res = read(port_fd, buf, 255);  // returns after 5 chars have been input
+        buf[res] = 0;                       // so we can printf...
         printf(":%s:%d\n", buf, res);
         if(buf[0] == 'z') STOP = TRUE;
     }
 
-    /* 
-    O ciclo WHILE deve ser alterado de modo a respeitar o indicado no gui�o 
-  */
-
-    tcsetattr(fd, TCSANOW, &oldtio);
-    close(fd);
+    // RESTORE INITIAL PORT SETTINGS
+    tcsetattr(port_fd, TCSANOW, &oldtio);
+    // CLOSE PORT
+    close(port_fd);
     return 0;
 }
