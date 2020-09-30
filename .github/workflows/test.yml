@@ -29,3 +29,12 @@ jobs:
       run: |
         sudo socat -d -d PTY,link=/dev/ttyS10,mode=777 PTY,link=/dev/ttyS11,mode=777 &
         sleep 1
+
+    - name: make
+      run: make
+
+    - name: Test message-sending
+      run: |
+        ./receiver /dev/ttyS11 &
+        sleep 1
+        echo -e "Hello world\!\n" | ./emitter /dev/ttyS10
