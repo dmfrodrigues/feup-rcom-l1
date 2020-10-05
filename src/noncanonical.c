@@ -14,6 +14,76 @@
 #define FALSE 0
 #define TRUE 1
 
+
+// [FLAG,A,C,BCC,FLAG]
+// flag = 01111110; A=11; C=11; BCC = A XOR C 
+#define FLAG 0x7E
+#define A 0x03
+#define C 0x03
+#define BCC (A^C)
+
+char a_rcv, c_rcv;
+
+typedef enum
+{
+    Start,
+    Flag_RCV,
+    A_RCV,
+    C_RCV,
+    BCC_OK,
+    Stop
+} setStateMachine;
+
+setStateMachine updateSetStateMachine(setStateMachine state, char byte){
+    switch (state)
+    {
+    case Start:
+        if(byte == FLAG)
+            state = Flag_RCV;
+        break;
+    case Flag_RCV:
+        if(byte == A){
+            a_rcv = byte;
+            state = A_RCV;
+        }
+        else if(byte == FLAG)
+            state = Flag_RCV;
+        else
+            state = Start;
+        break;
+    case A_RCV:
+        if(byte == C){
+            c_rcv = byte;
+            state = C_RCV;
+        }
+        else if(byte == FLAG)
+            state = Flag_RCV;
+        else
+            state = Start;
+        break;
+    case C_RCV:
+        if(byte == (a_rcv^c_rcv))
+            state = BCC_OK;
+        else if(byte == FLAG)
+            state = Flag_RCV;
+        else
+            state = Start;
+        break;
+    case BCC_OK:
+        if(byte == FLAG)
+            state = Stop;
+        else
+            state = Start;
+        break;
+    case Stop:
+        break;
+    default:
+        break;
+    }
+
+    return state;
+}
+
 int main(int argc, char** argv){
     // CHECK ARGUMENTS
     if(argc < 2){
@@ -46,17 +116,31 @@ int main(int argc, char** argv){
 
     if(tcsetattr(port_fd, TCSANOW, &newtio) == -1) { perror("tcsetattr"); exit(-1); }
 
+    
+    char UA[5];
+
+    UA[0] = FLAG;
+    UA[1] = A;
+    UA[2] = FLAG;
+    UA[3] = BCC;
+    UA[4] = FLAG;
+
+    setStateMachine state = Start;
+
     // OUTPUT
-    char buf[255];
+    char buf[5];
     int i = 0;
     do {
         int res = read(port_fd, buf+i, 1);
-    } while(buf[i++] != '\0');
+        updateSetStateMachine(state, buf[i]);
+        i++;
+    } while(state != Stop && i < 5);
     fprintf(stderr, "Received: \"%s\" (%d bytes)\n", buf, i);
 
     // RESEND
-    int res = write(port_fd, buf, strlen(buf)+1);
-    fprintf(stderr, "Resent: \"%s\" (%d bytes)\n", buf, (int)(strlen(buf)+1));
+    int res = write(port_fd, UA, 5);
+    fprintf(stderr, "SENT UA: \"%s\" (%d bytes)\n", UA, res);
+    
 
     // RESTORE INITIAL PORT SETTINGS
     tcsetattr(port_fd, TCSANOW, &oldtio);

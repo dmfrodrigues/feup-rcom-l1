@@ -8,13 +8,93 @@
 #include <sys/types.h>
 #include <termios.h>
 #include <unistd.h>
+#include <signal.h>
 
 #define BAUDRATE B38400
 #define _POSIX_SOURCE 1 /* POSIX compliant source */
 #define FALSE 0
 #define TRUE 1
 
+
+// [FLAG,A,C,BCC,FLAG]
+// flag = 01111110; A=11; C=11; BCC = A XOR C 
+#define FLAG 0x7E
+#define A 0x03
+#define C 0x03
+#define BCC (A^C)
+
+char a_rcv, c_rcv;
+
+typedef enum
+{
+    Start,
+    Flag_RCV,
+    A_RCV,
+    C_RCV,
+    BCC_OK,
+    Stop
+} uaStateMachine;
+
+int timeout=0;
+
+void alarmHandler(){
+	printf("TIMEOUT\n");
+	timeout=1;
+}
+
+
+uaStateMachine updateUAStateMachine(uaStateMachine state, char byte){
+    switch (state)
+    {
+    case Start:
+        if(byte == FLAG)
+            state = Flag_RCV;
+        break;
+    case Flag_RCV:
+        if(byte == A){
+            a_rcv = byte;
+            state = A_RCV;
+        }
+        else if(byte == FLAG)
+            state = Flag_RCV;
+        else
+            state = Start;
+        break;
+    case A_RCV:
+        if(byte == C){
+            c_rcv = byte;
+            state = C_RCV;
+        }
+        else if(byte == FLAG)
+            state = Flag_RCV;
+        else
+            state = Start;
+        break;
+    case C_RCV:
+        if(byte == (a_rcv^c_rcv))
+            state = BCC_OK;
+        else if(byte == FLAG)
+            state = Flag_RCV;
+        else
+            state = Start;
+        break;
+    case BCC_OK:
+        if(byte == FLAG)
+            state = Stop;
+        else
+            state = Start;
+        break;
+    case Stop:
+        break;
+    default:
+        break;
+    }
+    fprintf(stderr, "(debug) STATE: %d \n", state);
+    return state;
+}
+
 int main(int argc, char** argv){
+
     // CHECK ARGUMENTS
     if(argc < 2){
         printf("Usage:\tnserial SerialPort\n\tex: nserial /dev/ttyS1\n");
@@ -24,7 +104,7 @@ int main(int argc, char** argv){
     // OPEN SERIAL PORT
     // O_RDWR   - Open for reading and writing
     // O_NOCTTY - Open serial port not as controlling tty, because we don't want to get killed if linenoise sends CTRL-C
-    int port_fd = open(argv[1], O_RDWR | O_NOCTTY);
+    int port_fd = open(argv[1], O_RDWR | O_NOCTTY | O_NONBLOCK);
     if(port_fd < 0){ perror(argv[1]); exit(-1); }
 
     // SAVE INITIAL PORT SETTINGS
@@ -46,33 +126,54 @@ int main(int argc, char** argv){
 
     if(tcsetattr(port_fd, TCSANOW, &newtio) == -1) { perror("tcsetattr"); exit(-1); }
 
-    // GET INPUT
-    char *buf = malloc(255*sizeof(char)); size_t n = 255;
-    fprintf(stderr, "Write here whatever you want to send the other computer:\n");
-    if(getline(&buf, &n, stdin) == -1){ perror("getline"); exit(-1); }
-    buf[strlen(buf)-1] = '\0';
-    // WRITE TO PORT
-    int res = write(port_fd, buf, strlen(buf)+1);
-    fprintf(stderr, "Wrote to port: \"%s\" (%d bytes)\n", buf, res);
+    (void) signal(SIGALRM, alarmHandler);
+    
+    char SET[5];
 
-    // GET RESEND
-    char resend_buf[255];
-    int i = 0;
-    do {
-        int res = read(port_fd, resend_buf+i, 1);
-    } while(buf[i++] != '\0');
-    fprintf(stderr, "Got resend: \"%s\" (%d bytes)\n", resend_buf, i);
+    SET[0] = FLAG;
+    SET[1] = A;
+    SET[2] = C;
+    SET[3] = BCC;
+    SET[4] = FLAG;
 
-    // VALIDATION
-    if(strcmp(buf, resend_buf) == 0) fprintf(stderr, "Resend is correct\n");
-    else                             fprintf(stderr, "Resend is not correct\n");
+    uaStateMachine state = Start;
+    int attempts = 0;
+    
+    while(attempts < 3 && state != Stop){
+        
+        attempts++;
+        timeout = 0;
+        alarm(3);
+        
+        // WRITE TO PORT
+        
+        int res = write(port_fd, SET, 5);
+        fprintf(stderr, "Wrote SET to port: \"%s\" (%d bytes)\n", SET, res);
+
+        // GET RESEND
+        
+        char resend_buf[5];
+        
+        int i = 0;
+        do {
+            int res = read(port_fd, resend_buf+i, 1);
+            if(res > 0){
+                state = updateUAStateMachine(state, resend_buf[i]);
+                i++;
+            }
+        } while(state != Stop && !timeout && i < 5);
+        
+        // VALIDATION
+        
+        fprintf(stderr, "Got resend: \"%s\" (%d bytes)\n", resend_buf, i);
+        if(state == Stop)   fprintf(stderr, "Resend is correct\n");
+        else                fprintf(stderr, "Failed\n");
+    }
 
     // RESTORE INITIAL PORT SETTINGS
     if(tcsetattr(port_fd, TCSANOW, &oldtio) == -1) { perror("tcsetattr"); exit(-1); }
     // CLOSE PORT
     close(port_fd);
-
-    free(buf);
 
     return 0;
 }
