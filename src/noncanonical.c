@@ -121,7 +121,7 @@ int main(int argc, char** argv){
 
     UA[0] = FLAG;
     UA[1] = A;
-    UA[2] = FLAG;
+    UA[2] = C;
     UA[3] = BCC;
     UA[4] = FLAG;
 
