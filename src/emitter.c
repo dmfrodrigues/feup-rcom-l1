@@ -1,5 +1,6 @@
 /*Non-Canonical Input Processing*/
 
+#include <errno.h>
 #include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -19,11 +20,11 @@
 #define FALSE 0
 #define TRUE 1
 
-int timeout=0;
+int timeout = 0;
 
 void alarmHandler(){
 	fprintf(stderr, "Emitter | WARNING: timeout\n");
-	timeout=1;
+	timeout = 1;
 }
 
 int main(int argc, char** argv){
@@ -37,7 +38,7 @@ int main(int argc, char** argv){
     // OPEN SERIAL PORT
     // O_RDWR   - Open for reading and writing
     // O_NOCTTY - Open serial port not as controlling tty, because we don't want to get killed if linenoise sends CTRL-C
-    int port_fd = open(argv[1], O_RDWR | O_NOCTTY | O_NONBLOCK);
+    int port_fd = open(argv[1], O_RDWR | O_NOCTTY);
     if(port_fd < 0){ perror(argv[1]); exit(-1); }
 
     // SAVE INITIAL PORT SETTINGS
@@ -59,7 +60,11 @@ int main(int argc, char** argv){
 
     if(tcsetattr(port_fd, TCSANOW, &newtio) == -1) { perror("tcsetattr"); exit(-1); }
 
-    (void) signal(SIGALRM, alarmHandler);
+    struct sigaction action;
+    action.sa_handler = alarmHandler;
+    sigemptyset(&action.sa_mask);
+    action.sa_flags = 0;
+    sigaction(SIGALRM, &action, NULL);
     
     uint8_t SET[5];
 
@@ -86,21 +91,26 @@ int main(int argc, char** argv){
         // Get UA
         do {
             uint8_t byte;
-            int res = read(port_fd, &byte, 1);
+            res = read(port_fd, &byte, 1);
             if(res == 1){
                 fprintf(stderr, "Emitter | Read byte 0x%02X\n", byte);
                 fprintf(stderr, "Emitter | Transitioned from state %d", state);
                 state = update_su_state(state, byte);
                 fprintf(stderr, " to %d\n", state);
+            } else fprintf(stderr, "Emitter | WARNING: failed to read byte, res=%d\n", res);
+        } while(state != Stop && res == 1);
+        if(res != 1 || state != Stop){
+            if(errno == EINTR){
+                if(timeout) fprintf(stderr, "Emitter | WARNING: gave up due to timeout\n");
+                else        fprintf(stderr, "Emitter | ERROR: emitter was interrupted due to unknown reason\n");
+            } else {
+                perror("read");
             }
-        } while(state != Stop && !timeout);
-        if(timeout) {
-            fprintf(stderr, "Emitter | WARNING: gave up due to timeout\n");
-            continue;
+        } else {
+            // Validation
+            if(c_rcv == SP_C_UA && a_rcv == SP_A_SEND) fprintf(stderr, "Emitter | Got UA\n");
+            else                                       fprintf(stderr, "Emitter | ERROR: c_rcv or a_rcv are not correct\n");
         }
-        // Validation
-        if(c_rcv == SP_C_UA && a_rcv == SP_A_SEND) fprintf(stderr, "Emitter | Got UA\n");
-        else                                       fprintf(stderr, "Emitter | ERROR: c_rcv or a_rcv are not correct\n");
     }
 
     // Restore initial port settings
