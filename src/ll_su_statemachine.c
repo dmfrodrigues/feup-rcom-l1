@@ -3,7 +3,7 @@
 
 #include "flags.h"
 
-su_state_t update_su_state(su_state_t state, uint8_t byte){
+ll_su_state_t ll_su_state_update(ll_su_state_t state, uint8_t byte){
     switch (state) {
     case Start:
         switch(byte){

@@ -6,12 +6,10 @@ typedef struct {
     unsigned int retransmissions;
 } ll_config_t;
 
-enum ll_status {
+typedef enum {
     TRANSMITTER,
     RECEIVER
-};
-
-typedef enum ll_status ll_status_t;
+} ll_status_t;
 
 ll_config_t ll_config;
 

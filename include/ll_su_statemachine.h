@@ -15,10 +15,10 @@ typedef enum {
     C_RCV,      // Received control byte
     BCC_OK,     // Received BCC, and it is correct
     Stop        // W
-} su_state_t;
+} ll_su_state_t;
 
 uint8_t sm_a_rcv, sm_c_rcv;
 
-su_state_t update_su_state(su_state_t state, uint8_t byte) __attribute__((warn_unused_result));
+ll_su_state_t ll_su_state_update(ll_su_state_t state, uint8_t byte) __attribute__((warn_unused_result));
 
 #endif

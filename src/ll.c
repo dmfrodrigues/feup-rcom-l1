@@ -78,14 +78,14 @@ int ll_send_UA(int port_fd){
 }
 
 int ll_expect_SUframe(int port_fd, uint8_t *a_rcv, uint8_t *c_rcv){
-    su_state_t state = Start;
+    ll_su_state_t state = Start;
     do {
         uint8_t byte;
         int res = read(port_fd, &byte, 1);
         if(res == 1){
             fprintf(stderr, "Read byte 0x%02X\n", byte);
             fprintf(stderr, "Transitioned from state %d", state);
-            state = update_su_state(state, byte);
+            state = ll_su_state_update(state, byte);
             fprintf(stderr, " to %d\n", state);
         } else {
             perror("read");
