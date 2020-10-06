@@ -112,10 +112,10 @@ int llopen(int com, ll_status_t status){
     // O_RDWR   - Open for reading and writing
     // O_NOCTTY - Open serial port not as controlling tty, because we don't want to get killed if linenoise sends CTRL-C
     int port_fd = open(port_path, O_RDWR | O_NOCTTY);
-    if(port_fd < 0){ perror(port_path); exit(-1); }
+    if(port_fd < 0){ perror(port_path); return EXIT_FAILURE; }
 
     // Save initial port settings
-    if(tcgetattr(port_fd, &oldtio) == -1) { perror("tcgetattr"); exit(-1); }
+    if(tcgetattr(port_fd, &oldtio) == -1) { perror("tcgetattr"); return EXIT_FAILURE; }
 
     // Set port settings
     // VTIME and VMIN should be changed to protect reads of the following character(s) with a timer
@@ -131,7 +131,7 @@ int llopen(int com, ll_status_t status){
 
     tcflush(port_fd, TCIOFLUSH);    // flush data received but not read, and data written but not transmitted
 
-    if(tcsetattr(port_fd, TCSANOW, &newtio) == -1) { perror("tcsetattr"); exit(-1); }
+    if(tcsetattr(port_fd, TCSANOW, &newtio) == -1) { perror("tcsetattr"); return EXIT_FAILURE; }
 
     int res;
 
@@ -186,7 +186,7 @@ int llopen(int com, ll_status_t status){
 
 int llclose(int port_fd){
     // Restore initial port settings
-    if(tcsetattr(port_fd, TCSANOW, &oldtio) == -1) { perror("tcsetattr"); exit(-1); }
+    if(tcsetattr(port_fd, TCSANOW, &oldtio) == -1) { perror("tcsetattr"); return EXIT_FAILURE; }
     // Close port
     close(port_fd);
 
