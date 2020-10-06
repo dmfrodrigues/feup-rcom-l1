@@ -17,12 +17,14 @@ CFLAGS 	=-Wall -g #-O3
 EMITTER_O_FILES =$(ODIR)/writenoncanonical.o
 RECEIVER_O_FILES=$(ODIR)/noncanonical.o
 
+O_FILES=$(ODIR)/statemachine.o
+
 all: $(EMITTER) $(RECEIVER)
 
-$(EMITTER): $(EMITTER_O_FILES)
+$(EMITTER): $(EMITTER_O_FILES) $(O_FILES)
 	$(CC) $^ -o $@
 
-$(RECEIVER): $(RECEIVER_O_FILES)
+$(RECEIVER): $(RECEIVER_O_FILES) $(O_FILES)
 	$(CC) $^ -o $@
 
 $(ODIR):
