@@ -23,15 +23,15 @@ test2: $(EMITTER) $(RECEIVER)
 
 test3: $(EMITTER) $(RECEIVER)
 	echo ==================== $@ ====================
-	$(CALL_EMITTER)
+	$(CALL_EMITTER) &
 	sleep 0.5
-	$(CALL_RECEIVER) &
+	$(CALL_RECEIVER)
 	
 test4: $(EMITTER) $(RECEIVER)
 	echo ==================== $@ ====================
-	$(CALL_EMITTER)
+	$(CALL_EMITTER) &
 	sleep 1.5
-	$(CALL_RECEIVER) &
+	$(CALL_RECEIVER)
 
 clean:
 	make -C .. clean
