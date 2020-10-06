@@ -9,7 +9,10 @@
 #include <termios.h>
 #include <unistd.h>
 #include <signal.h>
+
+#include "flags.h"
 #include "statemachine.h"
+#include "utils.h"
 
 #define BAUDRATE B38400
 #define _POSIX_SOURCE 1 /* POSIX compliant source */
@@ -58,13 +61,13 @@ int main(int argc, char** argv){
 
     (void) signal(SIGALRM, alarmHandler);
     
-    char SET[5];
+    uint8_t SET[5];
 
-    SET[0] = FLAG;
-    SET[1] = A;
-    SET[2] = C;
-    SET[3] = BCC;
-    SET[4] = FLAG;
+    SET[0] = SP_FLAG;
+    SET[1] = SP_A_SEND;
+    SET[2] = SP_C_SET;
+    SET[3] = bcc(SET+1, SET+3);
+    SET[4] = SP_FLAG;
 
     stateMachine state = Start;
     int attempts = 0;
@@ -82,7 +85,7 @@ int main(int argc, char** argv){
 
         // GET RESEND
         
-        char resend_buf[5];
+        uint8_t resend_buf[5];
         
         int i = 0;
         do {

@@ -8,7 +8,10 @@
 #include <sys/types.h>
 #include <termios.h>
 #include <unistd.h>
+
+#include "flags.h"
 #include "statemachine.h"
+#include "utils.h"
 
 #define BAUDRATE B38400
 #define _POSIX_SOURCE 1 /* POSIX compliant source */
@@ -48,18 +51,18 @@ int main(int argc, char** argv){
     if(tcsetattr(port_fd, TCSANOW, &newtio) == -1) { perror("tcsetattr"); exit(-1); }
 
     
-    char UA[5];
+    uint8_t UA[5];
 
-    UA[0] = FLAG;
-    UA[1] = A;
-    UA[2] = C;
-    UA[3] = BCC;
-    UA[4] = FLAG;
+    UA[0] = SP_FLAG;
+    UA[1] = SP_A_SEND;
+    UA[2] = SP_C_UA;
+    UA[3] = bcc(UA+1, UA+3);
+    UA[4] = SP_FLAG;
 
     stateMachine state = Start;
 
     // OUTPUT
-    char buf[5];
+    uint8_t buf[5];
     int i = 0;
     do {
         int res = read(port_fd, buf+i, 1);

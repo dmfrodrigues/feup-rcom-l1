@@ -1,12 +1,7 @@
 #ifndef _STATEMACHINE_H_
 #define _STATEMACHINE_H_
 
-// [FLAG,A,C,BCC,FLAG]
-// flag = 01111110; A=11; C=11; BCC = A XOR C 
-#define FLAG 0x7E
-#define A 0x03
-#define C 0x03
-#define BCC (A^C)
+#include <stdint.h>
 
 typedef enum {
     Start,      // Start state
@@ -17,6 +12,6 @@ typedef enum {
     Stop        // W
 } stateMachine;
 
-stateMachine updateStateMachine(stateMachine state, char byte);
+stateMachine updateStateMachine(stateMachine state, uint8_t byte);
 
 #endif
