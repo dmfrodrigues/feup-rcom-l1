@@ -53,6 +53,7 @@ uaStateMachine updateUAStateMachine(uaStateMachine state, char byte){
         switch(byte){
             case A   : a_rcv = byte; state = A_RCV   ; break;
             case FLAG:               state = Flag_RCV; break;
+            default  :               state = Start   ; break;
         } break;
     case A_RCV:
         switch(byte){
