@@ -51,6 +51,32 @@ tcflag_t ll_get_baud_rate(void){
     ll_config.baud_rate = 230400; return B230400;
 }
 
+int ll_send_SET(int port_fd){
+    uint8_t SET[5];
+    SET[0] = SP_FLAG;
+    SET[1] = SP_A_SEND;
+    SET[2] = SP_C_SET;
+    SET[3] = bcc(SET+1, SET+3);
+    SET[4] = SP_FLAG;
+
+    int res = write(port_fd, SET, sizeof(SET));
+    if(res == sizeof(SET)) fprintf(stderr, "Sent SET\n");
+    return res;
+}
+
+int ll_send_UA(int port_fd){
+    uint8_t UA[5];
+    UA[0] = SP_FLAG;
+    UA[1] = SP_A_SEND;
+    UA[2] = SP_C_UA;
+    UA[3] = bcc(UA+1, UA+3);
+    UA[4] = SP_FLAG;
+
+    int res = write(port_fd, UA, sizeof(UA));
+    if(res == sizeof(UA))  fprintf(stderr, "Sent UA\n");
+    return res;
+}
+
 struct termios oldtio;
 
 int llopen(int com, ll_status_t status){
@@ -89,14 +115,6 @@ int llopen(int com, ll_status_t status){
         sigemptyset(&action.sa_mask);
         action.sa_flags = 0;
         sigaction(SIGALRM, &action, NULL);
-        
-        uint8_t SET[5];
-
-        SET[0] = SP_FLAG;
-        SET[1] = SP_A_SEND;
-        SET[2] = SP_C_SET;
-        SET[3] = bcc(SET+1, SET+3);
-        SET[4] = SP_FLAG;
 
         su_state_t state = Start;
         int attempts = 0;
@@ -108,9 +126,7 @@ int llopen(int com, ll_status_t status){
             alarm(3);
             
             // Send SET
-            int res = write(port_fd, SET, 5);
-            if(res != 5) perror("write");
-            else         fprintf(stderr, "Emitter | Sent SET\n");
+            int res = ll_send_SET(port_fd);
 
             // Get UA
             do {
@@ -152,18 +168,7 @@ int llopen(int com, ll_status_t status){
         if(c_rcv == SP_C_SET && a_rcv == SP_A_SEND){
             fprintf(stderr, "Receiver | Got SET, address=0x%02X\n", a_rcv);
             
-            // Create UA
-            uint8_t UA[5];
-            UA[0] = SP_FLAG;
-            UA[1] = SP_A_SEND;
-            UA[2] = SP_C_UA;
-            UA[3] = bcc(UA+1, UA+3);
-            UA[4] = SP_FLAG;
-
-            // Send UA
-            int res = write(port_fd, UA, sizeof(UA));
-            if(res == sizeof(UA)) fprintf(stderr, "Receiver | Sent UA\n");
-            else                  perror("write");
+            int res = ll_send_UA(port_fd);
         } else {
             fprintf(stderr, "Receiver | ERROR\n");
         }
