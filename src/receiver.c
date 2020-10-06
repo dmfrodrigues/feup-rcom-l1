@@ -55,10 +55,12 @@ int main(int argc, char** argv){
     do {
         uint8_t byte;
         int res = read(port_fd, &byte, 1);
-        fprintf(stderr, "Receiver | Read byte 0x%02X ('%c')\n", byte, (char)byte);
-        fprintf(stderr, "Receiver | Transitioned from state %d", state);
-        state = update_su_state(state, byte);
-        fprintf(stderr, " to %d\n", state);
+        if(res == 1){
+            fprintf(stderr, "Receiver | Read byte 0x%02X\n", byte);
+            fprintf(stderr, "Receiver | Transitioned from state %d", state);
+            state = update_su_state(state, byte);
+            fprintf(stderr, " to %d\n", state);
+        } else perror("read");
     } while(state != Stop);
     if(c_rcv == SP_C_SET && a_rcv == SP_A_SEND){
         fprintf(stderr, "Receiver | Got SET, address=0x%02X\n", a_rcv);
@@ -73,14 +75,16 @@ int main(int argc, char** argv){
 
         // Send UA
         int res = write(port_fd, UA, sizeof(UA));
-        fprintf(stderr, "Receiver | Sent UA\n");
+        if(res == sizeof(UA)) fprintf(stderr, "Receiver | Sent UA\n");
+        else                  perror("write");
     } else {
         fprintf(stderr, "Receiver | ERROR\n");
     }
 
-    // RESTORE INITIAL PORT SETTINGS
+    // Restore initial port settings
     tcsetattr(port_fd, TCSANOW, &oldtio);
-    // CLOSE PORT
+    // Close port
     close(port_fd);
+
     return 0;
 }

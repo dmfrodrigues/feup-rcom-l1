@@ -22,7 +22,7 @@
 int timeout=0;
 
 void alarmHandler(){
-	printf("TIMEOUT\n");
+	fprintf(stderr, "Emitter | WARNING: timeout\n");
 	timeout=1;
 }
 
@@ -78,34 +78,32 @@ int main(int argc, char** argv){
         timeout = 0;
         alarm(3);
         
-        // WRITE TO PORT
-        
+        // Send SET
         int res = write(port_fd, SET, 5);
-        fprintf(stderr, "Wrote SET to port: \"%s\" (%d bytes)\n", SET, res);
+        if(res != 5) perror("write");
+        else         fprintf(stderr, "Emitter | Sent SET\n");
 
-        // GET RESEND
-        
-        uint8_t resend_buf[5];
-        
-        int i = 0;
+        // Get UA
         do {
-            int res = read(port_fd, resend_buf+i, 1);
+            uint8_t byte;
+            int res = read(port_fd, &byte, 1);
             if(res > 0){
-                state = update_su_state(state, resend_buf[i]);
-                i++;
+                fprintf(stderr, "Emitter | Read byte 0x%02X\n", byte);
+                state = update_su_state(state, byte);
             }
-        } while(state != Stop && !timeout && i < 5);
-        
-        // VALIDATION
-        
-        fprintf(stderr, "Got resend: \"%s\" (%d bytes)\n", resend_buf, i);
-        if(state == Stop)   fprintf(stderr, "Resend is correct\n");
-        else                fprintf(stderr, "Failed\n");
+        } while(state != Stop && !timeout);
+        if(timeout) {
+            fprintf(stderr, "Emitter | WARNING: gave up due to timeout\n");
+            continue;
+        }
+        // Validation
+        if(c_rcv == SP_C_UA && a_rcv == SP_A_SEND) fprintf(stderr, "Emitter | Got UA\n");
+        else                                       fprintf(stderr, "Emitter | ERROR: c_rcv or a_rcv are not correct\n");
     }
 
-    // RESTORE INITIAL PORT SETTINGS
+    // Restore initial port settings
     if(tcsetattr(port_fd, TCSANOW, &oldtio) == -1) { perror("tcsetattr"); exit(-1); }
-    // CLOSE PORT
+    // Close port
     close(port_fd);
 
     return 0;
