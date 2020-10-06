@@ -25,14 +25,13 @@
 
 char a_rcv, c_rcv;
 
-typedef enum
-{
-    Start,
-    Flag_RCV,
-    A_RCV,
-    C_RCV,
-    BCC_OK,
-    Stop
+typedef enum {
+    Start,      // Start state
+    Flag_RCV,   // Received flag
+    A_RCV,      // Received address
+    C_RCV,      // Received control byte
+    BCC_OK,     // Received BCC, and it is correct
+    Stop        // W
 } uaStateMachine;
 
 int timeout=0;
@@ -44,49 +43,38 @@ void alarmHandler(){
 
 
 uaStateMachine updateUAStateMachine(uaStateMachine state, char byte){
-    switch (state)
-    {
+    switch (state) {
     case Start:
-        if(byte == FLAG)
-            state = Flag_RCV;
-        break;
+        switch(byte){
+            case FLAG:               state = Flag_RCV; break;
+            default  :               state = Start   ; break;
+        } break;
     case Flag_RCV:
-        if(byte == A){
-            a_rcv = byte;
-            state = A_RCV;
-        }
-        else if(byte == FLAG)
-            state = Flag_RCV;
-        else
-            state = Start;
-        break;
+        switch(byte){
+            case A   : a_rcv = byte; state = A_RCV   ; break;
+            case FLAG:               state = Flag_RCV; break;
+        } break;
     case A_RCV:
-        if(byte == C){
-            c_rcv = byte;
-            state = C_RCV;
-        }
-        else if(byte == FLAG)
-            state = Flag_RCV;
-        else
-            state = Start;
-        break;
+        switch(byte){
+            case C   : c_rcv = byte; state = C_RCV   ; break;
+            case FLAG:               state = Flag_RCV; break;
+            default  :               state = Start   ; break;
+        } break;
     case C_RCV:
-        if(byte == (a_rcv^c_rcv))
-            state = BCC_OK;
-        else if(byte == FLAG)
-            state = Flag_RCV;
-        else
-            state = Start;
-        break;
+        switch(byte){
+            case FLAG: state = Flag_RCV; break;
+            default  : state = (byte == (a_rcv^c_rcv) ? BCC_OK : Start); break;
+        } break;
     case BCC_OK:
-        if(byte == FLAG)
-            state = Stop;
-        else
-            state = Start;
-        break;
+        switch(byte){
+            case FLAG: state = Stop ; break;
+            default  : state = Start; break;
+        } break;
     case Stop:
+        state = Stop;
         break;
     default:
+        fprintf(stderr, "No such state %d\n", state);
         break;
     }
     fprintf(stderr, "(debug) STATE: %d \n", state);
