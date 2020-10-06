@@ -18,7 +18,7 @@
 
 ll_config_t ll_config = {
     .baud_rate       = 38400,
-    .timeout         = 3000,
+    .timeout         = 3,
     .retransmissions = 3
 };
 
@@ -119,11 +119,11 @@ int llopen(int com, ll_status_t status){
         su_state_t state = Start;
         int attempts = 0;
         
-        while(attempts < 3 && state != Stop){
+        while(attempts < ll_config.retransmissions && state != Stop){
             
             attempts++;
             timeout = 0;
-            alarm(3);
+            alarm(ll_config.timeout);
             
             // Send SET
             int res = ll_send_SET(port_fd);
@@ -152,6 +152,7 @@ int llopen(int com, ll_status_t status){
                 else                                       fprintf(stderr, "Emitter | ERROR: c_rcv or a_rcv are not correct\n");
             }
         }
+        alarm(0);
     } else if(status == RECEIVER){
         // Get SET
         su_state_t state = Start;
