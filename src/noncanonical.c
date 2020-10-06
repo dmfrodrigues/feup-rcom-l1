@@ -62,7 +62,7 @@ int main(int argc, char** argv){
     stateMachine state = Start;
 
     // OUTPUT
-    uint8_t buf[5];
+    char buf[5];
     int i = 0;
     do {
         int res = read(port_fd, buf+i, 1);
