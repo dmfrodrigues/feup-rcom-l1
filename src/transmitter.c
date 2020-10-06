@@ -1,15 +1,10 @@
-/*Non-Canonical Input Processing*/
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include "ll.h"
 
-#define BAUDRATE B38400
 #define _POSIX_SOURCE 1 /* POSIX compliant source */
-#define FALSE 0
-#define TRUE 1
 
 int main(int argc, char** argv){
 

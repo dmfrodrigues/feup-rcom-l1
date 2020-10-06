@@ -1,8 +1,8 @@
-EMITTER	=./emitter
-RECEIVER=./receiver
-SDIR	=./src
-IDIR	=./include
-ODIR   	=./obj
+TRANSMITTER=./transmitter
+RECEIVER   =./receiver
+SDIR	   =./src
+IDIR	   =./include
+ODIR   	   =./obj
 
 CC		=gcc
 
@@ -14,14 +14,14 @@ CFLAGS_PARANOID =-Wall -Wextra -Wformat-nonliteral -Wcast-align -Wpointer-arith 
 CFLAGS 	=-Wall -g #-O3
 #CFLAGS=$(CFLAGS_PARANOID)
 
-EMITTER_O_FILES =$(ODIR)/emitter.o
-RECEIVER_O_FILES=$(ODIR)/receiver.o
+TRANSMITTER_O_FILES=$(ODIR)/transmitter.o
+RECEIVER_O_FILES   =$(ODIR)/receiver.o
 
 O_FILES=$(ODIR)/statemachine.o $(ODIR)/utils.o $(ODIR)/ll.o
 
-all: $(EMITTER) $(RECEIVER)
+all: $(TRANSMITTER) $(RECEIVER)
 
-$(EMITTER): $(EMITTER_O_FILES) $(O_FILES)
+$(TRANSMITTER): $(TRANSMITTER_O_FILES) $(O_FILES)
 	$(CC) $^ -o $@
 
 $(RECEIVER): $(RECEIVER_O_FILES) $(O_FILES)

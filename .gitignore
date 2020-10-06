@@ -24,4 +24,5 @@ main
 lib*.a
 *.zip
 emitter
+transmitter
 receiver

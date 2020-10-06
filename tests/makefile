@@ -1,42 +1,42 @@
-EMITTER	=../emitter
-RECEIVER=../receiver
+TRANSMITTER=../transmitter
+RECEIVER   =../receiver
 
-EMITTER_PORT =/dev/ttyS10
-RECEIVER_PORT=/dev/ttyS11
+TRANSMITTER_PORT=11
+RECEIVER_PORT   =12
 
-CALL_EMITTER =$(EMITTER) $(EMITTER_PORT)
-CALL_RECEIVER=$(RECEIVER) $(RECEIVER_PORT)
+CALL_TRANSMITTER=$(TRANSMITTER) $(TRANSMITTER_PORT)
+CALL_RECEIVER   =$(RECEIVER) $(RECEIVER_PORT)
 
 all:
 
 test: clean test1 test2 test3 test4
 
-test1: $(EMITTER)
+test1: $(TRANSMITTER)
 	@echo ==================== $@ ====================
-	$(CALL_EMITTER)
+	$(CALL_TRANSMITTER)
 
-test2: $(EMITTER) $(RECEIVER)
+test2: $(TRANSMITTER) $(RECEIVER)
 	@echo ==================== $@ ====================
 	$(CALL_RECEIVER) &
 	sleep 1
-	$(CALL_EMITTER)
+	$(CALL_TRANSMITTER)
 
-test3: $(EMITTER) $(RECEIVER)
+test3: $(TRANSMITTER) $(RECEIVER)
 	@echo ==================== $@ ====================
-	$(CALL_EMITTER) &
+	$(CALL_TRANSMITTER) &
 	sleep 0.5
 	$(CALL_RECEIVER)
 	
-test4: $(EMITTER) $(RECEIVER)
+test4: $(TRANSMITTER) $(RECEIVER)
 	@echo ==================== $@ ====================
-	$(CALL_EMITTER) &
+	$(CALL_TRANSMITTER) &
 	sleep 1.5
 	$(CALL_RECEIVER)
 
 clean:
 	make -C .. clean
 
-$(EMITTER):
+$(TRANSMITTER):
 	make -C ..
 
 $(RECEIVER):
