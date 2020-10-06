@@ -59,14 +59,14 @@ int main(int argc, char** argv){
     UA[3] = bcc(UA+1, UA+3);
     UA[4] = SP_FLAG;
 
-    stateMachine state = Start;
+    su_state_t state = Start;
 
     // OUTPUT
     char buf[5];
     int i = 0;
     do {
         int res = read(port_fd, buf+i, 1);
-        updateStateMachine(state, buf[i]);
+        update_su_state(state, buf[i]);
         i++;
     } while(state != Stop && i < 5);
     fprintf(stderr, "Received: \"%s\" (%d bytes) [", buf, i);

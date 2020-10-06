@@ -3,6 +3,11 @@
 
 #include <stdint.h>
 
+/**
+ * State of state machine to receive a S-frame or a U-frame.
+ * S-frame: supervisory frames
+ * U-frame: unnumbered frames
+ */
 typedef enum {
     Start,      // Start state
     Flag_RCV,   // Received flag
@@ -10,8 +15,10 @@ typedef enum {
     C_RCV,      // Received control byte
     BCC_OK,     // Received BCC, and it is correct
     Stop        // W
-} stateMachine;
+} su_state_t;
 
-stateMachine updateStateMachine(stateMachine state, uint8_t byte);
+uint8_t a_rcv, c_rcv;
+
+su_state_t update_su_state(su_state_t state, uint8_t byte);
 
 #endif

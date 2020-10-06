@@ -69,7 +69,7 @@ int main(int argc, char** argv){
     SET[3] = bcc(SET+1, SET+3);
     SET[4] = SP_FLAG;
 
-    stateMachine state = Start;
+    su_state_t state = Start;
     int attempts = 0;
     
     while(attempts < 3 && state != Stop){
@@ -91,7 +91,7 @@ int main(int argc, char** argv){
         do {
             int res = read(port_fd, resend_buf+i, 1);
             if(res > 0){
-                state = updateStateMachine(state, resend_buf[i]);
+                state = update_su_state(state, resend_buf[i]);
                 i++;
             }
         } while(state != Stop && !timeout && i < 5);

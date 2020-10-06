@@ -3,9 +3,7 @@
 
 #include "flags.h"
 
-uint8_t a_rcv, c_rcv;
-
-stateMachine updateStateMachine(stateMachine state, uint8_t byte){
+su_state_t update_su_state(su_state_t state, uint8_t byte){
     switch (state) {
     case Start:
         switch(byte){
