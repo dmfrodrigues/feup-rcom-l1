@@ -129,6 +129,8 @@ int llopen(int com, ll_status_t status){
 
     if(tcsetattr(port_fd, TCSANOW, &newtio) == -1) { perror("tcsetattr"); exit(-1); }
 
+    int res;
+
     if(status == TRANSMITTER){
         struct sigaction action;
         action.sa_handler = alarmHandler;
@@ -136,41 +138,42 @@ int llopen(int com, ll_status_t status){
         action.sa_flags = 0;
         sigaction(SIGALRM, &action, NULL);
 
-        int attempts = 0;
-        
-        while(attempts < ll_config.retransmissions){
-            
-            attempts++;
+        int attempts;
+        for(attempts = 0; attempts < ll_config.retransmissions; ++attempts){
             timeout = 0;
             alarm(ll_config.timeout);
             
             // Send SET
-            int res = ll_send_SET(port_fd);
+            res = ll_send_SET(port_fd);
 
             // Get UA
             uint8_t a_rcv, c_rcv;
             res = ll_expect_SUframe(port_fd, &a_rcv, &c_rcv);
+            
+            // Validate UA
             if(res){
                 if(errno == EINTR){
-                    if(timeout) fprintf(stderr, "Emitter | WARNING: gave up due to timeout\n");
-                    else        fprintf(stderr, "Emitter | ERROR: emitter was interrupted due to unknown reason\n");
+                    if(timeout) fprintf(stderr, "WARNING: gave up due to timeout\n");
+                    else        fprintf(stderr, "ERROR: emitter was interrupted due to unknown reason\n");
                 } else perror("read");
             } else if(c_rcv == SP_C_UA && a_rcv == SP_A_SEND){
-                fprintf(stderr, "Emitter | Got UA\n");
+                fprintf(stderr, "Got UA\n");
                 break;
-            } else fprintf(stderr, "Emitter | ERROR: c_rcv or a_rcv are not correct\n");
+            } else fprintf(stderr, "ERROR: c_rcv or a_rcv are not correct\n");
         }
+        if(attempts == ll_config.retransmissions) return EXIT_FAILURE;
         alarm(0);
     } else if(status == RECEIVER){
         // Get SET
         uint8_t a_rcv, c_rcv;
-        int res = ll_expect_SUframe(port_fd, &a_rcv, &c_rcv);
-        if(sm_c_rcv == SP_C_SET && sm_a_rcv == SP_A_SEND){
-            fprintf(stderr, "Receiver | Got SET, address=0x%02X\n", sm_a_rcv);
-            
-            int res = ll_send_UA(port_fd);
+        res = ll_expect_SUframe(port_fd, &a_rcv, &c_rcv);
+        if(res){
+            perror("read");
+        } else if(a_rcv == SP_C_SET && c_rcv == SP_A_SEND){
+            fprintf(stderr, "Got SET\n");
+            res = ll_send_UA(port_fd);
         } else {
-            fprintf(stderr, "Receiver | ERROR\n");
+            fprintf(stderr, "ERROR: c_rcv or a_rcv are not correct\n");
         }
     }
 
