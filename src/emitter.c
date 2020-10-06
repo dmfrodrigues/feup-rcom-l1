@@ -87,7 +87,7 @@ int main(int argc, char** argv){
         do {
             uint8_t byte;
             int res = read(port_fd, &byte, 1);
-            if(res > 0){
+            if(res == 1){
                 fprintf(stderr, "Emitter | Read byte 0x%02X\n", byte);
                 fprintf(stderr, "Emitter | Transitioned from state %d", state);
                 state = update_su_state(state, byte);
