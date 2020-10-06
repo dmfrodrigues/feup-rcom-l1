@@ -50,33 +50,33 @@ int main(int argc, char** argv){
 
     if(tcsetattr(port_fd, TCSANOW, &newtio) == -1) { perror("tcsetattr"); exit(-1); }
 
-    
-    uint8_t UA[5];
-
-    UA[0] = SP_FLAG;
-    UA[1] = SP_A_SEND;
-    UA[2] = SP_C_UA;
-    UA[3] = bcc(UA+1, UA+3);
-    UA[4] = SP_FLAG;
-
+    // Get SET
     su_state_t state = Start;
-
-    // OUTPUT
-    char buf[5];
-    int i = 0;
     do {
-        int res = read(port_fd, buf+i, 1);
-        update_su_state(state, buf[i]);
-        i++;
-    } while(state != Stop && i < 5);
-    fprintf(stderr, "Received: \"%s\" (%d bytes) [", buf, i);
-    for(int i = 0; i < strlen(buf)+1; ++i) fprintf(stderr, "0x%02X ", buf[i]);
-    fprintf(stderr, "]\n");
-    // RESEND
-    int res = write(port_fd, UA, 5);
-    fprintf(stderr, "SENT UA: \"%s\" (%d bytes) [", UA, res);
-    for(int i = 0; i < 5; ++i) fprintf(stderr, "0x%02X ", UA[i]);
-    fprintf(stderr, "]\n");
+        uint8_t byte;
+        int res = read(port_fd, &byte, 1);
+        fprintf(stderr, "Receiver | Read byte 0x%02X ('%c')\n", byte, (char)byte);
+        fprintf(stderr, "Receiver | Transitioned from state %d", state);
+        update_su_state(state, byte);
+        fprintf(stderr, " to %d\n", state);
+    } while(state != Stop);
+    if(c_rcv == SP_C_SET && a_rcv == SP_A_SEND){
+        fprintf(stderr, "Receiver | Got SET, address=0x%02X\n", a_rcv);
+        
+        // Create UA
+        uint8_t UA[5];
+        UA[0] = SP_FLAG;
+        UA[1] = SP_A_SEND;
+        UA[2] = SP_C_UA;
+        UA[3] = bcc(UA+1, UA+3);
+        UA[4] = SP_FLAG;
+
+        // Send UA
+        int res = write(port_fd, UA, sizeof(UA));
+        fprintf(stderr, "Receiver | Sent UA\n");
+    } else {
+        fprintf(stderr, "Receiver | ERROR\n");
+    }
 
     // RESTORE INITIAL PORT SETTINGS
     tcsetattr(port_fd, TCSANOW, &oldtio);

@@ -15,7 +15,7 @@ CFLAGS 	=-Wall -g #-O3
 #CFLAGS=$(CFLAGS_PARANOID)
 
 EMITTER_O_FILES =$(ODIR)/writenoncanonical.o
-RECEIVER_O_FILES=$(ODIR)/noncanonical.o
+RECEIVER_O_FILES=$(ODIR)/receiver.o
 
 O_FILES=$(ODIR)/statemachine.o $(ODIR)/utils.o
 
