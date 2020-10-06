@@ -132,15 +132,18 @@ int main(int argc, char** argv){
     int i = 0;
     do {
         int res = read(port_fd, buf+i, 1);
+        fprintf(stderr, "Got: 0x%02X (%c)\n", buf[i], buf[i]);
         updateSetStateMachine(state, buf[i]);
         i++;
     } while(state != Stop && i < 5);
-    fprintf(stderr, "Received: \"%s\" (%d bytes)\n", buf, i);
-
+    fprintf(stderr, "Received: \"%s\" (%d bytes) [", buf, i);
+    for(int i = 0; i < strlen(buf)+1; ++i) fprintf(stderr, "0x%02X ", buf[i]);
+    fprintf(stderr, "]\n");
     // RESEND
     int res = write(port_fd, UA, 5);
-    fprintf(stderr, "SENT UA: \"%s\" (%d bytes)\n", UA, res);
-    
+    fprintf(stderr, "SENT UA: \"%s\" (%d bytes) [", UA, res);
+    for(int i = 0; i < 5; ++i) fprintf(stderr, "0x%02X ", UA[i]);
+    fprintf(stderr, "]\n");
 
     // RESTORE INITIAL PORT SETTINGS
     tcsetattr(port_fd, TCSANOW, &oldtio);
