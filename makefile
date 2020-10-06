@@ -17,7 +17,7 @@ CFLAGS 	=-Wall -g #-O3
 TRANSMITTER_O_FILES=$(ODIR)/transmitter.o
 RECEIVER_O_FILES   =$(ODIR)/receiver.o
 
-O_FILES=$(ODIR)/statemachine.o $(ODIR)/utils.o $(ODIR)/ll.o
+O_FILES=$(ODIR)/ll_su_statemachine.o $(ODIR)/utils.o $(ODIR)/ll.o
 
 all: $(TRANSMITTER) $(RECEIVER)
 
