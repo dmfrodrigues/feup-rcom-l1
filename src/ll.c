@@ -77,6 +77,26 @@ int ll_send_UA(int port_fd){
     return res;
 }
 
+int ll_expect_SUframe(int port_fd, uint8_t *a_rcv, uint8_t *c_rcv){
+    su_state_t state = Start;
+    do {
+        uint8_t byte;
+        int res = read(port_fd, &byte, 1);
+        if(res == 1){
+            fprintf(stderr, "Read byte 0x%02X\n", byte);
+            fprintf(stderr, "Transitioned from state %d", state);
+            state = update_su_state(state, byte);
+            fprintf(stderr, " to %d\n", state);
+        } else {
+            perror("read");
+            return EXIT_FAILURE;
+        }
+    } while(state != Stop);
+    *a_rcv = sm_a_rcv;
+    *c_rcv = sm_c_rcv;
+    return EXIT_SUCCESS;
+}
+
 struct termios oldtio;
 
 int llopen(int com, ll_status_t status){
@@ -116,10 +136,9 @@ int llopen(int com, ll_status_t status){
         action.sa_flags = 0;
         sigaction(SIGALRM, &action, NULL);
 
-        su_state_t state = Start;
         int attempts = 0;
         
-        while(attempts < ll_config.retransmissions && state != Stop){
+        while(attempts < ll_config.retransmissions){
             
             attempts++;
             timeout = 0;
@@ -129,45 +148,25 @@ int llopen(int com, ll_status_t status){
             int res = ll_send_SET(port_fd);
 
             // Get UA
-            do {
-                uint8_t byte;
-                res = read(port_fd, &byte, 1);
-                if(res == 1){
-                    fprintf(stderr, "Emitter | Read byte 0x%02X\n", byte);
-                    fprintf(stderr, "Emitter | Transitioned from state %d", state);
-                    state = update_su_state(state, byte);
-                    fprintf(stderr, " to %d\n", state);
-                } else fprintf(stderr, "Emitter | WARNING: failed to read byte, res=%d\n", res);
-            } while(state != Stop && res == 1);
-            if(res != 1 || state != Stop){
+            uint8_t a_rcv, c_rcv;
+            res = ll_expect_SUframe(port_fd, &a_rcv, &c_rcv);
+            if(res){
                 if(errno == EINTR){
                     if(timeout) fprintf(stderr, "Emitter | WARNING: gave up due to timeout\n");
                     else        fprintf(stderr, "Emitter | ERROR: emitter was interrupted due to unknown reason\n");
-                } else {
-                    perror("read");
-                }
-            } else {
-                // Validation
-                if(c_rcv == SP_C_UA && a_rcv == SP_A_SEND) fprintf(stderr, "Emitter | Got UA\n");
-                else                                       fprintf(stderr, "Emitter | ERROR: c_rcv or a_rcv are not correct\n");
-            }
+                } else perror("read");
+            } else if(c_rcv == SP_C_UA && a_rcv == SP_A_SEND){
+                fprintf(stderr, "Emitter | Got UA\n");
+                break;
+            } else fprintf(stderr, "Emitter | ERROR: c_rcv or a_rcv are not correct\n");
         }
         alarm(0);
     } else if(status == RECEIVER){
         // Get SET
-        su_state_t state = Start;
-        do {
-            uint8_t byte;
-            int res = read(port_fd, &byte, 1);
-            if(res == 1){
-                fprintf(stderr, "Receiver | Read byte 0x%02X\n", byte);
-                fprintf(stderr, "Receiver | Transitioned from state %d", state);
-                state = update_su_state(state, byte);
-                fprintf(stderr, " to %d\n", state);
-            } else perror("read");
-        } while(state != Stop);
-        if(c_rcv == SP_C_SET && a_rcv == SP_A_SEND){
-            fprintf(stderr, "Receiver | Got SET, address=0x%02X\n", a_rcv);
+        uint8_t a_rcv, c_rcv;
+        int res = ll_expect_SUframe(port_fd, &a_rcv, &c_rcv);
+        if(sm_c_rcv == SP_C_SET && sm_a_rcv == SP_A_SEND){
+            fprintf(stderr, "Receiver | Got SET, address=0x%02X\n", sm_a_rcv);
             
             int res = ll_send_UA(port_fd);
         } else {
