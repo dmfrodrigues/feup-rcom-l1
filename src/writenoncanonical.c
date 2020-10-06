@@ -62,6 +62,7 @@ int main(int argc, char** argv){
     int sz = 0;
     do {
         int res = read(port_fd, resend_buf+sz, 1);
+        fprintf(stderr, "Got: 0x%02X (%c)\n", resend_buf[sz], resend_buf[sz]);
     } while(buf[sz++] != '\0');
     fprintf(stderr, "Got resend   : \"%s\" (%d bytes) [", resend_buf, sz);
     for(int i = 0; i < sz; ++i) fprintf(stderr, "0x%02X ", resend_buf[i]);

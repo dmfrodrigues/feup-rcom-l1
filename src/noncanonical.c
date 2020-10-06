@@ -51,6 +51,7 @@ int main(int argc, char** argv){
     int i = 0;
     do {
         int res = read(port_fd, buf+i, 1);
+        fprintf(stderr, "Got: 0x%02X (%c)\n", buf[i], buf[i]);
     } while(buf[i++] != '\0');
     fprintf(stderr, "Received: \"%s\" (%d bytes) [", buf, i);
     for(int i = 0; i < strlen(buf)+1; ++i) fprintf(stderr, "0x%02X ", buf[i]);
