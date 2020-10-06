@@ -42,6 +42,5 @@ su_state_t update_su_state(su_state_t state, uint8_t byte){
         fprintf(stderr, "No such state %d\n", state);
         break;
     }
-    fprintf(stderr, "(debug) STATE: %d \n", state);
     return state;
 }

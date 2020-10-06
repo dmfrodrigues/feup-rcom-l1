@@ -57,7 +57,7 @@ int main(int argc, char** argv){
         int res = read(port_fd, &byte, 1);
         fprintf(stderr, "Receiver | Read byte 0x%02X ('%c')\n", byte, (char)byte);
         fprintf(stderr, "Receiver | Transitioned from state %d", state);
-        update_su_state(state, byte);
+        state = update_su_state(state, byte);
         fprintf(stderr, " to %d\n", state);
     } while(state != Stop);
     if(c_rcv == SP_C_SET && a_rcv == SP_A_SEND){
