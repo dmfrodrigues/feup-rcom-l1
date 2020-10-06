@@ -9,77 +9,18 @@
 #include <termios.h>
 #include <unistd.h>
 #include <signal.h>
+#include "statemachine.h"
 
 #define BAUDRATE B38400
 #define _POSIX_SOURCE 1 /* POSIX compliant source */
 #define FALSE 0
 #define TRUE 1
 
-
-// [FLAG,A,C,BCC,FLAG]
-// flag = 01111110; A=11; C=11; BCC = A XOR C 
-#define FLAG 0x7E
-#define A 0x03
-#define C 0x03
-#define BCC (A^C)
-
-char a_rcv, c_rcv;
-
-typedef enum {
-    Start,      // Start state
-    Flag_RCV,   // Received flag
-    A_RCV,      // Received address
-    C_RCV,      // Received control byte
-    BCC_OK,     // Received BCC, and it is correct
-    Stop        // W
-} uaStateMachine;
-
 int timeout=0;
 
 void alarmHandler(){
 	printf("TIMEOUT\n");
 	timeout=1;
-}
-
-
-uaStateMachine updateUAStateMachine(uaStateMachine state, char byte){
-    switch (state) {
-    case Start:
-        switch(byte){
-            case FLAG:               state = Flag_RCV; break;
-            default  :               state = Start   ; break;
-        } break;
-    case Flag_RCV:
-        switch(byte){
-            case A   : a_rcv = byte; state = A_RCV   ; break;
-            case FLAG:               state = Flag_RCV; break;
-            default  :               state = Start   ; break;
-        } break;
-    case A_RCV:
-        switch(byte){
-            case C   : c_rcv = byte; state = C_RCV   ; break;
-            case FLAG:               state = Flag_RCV; break;
-            default  :               state = Start   ; break;
-        } break;
-    case C_RCV:
-        switch(byte){
-            case FLAG: state = Flag_RCV; break;
-            default  : state = (byte == (a_rcv^c_rcv) ? BCC_OK : Start); break;
-        } break;
-    case BCC_OK:
-        switch(byte){
-            case FLAG: state = Stop ; break;
-            default  : state = Start; break;
-        } break;
-    case Stop:
-        state = Stop;
-        break;
-    default:
-        fprintf(stderr, "No such state %d\n", state);
-        break;
-    }
-    fprintf(stderr, "(debug) STATE: %d \n", state);
-    return state;
 }
 
 int main(int argc, char** argv){
@@ -125,7 +66,7 @@ int main(int argc, char** argv){
     SET[3] = BCC;
     SET[4] = FLAG;
 
-    uaStateMachine state = Start;
+    stateMachine state = Start;
     int attempts = 0;
     
     while(attempts < 3 && state != Stop){
@@ -147,7 +88,7 @@ int main(int argc, char** argv){
         do {
             int res = read(port_fd, resend_buf+i, 1);
             if(res > 0){
-                state = updateUAStateMachine(state, resend_buf[i]);
+                state = updateStateMachine(state, resend_buf[i]);
                 i++;
             }
         } while(state != Stop && !timeout && i < 5);
