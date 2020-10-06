@@ -14,7 +14,7 @@ CFLAGS_PARANOID =-Wall -Wextra -Wformat-nonliteral -Wcast-align -Wpointer-arith 
 CFLAGS 	=-Wall -g #-O3
 #CFLAGS=$(CFLAGS_PARANOID)
 
-EMITTER_O_FILES =$(ODIR)/writenoncanonical.o
+EMITTER_O_FILES =$(ODIR)/emitter.o
 RECEIVER_O_FILES=$(ODIR)/receiver.o
 
 O_FILES=$(ODIR)/statemachine.o $(ODIR)/utils.o
