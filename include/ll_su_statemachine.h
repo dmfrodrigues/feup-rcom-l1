@@ -17,8 +17,11 @@ typedef enum {
     Stop        // W
 } ll_su_state_t;
 
-uint8_t sm_a_rcv, sm_c_rcv;
+typedef struct {
+    ll_su_state_t state;
+    uint8_t a_rcv, c_rcv;
+} ll_su_statemachine_t;
 
-ll_su_state_t ll_su_state_update(ll_su_state_t state, uint8_t byte) __attribute__((warn_unused_result));
+int ll_su_state_update(ll_su_statemachine_t *machine, uint8_t byte) __attribute__((warn_unused_result));
 
 #endif

@@ -78,22 +78,27 @@ int ll_send_UA(int port_fd){
 }
 
 int ll_expect_SUframe(int port_fd, uint8_t *a_rcv, uint8_t *c_rcv){
-    ll_su_state_t state = Start;
+    ll_su_statemachine_t machine = {
+        .state = Start,
+        .a_rcv = 0,
+        .c_rcv = 0
+    };
     do {
         uint8_t byte;
         int res = read(port_fd, &byte, 1);
         if(res == 1){
             fprintf(stderr, "Read byte 0x%02X\n", byte);
-            fprintf(stderr, "Transitioned from state %d", state);
-            state = ll_su_state_update(state, byte);
-            fprintf(stderr, " to %d\n", state);
+            fprintf(stderr, "Transitioned from state %d", machine.state);
+            res = ll_su_state_update(&machine, byte);
+            fprintf(stderr, " to %d\n", machine.state);
+            if(res) fprintf(stderr, "ERROR: failed to update state\n");
         } else {
             perror("read");
             return EXIT_FAILURE;
         }
-    } while(state != Stop);
-    *a_rcv = sm_a_rcv;
-    *c_rcv = sm_c_rcv;
+    } while(machine.state != Stop);
+    *a_rcv = machine.a_rcv;
+    *c_rcv = machine.c_rcv;
     return EXIT_SUCCESS;
 }
 

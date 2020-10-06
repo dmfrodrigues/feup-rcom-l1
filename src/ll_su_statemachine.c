@@ -1,46 +1,48 @@
-#include <stdio.h>
 #include "ll_su_statemachine.h"
+
+#include <stdio.h>
+#include <stdlib.h>
 
 #include "flags.h"
 
-ll_su_state_t ll_su_state_update(ll_su_state_t state, uint8_t byte){
-    switch (state) {
+int ll_su_state_update(ll_su_statemachine_t *machine, uint8_t byte){
+    switch (machine->state) {
     case Start:
         switch(byte){
-            case SP_FLAG  :                  state = Flag_RCV; break;
-            default       :                  state = Start   ; break;
+            case SP_FLAG  :                        machine->state = Flag_RCV; break;
+            default       :                        machine->state = Start   ; break;
         } break;
     case Flag_RCV:
         switch(byte){
             case SP_A_SEND:
-            case SP_A_RECV: sm_a_rcv = byte; state = A_RCV   ; break;
-            case SP_FLAG  :                  state = Flag_RCV; break;
-            default       :                  state = Start   ; break;
+            case SP_A_RECV: machine->a_rcv = byte; machine->state = A_RCV   ; break;
+            case SP_FLAG  :                        machine->state = Flag_RCV; break;
+            default       :                        machine->state = Start   ; break;
         } break;
     case A_RCV:
         switch(byte){
             case SP_C_SET :
             case SP_C_DISC:
-            case SP_C_UA  : sm_c_rcv = byte; state = C_RCV   ; break;
-            case SP_FLAG  :                  state = Flag_RCV; break;
-            default       :                  state = Start   ; break;
+            case SP_C_UA  : machine->c_rcv = byte; machine->state = C_RCV   ; break;
+            case SP_FLAG  :                        machine->state = Flag_RCV; break;
+            default       :                        machine->state = Start   ; break;
         } break;
     case C_RCV:
         switch(byte){
-            case SP_FLAG  : state = Flag_RCV; break;
-            default       : state = (byte == (sm_a_rcv^sm_c_rcv) ? BCC_OK : Start); break;
+            case SP_FLAG  : machine->state = Flag_RCV; break;
+            default       : machine->state = (byte == (machine->a_rcv^machine->c_rcv) ? BCC_OK : Start); break;
         } break;
     case BCC_OK:
         switch(byte){
-            case SP_FLAG  : state = Stop ; break;
-            default       : state = Start; break;
+            case SP_FLAG  : machine->state = Stop ; break;
+            default       : machine->state = Start; break;
         } break;
     case Stop:
-        state = Stop;
+        machine->state = Stop;
         break;
     default:
-        fprintf(stderr, "No such state %d\n", state);
-        break;
+        fprintf(stderr, "No such state %d\n", machine->state);
+        return EXIT_FAILURE;
     }
-    return state;
+    return EXIT_SUCCESS;
 }
