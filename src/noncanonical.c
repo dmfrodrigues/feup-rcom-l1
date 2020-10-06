@@ -52,11 +52,15 @@ int main(int argc, char** argv){
     do {
         int res = read(port_fd, buf+i, 1);
     } while(buf[i++] != '\0');
-    fprintf(stderr, "Received: \"%s\" (%d bytes)\n", buf, i);
+    fprintf(stderr, "Received: \"%s\" (%d bytes) [", buf, i);
+    for(int i = 0; i < strlen(buf)+1; ++i) fprintf(stderr, "0x%02X ", buf[i]);
+    fprintf(stderr, "]\n");
 
     // RESEND
     int res = write(port_fd, buf, strlen(buf)+1);
-    fprintf(stderr, "Resent: \"%s\" (%d bytes)\n", buf, (int)(strlen(buf)+1));
+    fprintf(stderr, "Resent  : \"%s\" (%d bytes) [", buf, (int)(strlen(buf)+1));
+    for(int i = 0; i < strlen(buf)+1; ++i) fprintf(stderr, "0x%02X ", buf[i]);
+    fprintf(stderr, "]\n");
 
     // RESTORE INITIAL PORT SETTINGS
     tcsetattr(port_fd, TCSANOW, &oldtio);

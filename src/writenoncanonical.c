@@ -53,15 +53,19 @@ int main(int argc, char** argv){
     buf[strlen(buf)-1] = '\0';
     // WRITE TO PORT
     int res = write(port_fd, buf, strlen(buf)+1);
-    fprintf(stderr, "Wrote to port: \"%s\" (%d bytes)\n", buf, res);
+    fprintf(stderr, "Wrote to port: \"%s\" (%d bytes) [", buf, res);
+    for(int i = 0; i < strlen(buf)+1; ++i) fprintf(stderr, "0x%02X ", buf[i]);
+    fprintf(stderr, "]\n");
 
     // GET RESEND
     char resend_buf[255];
-    int i = 0;
+    int sz = 0;
     do {
-        int res = read(port_fd, resend_buf+i, 1);
-    } while(buf[i++] != '\0');
-    fprintf(stderr, "Got resend: \"%s\" (%d bytes)\n", resend_buf, i);
+        int res = read(port_fd, resend_buf+sz, 1);
+    } while(buf[sz++] != '\0');
+    fprintf(stderr, "Got resend   : \"%s\" (%d bytes) [", resend_buf, sz);
+    for(int i = 0; i < sz; ++i) fprintf(stderr, "0x%02X ", resend_buf[i]);
+    fprintf(stderr, "]\n");
 
     // VALIDATION
     if(strcmp(buf, resend_buf) == 0) fprintf(stderr, "Resend is correct\n");
