@@ -14,15 +14,17 @@ CFLAGS_PARANOID =-Wall -Wextra -Wformat-nonliteral -Wcast-align -Wpointer-arith 
 CFLAGS 	=-Wall -g #-O3
 #CFLAGS=$(CFLAGS_PARANOID)
 
-EMITTER_O_FILES =$(ODIR)/writenoncanonical.o
-RECEIVER_O_FILES=$(ODIR)/noncanonical.o
+EMITTER_O_FILES =$(ODIR)/emitter.o
+RECEIVER_O_FILES=$(ODIR)/receiver.o
+
+O_FILES=$(ODIR)/statemachine.o $(ODIR)/utils.o
 
 all: $(EMITTER) $(RECEIVER)
 
-$(EMITTER): $(EMITTER_O_FILES)
+$(EMITTER): $(EMITTER_O_FILES) $(O_FILES)
 	$(CC) $^ -o $@
 
-$(RECEIVER): $(RECEIVER_O_FILES)
+$(RECEIVER): $(RECEIVER_O_FILES) $(O_FILES)
 	$(CC) $^ -o $@
 
 $(ODIR):
@@ -31,7 +33,8 @@ $(ODIR):
 $(ODIR)/%.o: $(SDIR)/%.c | $(ODIR)
 	$(CC) $(CFLAGS) $(IFLAGS) -c $< -o $@
 
-FORCE:
+test: FORCE
+	make -C tests test
 
 report.pdf: FORCE
 	cd doc/report && latexmk --shell-escape report.tex -pdf
@@ -39,3 +42,5 @@ report.pdf: FORCE
 
 clean: FORCE
 	git clean -dfX
+
+FORCE:
