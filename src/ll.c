@@ -14,7 +14,6 @@
 
 #include "flags.h"
 #include "ll_su_statemachine.h"
-#include "utils.h"
 
 ll_config_t ll_config = {
     .baud_rate       = 38400,

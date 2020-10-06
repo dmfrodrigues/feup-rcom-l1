@@ -1,5 +1,7 @@
 #define LL_MAX_SIZE 1024
 
+#include "ll_utils.h"
+
 typedef struct {
     int baud_rate;
     unsigned int timeout;
