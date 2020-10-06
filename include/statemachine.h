@@ -19,6 +19,6 @@ typedef enum {
 
 uint8_t a_rcv, c_rcv;
 
-su_state_t update_su_state(su_state_t state, uint8_t byte);
+su_state_t update_su_state(su_state_t state, uint8_t byte) __attribute__((warn_unused_result));
 
 #endif

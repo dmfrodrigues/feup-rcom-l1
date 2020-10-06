@@ -89,7 +89,9 @@ int main(int argc, char** argv){
             int res = read(port_fd, &byte, 1);
             if(res > 0){
                 fprintf(stderr, "Emitter | Read byte 0x%02X\n", byte);
+                fprintf(stderr, "Emitter | Transitioned from state %d", state);
                 state = update_su_state(state, byte);
+                fprintf(stderr, " to %d\n", state);
             }
         } while(state != Stop && !timeout);
         if(timeout) {

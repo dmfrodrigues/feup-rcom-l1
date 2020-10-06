@@ -33,7 +33,8 @@ $(ODIR):
 $(ODIR)/%.o: $(SDIR)/%.c | $(ODIR)
 	$(CC) $(CFLAGS) $(IFLAGS) -c $< -o $@
 
-FORCE:
+test: FORCE
+	make -C tests test
 
 report.pdf: FORCE
 	cd doc/report && latexmk --shell-escape report.tex -pdf
@@ -41,3 +42,5 @@ report.pdf: FORCE
 
 clean: FORCE
 	git clean -dfX
+
+FORCE:
