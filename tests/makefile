@@ -12,23 +12,23 @@ all:
 test: clean test1 test2 test3 test4
 
 test1: $(EMITTER)
-	echo ==================== $@ ====================
+	@echo ==================== $@ ====================
 	$(CALL_EMITTER)
 
 test2: $(EMITTER) $(RECEIVER)
-	echo ==================== $@ ====================
+	@echo ==================== $@ ====================
 	$(CALL_RECEIVER) &
 	sleep 1
 	$(CALL_EMITTER)
 
 test3: $(EMITTER) $(RECEIVER)
-	echo ==================== $@ ====================
+	@echo ==================== $@ ====================
 	$(CALL_EMITTER) &
 	sleep 0.5
 	$(CALL_RECEIVER)
 	
 test4: $(EMITTER) $(RECEIVER)
-	echo ==================== $@ ====================
+	@echo ==================== $@ ====================
 	$(CALL_EMITTER) &
 	sleep 1.5
 	$(CALL_RECEIVER)
