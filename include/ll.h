@@ -41,6 +41,6 @@ int llwrite(int id, const char *buffer, int length) __attribute__((warn_unused_r
  * @brief Close serial port.
  * 
  * @param id        Port to close.
- * @return int      0 if successful, other value otherwise
+ * @return int      1 if successful, -1 otherwise
  */
 int llclose(int id) __attribute__((warn_unused_result));
