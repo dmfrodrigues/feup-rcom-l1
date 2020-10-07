@@ -21,6 +21,8 @@ ll_config_t ll_config = {
     .retransmissions = 3
 };
 
+ll_status_t ll_status;
+
 int timeout = 0;
 
 void alarmHandler(){
@@ -51,28 +53,41 @@ tcflag_t ll_get_baud_rate(void){
 }
 
 int ll_send_SET(int port_fd){
-    uint8_t SET[5];
-    SET[0] = SP_FLAG;
-    SET[1] = SP_A_SEND;
-    SET[2] = SP_C_SET;
-    SET[3] = bcc(SET+1, SET+3);
-    SET[4] = SP_FLAG;
+    uint8_t frame[5];
+    frame[0] = SP_FLAG;
+    frame[1] = (ll_status == TRANSMITTER ? SP_A_SEND : SP_A_RECV);;
+    frame[2] = SP_C_SET;
+    frame[3] = bcc(frame+1, frame+3);
+    frame[4] = SP_FLAG;
 
-    int res = write(port_fd, SET, sizeof(SET));
-    if(res == sizeof(SET)) fprintf(stderr, "Sent SET\n");
+    int res = write(port_fd, frame, sizeof(frame));
+    if(res == sizeof(frame)) fprintf(stderr, "Sent SET\n");
+    return res;
+}
+
+int ll_send_DISC(int port_fd){
+    uint8_t frame[5];
+    frame[0] = SP_FLAG;
+    frame[1] = (ll_status == TRANSMITTER ? SP_A_SEND : SP_A_RECV);
+    frame[2] = SP_C_DISC;
+    frame[3] = bcc(frame+1, frame+3);
+    frame[4] = SP_FLAG;
+
+    int res = write(port_fd, frame, sizeof(frame));
+    if(res == sizeof(frame))  fprintf(stderr, "Sent DISC\n");
     return res;
 }
 
 int ll_send_UA(int port_fd){
-    uint8_t UA[5];
-    UA[0] = SP_FLAG;
-    UA[1] = SP_A_SEND;
-    UA[2] = SP_C_UA;
-    UA[3] = bcc(UA+1, UA+3);
-    UA[4] = SP_FLAG;
+    uint8_t frame[5];
+    frame[0] = SP_FLAG;
+    frame[1] = (ll_status == TRANSMITTER ? SP_A_RECV : SP_A_SEND);
+    frame[2] = SP_C_UA;
+    frame[3] = bcc(frame+1, frame+3);
+    frame[4] = SP_FLAG;
 
-    int res = write(port_fd, UA, sizeof(UA));
-    if(res == sizeof(UA))  fprintf(stderr, "Sent UA\n");
+    int res = write(port_fd, frame, sizeof(frame));
+    if(res == sizeof(frame))  fprintf(stderr, "Sent UA\n");
     return res;
 }
 
@@ -104,6 +119,8 @@ int ll_expect_SUframe(int port_fd, uint8_t *a_rcv, uint8_t *c_rcv){
 struct termios oldtio;
 
 int llopen(int com, ll_status_t status){
+    ll_status = status;
+
     // Get serial port path
     char port_path[255];
     sprintf(port_path, "/dev/ttyS%d", com-1);
