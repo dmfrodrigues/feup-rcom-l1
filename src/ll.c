@@ -254,7 +254,7 @@ int llopen(int com, ll_status_t status){
         if(res){
             perror("read");
             return -1;
-        } else if(a_rcv == SP_C_SET && c_rcv == SP_A_SEND){
+        } else if(a_rcv == SP_A_SEND && c_rcv == SP_C_SET){
             fprintf(stderr, "Got SET\n");
             res = ll_send_UA(port_fd);
         } else {
