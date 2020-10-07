@@ -341,15 +341,11 @@ int llclose(int port_fd){
             if(ll_status == TRANSMITTER){
                 if(c_rcv == SP_C_DISC && a_rcv == SP_A_SEND){
                     fprintf(stderr, "Got DISC\n");
-                    // Send UA
-                    res = ll_send_UA(port_fd);
                     break;
                 } else fprintf(stderr, "ERROR: c_rcv or a_rcv are not correct\n");
             }else{
                 if(c_rcv == SP_C_DISC && a_rcv == SP_A_RECV){
                     fprintf(stderr, "Got DISC\n");
-                    // Send UA
-                    res = ll_send_UA(port_fd);
                     break;
                 } else fprintf(stderr, "ERROR: c_rcv or a_rcv are not correct\n");
             }
@@ -358,6 +354,9 @@ int llclose(int port_fd){
     
     if(attempts == ll_config.retransmissions) return -1;
     alarm(0);
+
+    // Send UA
+    res = ll_send_UA(port_fd);
 
     // Restore initial port settings
     if(tcsetattr(port_fd, TCSANOW, &oldtio) == -1) { perror("tcsetattr"); return -1; }
