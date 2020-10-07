@@ -158,8 +158,8 @@ ssize_t ll_send_RR(int port_fd){
     uint8_t frame[5];
     frame[0] = SP_FLAG;
     frame[1] = (ll_status == TRANSMITTER ? SP_A_RECV : SP_A_SEND);
-    frame[2] = SP_RR_MASK | (sequence_number << 5);
-    frame[3] = LL_RR(sequence_number);
+    frame[2] = LL_RR(sequence_number);
+    frame[3] = bcc(frame+1, frame+3);
     frame[4] = SP_FLAG;
 
     int res = write(port_fd, frame, sizeof(frame));
