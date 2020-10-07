@@ -22,8 +22,8 @@ ll_config_t ll_config = {
 };
 
 ll_status_t ll_status;
-
 int timeout = 0;
+unsigned int sequence_number = 1;
 
 void alarmHandler(){
 	fprintf(stderr, "Emitter | WARNING: timeout\n");
@@ -50,6 +50,23 @@ tcflag_t ll_get_baud_rate(void){
     if(ll_config.baud_rate < 57600 ){ ll_config.baud_rate = 57600 ; return B57600 ; }
     if(ll_config.baud_rate < 115200){ ll_config.baud_rate = 115200; return B115200; }
     ll_config.baud_rate = 230400; return B230400;
+}
+
+uint8_t ll_get_expected_RR(void){
+    uint8_t Ns = sequence_number;
+    uint8_t Nr = (Ns+1)%2;
+    return LL_RR(Nr);
+}
+
+uint8_t ll_get_expected_REJ(void){
+    uint8_t Ns = sequence_number;
+    uint8_t Nr = (Ns+1)%2;
+    return LL_REJ(Nr);
+}
+
+uint8_t ll_get_Iframe_C(void){
+    uint8_t Ns = sequence_number;
+    return LL_C(Ns);
 }
 
 int ll_send_SET(int port_fd){
@@ -89,6 +106,52 @@ int ll_send_UA(int port_fd){
     int res = write(port_fd, frame, sizeof(frame));
     if(res == sizeof(frame))  fprintf(stderr, "Sent UA\n");
     return res;
+}
+
+ssize_t ll_escape(uint8_t *buf_esc, const uint8_t *buf, size_t length){
+    ssize_t j = 0;
+    for(size_t i = 0; i < length; ++i){
+        uint8_t c = buf[i];
+        switch(c){
+            case SP_FLAG:
+            case SP_ESC :
+                buf_esc[j++] = SP_ESC;
+                buf_esc[j++] = LL_ESCAPE(c);
+                break;
+            default:
+                buf_esc[j++] = c;
+                break;
+        }
+    }
+    return j;
+}
+
+/**
+ * @brief Send I-frame to port.
+ * 
+ * @param port_fd Port to send I-frame to.
+ * @param buffer  Data to send to port.
+ * @param length  Length of the data to send.
+ * @return ssize_t Number of characters written, or -1 if error
+ */
+ssize_t ll_send_I(int port_fd, const uint8_t *buffer, size_t length){
+    uint8_t frame_header[4];
+    frame_header[0] = SP_FLAG;
+    frame_header[1] = (ll_status == TRANSMITTER ? SP_A_RECV : SP_A_SEND);
+    frame_header[2] = ll_get_Iframe_C();
+    frame_header[3] = bcc(frame_header+1, frame_header+3);
+    if(write(port_fd, frame_header, sizeof(frame_header)) != sizeof(frame_header)){ perror("write"); return -1; }
+    
+    uint8_t buffer_escaped[2*LL_MAX_SIZE];
+    ssize_t written_chars = ll_escape(buffer_escaped, buffer, length);
+    if(written_chars < length) return -1;
+
+    uint8_t frame_tail[2];
+    frame_tail[0] = bcc(buffer, buffer+length);
+    frame_tail[1] = SP_FLAG;
+    if(write(port_fd, frame_tail, sizeof(frame_tail)) != sizeof(frame_tail)){ perror("write"); return -1; }
+
+    return length;
 }
 
 int ll_expect_SUframe(int port_fd, uint8_t *a_rcv, uint8_t *c_rcv){
@@ -201,6 +264,49 @@ int llopen(int com, ll_status_t status){
     }
 
     return port_fd;
+}
+
+int llwrite(int port_fd, const char *buffer, int length){
+    sequence_number = (sequence_number+1)%2;
+
+    int res, ret = 0;
+    int attempts;
+    for(attempts = 0; attempts < ll_config.retransmissions; ++attempts){
+        timeout = 0;
+        alarm(ll_config.timeout);
+        
+        // Send SET
+        ret = ll_send_I(port_fd, (const uint8_t *)buffer, length);
+        if(ret != length){
+            fprintf(stderr, "ERROR: only wrote %d chars\n", ret);
+            continue;
+        }
+
+        // Get UA
+        uint8_t a_rcv, c_rcv;
+        res = ll_expect_SUframe(port_fd, &a_rcv, &c_rcv);
+        
+        // Validate UA
+        if(res){
+            if(errno == EINTR){
+                if(timeout) fprintf(stderr, "WARNING: gave up due to timeout\n");
+                else        fprintf(stderr, "ERROR: emitter was interrupted due to unknown reason\n");
+            } else perror("read");
+        } else if(a_rcv == SP_A_SEND){
+            if(c_rcv == ll_get_expected_RR()){
+                fprintf(stderr, "Got RR\n");
+                break;
+            } else if(c_rcv == ll_get_expected_REJ()){
+                fprintf(stderr, "Got REJ\n");
+            } else fprintf(stderr, "Don't know what I got; a=0x%02X, c=0x%02X\n", a_rcv, c_rcv);
+        } else{
+            fprintf(stderr, "ERROR: c_rcv or a_rcv are not correct\n");
+        }
+    }
+    if(attempts == ll_config.retransmissions) return -1;
+    alarm(0);
+
+    return ret;
 }
 
 int llclose(int port_fd){

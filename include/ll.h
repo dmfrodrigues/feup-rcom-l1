@@ -28,6 +28,16 @@ ll_config_t ll_config;
 int llopen(int com, ll_status_t status) __attribute__((warn_unused_result));
 
 /**
+ * @brief Write to serial port.
+ * 
+ * @param id        Port to write to.
+ * @param buffer    Data to be written to port.
+ * @param length    Length of data to be written to port.
+ * @return int      Number of written characters, or a negative value if error.
+ */
+int llwrite(int id, const char *buffer, int length) __attribute__((warn_unused_result));
+
+/**
  * @brief Close serial port.
  * 
  * @param id        Port to close.
