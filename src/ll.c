@@ -384,5 +384,5 @@ int llclose(int port_fd){
     
     fprintf(stderr, "Successfully disconnected\n");
 
-    return 1;
+    return 0;
 }
