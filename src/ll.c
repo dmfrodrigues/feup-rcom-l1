@@ -377,6 +377,7 @@ int llclose(int port_fd){
     }
 
     // Restore initial port settings
+    sleep(1);
     if(tcsetattr(port_fd, TCSANOW, &oldtio) == -1) { perror("tcsetattr"); return -1; }
     // Close port
     if(close(port_fd) == -1) { perror("close"); return -1; };
