@@ -315,12 +315,6 @@ int llclose(int port_fd){
     int res;
 
     if(ll_status == TRANSMITTER){  
-        struct sigaction action;
-        action.sa_handler = alarmHandler;
-        sigemptyset(&action.sa_mask);
-        action.sa_flags = 0;
-        sigaction(SIGALRM, &action, NULL);
-
         int attempts;
         for(attempts = 0; attempts < ll_config.retransmissions; ++attempts){
             timeout = 0;
@@ -380,13 +374,14 @@ int llclose(int port_fd){
         } else{ 
             fprintf(stderr, "ERROR: c_rcv or a_rcv are not correct\n"); return -1;
         }
-
-        // Restore initial port settings
-        if(tcsetattr(port_fd, TCSANOW, &oldtio) == -1) { perror("tcsetattr"); return -1; }
-        // Close port
-        if(close(port_fd) == -1) { perror("close"); return -1; };
-    
-        fprintf(stderr, "Successfully disconnected\n");
     }
+
+    // Restore initial port settings
+    if(tcsetattr(port_fd, TCSANOW, &oldtio) == -1) { perror("tcsetattr"); return -1; }
+    // Close port
+    if(close(port_fd) == -1) { perror("close"); return -1; };
+    
+    fprintf(stderr, "Successfully disconnected\n");
+
     return 1;
 }
