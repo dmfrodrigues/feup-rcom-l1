@@ -154,6 +154,32 @@ ssize_t ll_send_I(int port_fd, const uint8_t *buffer, size_t length){
     return length;
 }
 
+ssize_t ll_send_RR(int port_fd){
+    uint8_t frame[5];
+    frame[0] = SP_FLAG;
+    frame[1] = (ll_status == TRANSMITTER ? SP_A_RECV : SP_A_SEND);
+    frame[2] = SP_RR_MASK | (sequence_number << 5);
+    frame[3] = LL_RR(sequence_number);
+    frame[4] = SP_FLAG;
+
+    int res = write(port_fd, frame, sizeof(frame));
+    if(res == sizeof(frame))  fprintf(stderr, "Sent RR\n");
+    return res;
+}
+
+ssize_t ll_send_REJ(int port_fd){
+    uint8_t frame[5];
+    frame[0] = SP_FLAG;
+    frame[1] = (ll_status == TRANSMITTER ? SP_A_RECV : SP_A_SEND);
+    frame[2] = LL_REJ(sequence_number);
+    frame[3] = bcc(frame+1, frame+3);
+    frame[4] = SP_FLAG;
+
+    int res = write(port_fd, frame, sizeof(frame));
+    if(res == sizeof(frame))  fprintf(stderr, "Sent REJ\n");
+    return res;
+}
+
 int ll_expect_SUframe(int port_fd, uint8_t *a_rcv, uint8_t *c_rcv){
     ll_su_statemachine_t machine = {
         .state = Start,
@@ -307,6 +333,11 @@ int llwrite(int port_fd, const char *buffer, int length){
     alarm(0);
 
     return ret;
+}
+
+int llread(int port_fd, const char *buffer){
+    //TODO
+    return -1;
 }
 
 int llclose(int port_fd){

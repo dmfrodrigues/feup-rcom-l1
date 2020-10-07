@@ -38,9 +38,18 @@ int llopen(int com, ll_status_t status) __attribute__((warn_unused_result));
 int llwrite(int id, const char *buffer, int length) __attribute__((warn_unused_result));
 
 /**
+ * @brief Read serial port.
+ * 
+ * @param id        Port to read.
+ * @param buffer    Data to be read.
+ * @return int      Number of read characters, or a negative value if error.
+ */
+int llread(int id, const char *buffer) __attribute__((warn_unused_result));
+
+/**
  * @brief Close serial port.
  * 
  * @param id        Port to close.
- * @return int      1 if successful, -1 otherwise
+ * @return int      positive value if successful, negative otherwise
  */
 int llclose(int id) __attribute__((warn_unused_result));
