@@ -257,5 +257,7 @@ int llclose(int port_fd){
     if(tcsetattr(port_fd, TCSANOW, &oldtio) == -1) { perror("tcsetattr"); return -1; }
     // Close port
     if(close(port_fd) == -1) { perror("close"); return -1; };
+
+    fprintf(stderr, "Successfully disconnected\n");
     return 1;
 }
