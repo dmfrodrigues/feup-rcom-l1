@@ -204,14 +204,6 @@ int llopen(int com, ll_status_t status){
 }
 
 int llclose(int port_fd){
-
-    // ativa temporizador
-
-    // envia disc/ excedido timeout retransmite
-
-    // get disc
-
-    // send UA
     int res;
     
     struct sigaction action;
@@ -238,21 +230,32 @@ int llclose(int port_fd){
                 if(timeout) fprintf(stderr, "WARNING: gave up due to timeout\n");
                 else        fprintf(stderr, "ERROR: interrupted due to unknown reason\n");
             } else perror("read");
-        } else if(c_rcv == SP_C_UA && a_rcv == SP_A_SEND){
-            fprintf(stderr, "Got DISC\n");
-
-            // Send UA
-            res = ll_send_UA(port_fd);
-            break;
-        } else fprintf(stderr, "ERROR: c_rcv or a_rcv are not correct\n");
-
+        } 
+        else{
+            if(ll_status == TRANSMITTER){
+                if(c_rcv == SP_C_DISC && a_rcv == SP_A_SEND){
+                    fprintf(stderr, "Got DISC\n");
+                    // Send UA
+                    res = ll_send_UA(port_fd);
+                    break;
+                } else fprintf(stderr, "ERROR: c_rcv or a_rcv are not correct\n");
+            }else{
+                if(c_rcv == SP_C_DISC && a_rcv == SP_A_RECV){
+                    fprintf(stderr, "Got DISC\n");
+                    // Send UA
+                    res = ll_send_UA(port_fd);
+                    break;
+                } else fprintf(stderr, "ERROR: c_rcv or a_rcv are not correct\n");
+            }
+        }
     }
-        if(attempts == ll_config.retransmissions) return -1;
-        alarm(0);
+    
+    if(attempts == ll_config.retransmissions) return -1;
+    alarm(0);
 
     // Restore initial port settings
     if(tcsetattr(port_fd, TCSANOW, &oldtio) == -1) { perror("tcsetattr"); return -1; }
     // Close port
-    close(port_fd);
+    if(close(port_fd) == -1) { perror("close"); return -1; };
     return 1;
 }
