@@ -313,58 +313,80 @@ int llwrite(int port_fd, const char *buffer, int length){
 
 int llclose(int port_fd){
     int res;
-    
-    struct sigaction action;
-    action.sa_handler = alarmHandler;
-    sigemptyset(&action.sa_mask);
-    action.sa_flags = 0;
-    sigaction(SIGALRM, &action, NULL);
 
-    int attempts;
-    for(attempts = 0; attempts < ll_config.retransmissions; ++attempts){
-        timeout = 0;
-        alarm(ll_config.timeout);
+    if(ll_status == TRANSMITTER){  
+        struct sigaction action;
+        action.sa_handler = alarmHandler;
+        sigemptyset(&action.sa_mask);
+        action.sa_flags = 0;
+        sigaction(SIGALRM, &action, NULL);
+
+        int attempts;
+        for(attempts = 0; attempts < ll_config.retransmissions; ++attempts){
+            timeout = 0;
+            alarm(ll_config.timeout);
             
-        // Send DISC
-        res = ll_send_DISC(port_fd);
+            // Send DISC
+            res = ll_send_DISC(port_fd);
 
+            // Get DISC
+            uint8_t a_rcv, c_rcv;
+            res = ll_expect_SUframe(port_fd, &a_rcv, &c_rcv);
+            
+            // Validate DISC
+            if(res){
+                if(errno == EINTR){
+                    if(timeout) fprintf(stderr, "WARNING: gave up due to timeout\n");
+                    else        fprintf(stderr, "ERROR: interrupted due to unknown reason\n");
+                } else perror("read");
+            } 
+            else if(a_rcv == SP_A_RECV && c_rcv == SP_C_DISC) {
+                fprintf(stderr, "Got DISC\n");
+                break;
+            } else fprintf(stderr, "ERROR: c_rcv or a_rcv are not correct\n");
+        }
+    
+        if(attempts == ll_config.retransmissions) return -1;
+
+        // Send UA
+        res = ll_send_UA(port_fd);
+        alarm(0);
+    }
+    else{
         // Get DISC
         uint8_t a_rcv, c_rcv;
         res = ll_expect_SUframe(port_fd, &a_rcv, &c_rcv);
-            
-        // Validate DISC
+
         if(res){
-            if(errno == EINTR){
-                if(timeout) fprintf(stderr, "WARNING: gave up due to timeout\n");
-                else        fprintf(stderr, "ERROR: interrupted due to unknown reason\n");
-            } else perror("read");
-        } 
-        else{
-            if(ll_status == TRANSMITTER){
-                if(a_rcv == SP_A_RECV && c_rcv == SP_C_DISC){
-                    fprintf(stderr, "Got DISC\n");
-                    break;
-                } else fprintf(stderr, "ERROR: c_rcv or a_rcv are not correct\na_rcv=0x%02X (should be 0x%02X)\nc_rcv=0x%02X (should be 0x%02X)\n", a_rcv, SP_A_SEND, c_rcv, SP_C_DISC);
-            }else{
-                if(a_rcv == SP_A_SEND && c_rcv == SP_C_DISC){
-                    fprintf(stderr, "Got DISC\n");
-                    break;
-                } else fprintf(stderr, "ERROR: c_rcv or a_rcv are not correct\na_rcv=0x%02X (should be 0x%02X)\nc_rcv=0x%02X (should be 0x%02X)\n", a_rcv, SP_A_RECV, c_rcv, SP_C_DISC);
-            }
+            perror("read"); return -1;
         }
-    }
+        else if(a_rcv == SP_A_SEND && c_rcv == SP_C_DISC){
+            fprintf(stderr, "Got DISC\n");
+        } else{ 
+            fprintf(stderr, "ERROR: c_rcv or a_rcv are not correct\n"); return -1;
+        }
+        // Send DISC
+        res = ll_send_DISC(port_fd);
+
+
+        // Get UA
+        res = ll_expect_SUframe(port_fd, &a_rcv, &c_rcv);
+
+        if(res){
+            perror("read"); return -1;
+        }
+        else if(a_rcv == SP_A_RECV && c_rcv == SP_C_UA){
+            fprintf(stderr, "Got UA\n");
+        } else{ 
+            fprintf(stderr, "ERROR: c_rcv or a_rcv are not correct\n"); return -1;
+        }
+
+        // Restore initial port settings
+        if(tcsetattr(port_fd, TCSANOW, &oldtio) == -1) { perror("tcsetattr"); return -1; }
+        // Close port
+        if(close(port_fd) == -1) { perror("close"); return -1; };
     
-    if(attempts == ll_config.retransmissions) return -1;
-    alarm(0);
-
-    // Send UA
-    res = ll_send_UA(port_fd);
-
-    // Restore initial port settings
-    if(tcsetattr(port_fd, TCSANOW, &oldtio) == -1) { perror("tcsetattr"); return -1; }
-    // Close port
-    if(close(port_fd) == -1) { perror("close"); return -1; };
-
-    fprintf(stderr, "Successfully disconnected\n");
+        fprintf(stderr, "Successfully disconnected\n");
+    }
     return 1;
 }
