@@ -240,10 +240,12 @@ int llopen(int com, ll_status_t status){
                     if(timeout) fprintf(stderr, "WARNING: gave up due to timeout\n");
                     else        fprintf(stderr, "ERROR: emitter was interrupted due to unknown reason\n");
                 } else perror("read");
-            } else if(c_rcv == SP_C_UA && a_rcv == SP_A_SEND){
+            } else if(a_rcv == SP_A_SEND && c_rcv == SP_C_UA){
                 fprintf(stderr, "Got UA\n");
                 break;
-            } else fprintf(stderr, "ERROR: c_rcv or a_rcv are not correct\n");
+            } else{
+                fprintf(stderr, "ERROR: c_rcv or a_rcv are not correct\na_rcv=0x%02X (should be 0x%02X)\nc_rcv=0x%02X (should be 0x%02X)\n", a_rcv, SP_A_SEND, c_rcv, SP_C_UA);
+            }
         }
         if(attempts == ll_config.retransmissions) return -1;
         alarm(0);
@@ -258,7 +260,7 @@ int llopen(int com, ll_status_t status){
             fprintf(stderr, "Got SET\n");
             res = ll_send_UA(port_fd);
         } else {
-            fprintf(stderr, "ERROR: c_rcv or a_rcv are not correct\n");
+            fprintf(stderr, "ERROR: c_rcv or a_rcv are not correct\na_rcv=0x%02X (should be 0x%02X)\nc_rcv=0x%02X (should be 0x%02X)\n", a_rcv, SP_A_SEND, c_rcv, SP_C_SET);
             return -1;
         }
     }
@@ -300,7 +302,7 @@ int llwrite(int port_fd, const char *buffer, int length){
                 fprintf(stderr, "Got REJ\n");
             } else fprintf(stderr, "Don't know what I got; a=0x%02X, c=0x%02X\n", a_rcv, c_rcv);
         } else{
-            fprintf(stderr, "ERROR: c_rcv or a_rcv are not correct\n");
+            fprintf(stderr, "ERROR: c_rcv or a_rcv are not correct\na_rcv=0x%02X (should be 0x%02X)\nc_rcv=0x%02X (should be 0x%02X, 0x%02X)\n", a_rcv, SP_A_SEND, c_rcv, ll_get_expected_RR(), ll_get_expected_REJ());
         }
     }
     if(attempts == ll_config.retransmissions) return -1;
@@ -339,15 +341,15 @@ int llclose(int port_fd){
         } 
         else{
             if(ll_status == TRANSMITTER){
-                if(c_rcv == SP_C_DISC && a_rcv == SP_A_SEND){
+                if(a_rcv == SP_A_RECV && c_rcv == SP_C_DISC){
                     fprintf(stderr, "Got DISC\n");
                     break;
-                } else fprintf(stderr, "ERROR: c_rcv or a_rcv are not correct\n");
+                } else fprintf(stderr, "ERROR: c_rcv or a_rcv are not correct\na_rcv=0x%02X (should be 0x%02X)\nc_rcv=0x%02X (should be 0x%02X)\n", a_rcv, SP_A_SEND, c_rcv, SP_C_DISC);
             }else{
-                if(c_rcv == SP_C_DISC && a_rcv == SP_A_RECV){
+                if(a_rcv == SP_A_SEND && c_rcv == SP_C_DISC){
                     fprintf(stderr, "Got DISC\n");
                     break;
-                } else fprintf(stderr, "ERROR: c_rcv or a_rcv are not correct\n");
+                } else fprintf(stderr, "ERROR: c_rcv or a_rcv are not correct\na_rcv=0x%02X (should be 0x%02X)\nc_rcv=0x%02X (should be 0x%02X)\n", a_rcv, SP_A_RECV, c_rcv, SP_C_DISC);
             }
         }
     }
