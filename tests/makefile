@@ -13,7 +13,7 @@ test: clean test1 test2 test3 test4
 
 test1: $(TRANSMITTER)
 	@echo ==================== $@ ====================
-	$(CALL_TRANSMITTER)
+	$(CALL_TRANSMITTER) || echo "It should fail"
 	sleep 1
 
 test2: $(TRANSMITTER) $(RECEIVER)

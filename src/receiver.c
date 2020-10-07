@@ -18,9 +18,10 @@ int main(int argc, char** argv){
 
     // OPEN SERIAL PORT
     int port_fd = llopen(atoi(argv[1]), RECEIVER);
+    if(port_fd < 0) return -1;
 
     int res = llclose(port_fd);
-    if(res) fprintf(stderr, "Receiver | ERROR");
+    if(res) return -1;
 
     return 0;
 }

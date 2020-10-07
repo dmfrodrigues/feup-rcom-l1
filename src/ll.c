@@ -112,10 +112,10 @@ int llopen(int com, ll_status_t status){
     // O_RDWR   - Open for reading and writing
     // O_NOCTTY - Open serial port not as controlling tty, because we don't want to get killed if linenoise sends CTRL-C
     int port_fd = open(port_path, O_RDWR | O_NOCTTY);
-    if(port_fd < 0){ perror(port_path); return EXIT_FAILURE; }
+    if(port_fd < 0){ perror(port_path); return -1; }
 
     // Save initial port settings
-    if(tcgetattr(port_fd, &oldtio) == -1) { perror("tcgetattr"); return EXIT_FAILURE; }
+    if(tcgetattr(port_fd, &oldtio) == -1) { perror("tcgetattr"); return -1; }
 
     // Set port settings
     // VTIME and VMIN should be changed to protect reads of the following character(s) with a timer
@@ -131,7 +131,7 @@ int llopen(int com, ll_status_t status){
 
     tcflush(port_fd, TCIOFLUSH);    // flush data received but not read, and data written but not transmitted
 
-    if(tcsetattr(port_fd, TCSANOW, &newtio) == -1) { perror("tcsetattr"); return EXIT_FAILURE; }
+    if(tcsetattr(port_fd, TCSANOW, &newtio) == -1) { perror("tcsetattr"); return -1; }
 
     int res;
 
@@ -165,7 +165,7 @@ int llopen(int com, ll_status_t status){
                 break;
             } else fprintf(stderr, "ERROR: c_rcv or a_rcv are not correct\n");
         }
-        if(attempts == ll_config.retransmissions) return EXIT_FAILURE;
+        if(attempts == ll_config.retransmissions) return -1;
         alarm(0);
     } else if(status == RECEIVER){
         // Get SET
@@ -173,11 +173,13 @@ int llopen(int com, ll_status_t status){
         res = ll_expect_SUframe(port_fd, &a_rcv, &c_rcv);
         if(res){
             perror("read");
+            return -1;
         } else if(a_rcv == SP_C_SET && c_rcv == SP_A_SEND){
             fprintf(stderr, "Got SET\n");
             res = ll_send_UA(port_fd);
         } else {
             fprintf(stderr, "ERROR: c_rcv or a_rcv are not correct\n");
+            return -1;
         }
     }
 
