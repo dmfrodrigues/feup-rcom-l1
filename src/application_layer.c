@@ -46,10 +46,40 @@ int app_send_ctrl_packet(int ctrl, size_t file_size, char *file_name){
     
     if(llwrite(app.fileDescriptor, ctrl_packet, packet_size) < 0){
         fprintf(stderr, "ERROR: unable to write control packet\n");
+        free(ctrl_packet);
         return -1;
     }
 
     free(ctrl_packet);
+
+    return 1;
+}
+
+
+int app_send_data_packet(uint8_t *data, size_t data_size, unsigned int seq_number){
+
+    size_t packet_size = 4 + data_size;
+    uint8_t *data_packet = (uint8_t*) malloc(packet_size);
+
+    data_packet[0] = CTRL_DATA;
+    data_packet[1] = seq_number % 255;
+
+    // data_size = 256*L2 + L1 
+    // is it right?
+    data_packet[2] = (data_size & 0xFF00);    //L2
+    data_packet[3] = (data_size & 0xFF);      //L1
+
+    for(int i = 0; i < data_size; i++){
+        data_packet[i+4] = data[i];
+    }
+
+    if(llwrite(app.fileDescriptor, data_packet, packet_size) < 0){
+        fprintf(stderr, "ERROR: unable to write data packet\n");
+        free(data_packet);
+        return -1;
+    }
+
+    free(data_packet);
     
     return 1;
 }
