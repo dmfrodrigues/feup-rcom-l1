@@ -26,7 +26,92 @@ ll_status_t ll_status;
 int timeout = 0;
 unsigned int sequence_number = 1;
 
-void alarmHandler(){
+/**
+ * @brief Handle alarm signal.
+ * 
+ * @param signum    Signal number (unused)
+ */
+void alarmHandler(__attribute__((unused)) int signum);
+
+/**
+ * @brief Get baud rate.
+ * 
+ * The baud rate can be specified as any integer in ll_config.baud_rate.
+ * However, serial port drivers only support certain baud rates,
+ * so this function takes the specified baud rate, rounds it up to the
+ * next valid baud rate, and returns the corresponding baud rate flag
+ * to use in termios.c_cflag.
+ * 
+ * @return tcflag_t     Valid baud rate flag for termios.c_cflag
+ */
+tcflag_t ll_get_baud_rate(void) __attribute__((warn_unused_result));
+
+/**
+ * @brief Get RR byte expected from the other end of the communication.
+ * 
+ * @return uint8_t  Expected RR byte
+ */
+uint8_t ll_get_expected_RR(void) __attribute__((warn_unused_result));
+
+/**
+ * @brief Get REJ byte expected from the other end of the communication.
+ * 
+ * @return uint8_t  Expected REJ byte
+ */
+uint8_t ll_get_expected_REJ(void) __attribute__((warn_unused_result));
+
+/**
+ * @brief Get I-frame C byte (according to the value of sequence_number, aka Ns).
+ * 
+ * @return uint8_t  I-frame C byte
+ */
+uint8_t ll_get_Iframe_C(void) __attribute__((warn_unused_result));
+
+/**
+ * @brief Send SET message (a S-frame) to serial port.
+ * 
+ * @param port_fd   Port to send SET message to
+ * @return int      On success, the number of bytes written; on error, -1, and errno is set
+ */
+int ll_send_SET(int port_fd) __attribute__((warn_unused_result));
+
+/**
+ * @brief Send DISC message (a S-frame) to serial port.
+ * 
+ * @param port_fd   Port to send DISC message to
+ * @return int      On success, the number of bytes written; on error, -1, and errno is set
+ */
+int ll_send_DISC(int port_fd) __attribute__((warn_unused_result));
+
+/**
+ * @brief Send UA message (a U-frame) to serial port.
+ * 
+ * @param port_fd   Port to send UA message to
+ * @return int      On success, the number of bytes written; on error, -1, and errno is set
+ */
+int ll_send_UA(int port_fd) __attribute__((warn_unused_result));
+
+/**
+ * @brief Send data message (I-frame) to serial port.
+ * 
+ * @param port_fd   Port to send data message to
+ * @param buffer    Raw (destuffed) data to send to port
+ * @param length    Length of data to send, in bytes
+ * @return ssize_t  On success, the number of bytes written; on error, -1, and errno is set
+ */
+ssize_t ll_send_I(int port_fd, const uint8_t *buffer, size_t length) __attribute__((warn_unused_result));
+
+/**
+ * @brief Expect for S/U-frame to arrive from port.
+ * 
+ * @param port_fd   Port to expect the frame comes from
+ * @param a_rcv     Pointer to memory where address (A) byte will be saved
+ * @param c_rcv     Pointer to memory where control (C) byte will be saved
+ * @return int      On success, 0; on error, another value, and errno is set
+ */
+int ll_expect_SUframe(int port_fd, uint8_t *a_rcv, uint8_t *c_rcv) __attribute__((warn_unused_result));
+
+void alarmHandler(__attribute__((unused)) int signum){
 	fprintf(stderr, "Emitter | WARNING: timeout\n");
 	timeout = 1;
 }
@@ -109,46 +194,6 @@ int ll_send_UA(int port_fd){
     return res;
 }
 
-ssize_t ll_stuffing(uint8_t *out, const uint8_t *in, size_t length){
-    ssize_t j = 0;
-    for(size_t i = 0; i < length; ++i){
-        uint8_t c = in[i];
-        switch(c){
-            case SP_FLAG:
-            case SP_ESC :
-                out[j++] = SP_ESC;
-                out[j++] = LL_ESCAPE(c);
-                break;
-            default:
-                out[j++] = c;
-                break;
-        }
-    }
-    return j;
-}
-
-ssize_t ll_destuffing(uint8_t *out, const uint8_t *in, size_t length){
-    ssize_t j = 0;
-    for(size_t i = 0; i < length; ++i){
-        uint8_t c = in[i];
-        if(c == SP_ESC){
-            uint8_t c_ = in[++i];
-            out[j++] = LL_ESCAPE(c_);
-        } else {
-            out[j++] = c;
-        }
-    }
-    return j;
-}
-
-/**
- * @brief Send I-frame to port.
- * 
- * @param port_fd Port to send I-frame to.
- * @param buffer  Data to send to port.
- * @param length  Length of the data to send.
- * @return ssize_t Number of characters written, or -1 if error
- */
 ssize_t ll_send_I(int port_fd, const uint8_t *buffer, size_t length){
     uint8_t frame_header[4];
     frame_header[0] = SP_FLAG;
@@ -158,7 +203,7 @@ ssize_t ll_send_I(int port_fd, const uint8_t *buffer, size_t length){
     if(write(port_fd, frame_header, sizeof(frame_header)) != sizeof(frame_header)){ perror("write"); return -1; }
     
     uint8_t buffer_escaped[2*LL_MAX_SIZE];
-    ssize_t written_chars = ll_stuffing(buffer_escaped, buffer, length);
+    size_t written_chars = ll_stuffing(buffer_escaped, buffer, length);
     if(written_chars < length) return -1;
 
     uint8_t frame_tail[2];
@@ -237,7 +282,7 @@ int llopen(int com, ll_status_t status){
         action.sa_flags = 0;
         sigaction(SIGALRM, &action, NULL);
 
-        int attempts;
+        unsigned attempts;
         for(attempts = 0; attempts < ll_config.retransmissions; ++attempts){
             timeout = 0;
             alarm(ll_config.timeout);
@@ -287,7 +332,7 @@ int llwrite(int port_fd, const char *buffer, int length){
     sequence_number = (sequence_number+1)%2;
 
     int res, ret = 0;
-    int attempts;
+    unsigned attempts;
     for(attempts = 0; attempts < ll_config.retransmissions; ++attempts){
         timeout = 0;
         alarm(ll_config.timeout);
@@ -330,7 +375,7 @@ int llclose(int port_fd){
     int res;
 
     if(ll_status == TRANSMITTER){  
-        int attempts;
+        unsigned attempts;
         for(attempts = 0; attempts < ll_config.retransmissions; ++attempts){
             timeout = 0;
             alarm(ll_config.timeout);
