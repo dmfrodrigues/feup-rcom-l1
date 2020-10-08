@@ -36,6 +36,9 @@ $(ODIR)/%.o: $(SDIR)/%.c | $(ODIR)
 test: FORCE
 	make -C tests test
 
+doc: FORCE
+	cd doc && doxygen doxyfile
+
 report.pdf: FORCE
 	cd doc/report && latexmk --shell-escape report.tex -pdf
 	cp doc/report/report.pdf .
