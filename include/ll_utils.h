@@ -10,7 +10,7 @@
  * @param end       Pointer to past-the-end of array to calculate BCC
  * @return uint8_t  BCC byte
  */
-uint8_t bcc(const uint8_t *start, const uint8_t *end) __attribute__((warn_unused_result));
+uint8_t ll_bcc(const uint8_t *start, const uint8_t *end) __attribute__((warn_unused_result));
 
 /**
  * @brief Perform bit stuffing in an array of bytes.
