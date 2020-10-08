@@ -13,7 +13,7 @@
 #include <signal.h>
 #include <stdbool.h>
 
-#include "flags.h"
+#include "ll_flags.h"
 #include "ll_su_statemachine.h"
 
 ll_config_t ll_config = {
