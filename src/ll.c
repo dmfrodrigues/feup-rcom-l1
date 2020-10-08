@@ -15,6 +15,7 @@
 
 #include "ll_flags.h"
 #include "ll_su_statemachine.h"
+#include "ll_utils.h"
 
 ll_config_t ll_config = {
     .baud_rate       = 38400,
@@ -160,7 +161,7 @@ int ll_send_SET(int port_fd){
     frame[0] = SP_FLAG;
     frame[1] = (ll_status == TRANSMITTER ? SP_A_SEND : SP_A_RECV);;
     frame[2] = SP_C_SET;
-    frame[3] = bcc(frame+1, frame+3);
+    frame[3] = ll_bcc(frame+1, frame+3);
     frame[4] = SP_FLAG;
 
     int res = write(port_fd, frame, sizeof(frame));
@@ -173,7 +174,7 @@ int ll_send_DISC(int port_fd){
     frame[0] = SP_FLAG;
     frame[1] = (ll_status == TRANSMITTER ? SP_A_SEND : SP_A_RECV);
     frame[2] = SP_C_DISC;
-    frame[3] = bcc(frame+1, frame+3);
+    frame[3] = ll_bcc(frame+1, frame+3);
     frame[4] = SP_FLAG;
 
     int res = write(port_fd, frame, sizeof(frame));
@@ -186,7 +187,7 @@ int ll_send_UA(int port_fd){
     frame[0] = SP_FLAG;
     frame[1] = (ll_status == TRANSMITTER ? SP_A_RECV : SP_A_SEND);
     frame[2] = SP_C_UA;
-    frame[3] = bcc(frame+1, frame+3);
+    frame[3] = ll_bcc(frame+1, frame+3);
     frame[4] = SP_FLAG;
 
     int res = write(port_fd, frame, sizeof(frame));
@@ -199,7 +200,7 @@ ssize_t ll_send_I(int port_fd, const uint8_t *buffer, size_t length){
     frame_header[0] = SP_FLAG;
     frame_header[1] = (ll_status == TRANSMITTER ? SP_A_RECV : SP_A_SEND);
     frame_header[2] = ll_get_Iframe_C();
-    frame_header[3] = bcc(frame_header+1, frame_header+3);
+    frame_header[3] = ll_bcc(frame_header+1, frame_header+3);
     if(write(port_fd, frame_header, sizeof(frame_header)) != sizeof(frame_header)){ perror("write"); return -1; }
     
     uint8_t buffer_escaped[2*LL_MAX_SIZE];
@@ -207,7 +208,7 @@ ssize_t ll_send_I(int port_fd, const uint8_t *buffer, size_t length){
     if(written_chars < length) return -1;
 
     uint8_t frame_tail[2];
-    frame_tail[0] = bcc(buffer, buffer+length);
+    frame_tail[0] = ll_bcc(buffer, buffer+length);
     frame_tail[1] = SP_FLAG;
     if(write(port_fd, frame_tail, sizeof(frame_tail)) != sizeof(frame_tail)){ perror("write"); return -1; }
 

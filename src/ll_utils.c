@@ -2,7 +2,7 @@
 
 #include "ll_flags.h"
 
-uint8_t bcc(const uint8_t *start, const uint8_t *end){
+uint8_t ll_bcc(const uint8_t *start, const uint8_t *end){
     uint8_t ret = 0;
     while(start < end){
         ret ^= *(start++);
@@ -34,7 +34,7 @@ ssize_t ll_destuffing(uint8_t *out, const uint8_t *in, size_t length){
         uint8_t c = in[i];
         if(c == SP_ESC){
             uint8_t c_ = in[++i];
-            out[j++] = LL_ESCAPE(c_);
+            out[j++] = LL_DEESCAPE(c_);
         } else {
             out[j++] = c;
         }

@@ -19,6 +19,8 @@
 *.dvi
 *.lof
 obj/
+doc/html
+doc/latex
 main
 *.png
 lib*.a

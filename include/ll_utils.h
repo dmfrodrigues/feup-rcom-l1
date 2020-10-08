@@ -1,7 +1,14 @@
+/**
+ * @defgroup    ll_utils    LL utilities
+ * @ingroup     ll
+ * @brief       Logical link (LL) utilities, for internal use.
+ */
+
 #include <stdint.h>
 #include <sys/types.h>
 
 /**
+ * @ingroup ll_utils
  * @brief Determine BCC byte value.
  * 
  * BCC is a checksum, composed from the XOR of all bytes in the segment one wishes to check.
@@ -10,9 +17,10 @@
  * @param end       Pointer to past-the-end of array to calculate BCC
  * @return uint8_t  BCC byte
  */
-uint8_t bcc(const uint8_t *start, const uint8_t *end) __attribute__((warn_unused_result));
+uint8_t ll_bcc(const uint8_t *start, const uint8_t *end) __attribute__((warn_unused_result));
 
 /**
+ * @ingroup ll_utils
  * @brief Perform bit stuffing in an array of bytes.
  * 
  * Bits are stuffed using the escape character ESC (0x7D). This character is used when a byte b is equal to
@@ -24,11 +32,12 @@ uint8_t bcc(const uint8_t *start, const uint8_t *end) __attribute__((warn_unused
  * @param length    Length of the input buffer
  * @return ssize_t  On success, the number of bytes written to the output buffer; on error, -1, and errno is set
  * 
- * @see             ll_stuffing
+ * @see             ll_destuffing(uint8_t*, const uint8_t*, size_t)
  */
 ssize_t ll_stuffing(uint8_t *out, const uint8_t *in, size_t length) __attribute__((warn_unused_result));
 
 /**
+ * @ingroup ll_utils
  * @brief Perform bit destuffing in an array of bytes.
  * 
  * @param out       Output buffer; should be at least as large as the input buffer
@@ -36,6 +45,6 @@ ssize_t ll_stuffing(uint8_t *out, const uint8_t *in, size_t length) __attribute_
  * @param length    Length of the input buffer
  * @return ssize_t  On success, the number of bytes written to the output buffer; on error, -1, and errno is set
  * 
- * @see             ssize_t ll_stuffing(uint8_t*, const uint8_t*, size_t)
+ * @see             ll_stuffing(uint8_t*, const uint8_t*, size_t)
  */
 ssize_t ll_destuffing(uint8_t *out, const uint8_t *in, size_t length) __attribute__((warn_unused_result));
