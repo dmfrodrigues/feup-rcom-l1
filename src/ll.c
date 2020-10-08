@@ -103,6 +103,22 @@ int ll_send_UA(int port_fd) __attribute__((warn_unused_result));
 ssize_t ll_send_I(int port_fd, const uint8_t *buffer, size_t length) __attribute__((warn_unused_result));
 
 /**
+ * @brief Send Receiver Ready (RR) to port.
+ * 
+ * @param port_fd   Port to send RR to
+ * @return int      0 if successful; -1 otherwise
+ */
+int ll_send_RR(int port_fd) __attribute__((warn_unused_result));
+
+/**
+ * @brief Send Rejected (REJ) to port.
+ * 
+ * @param port_fd   Port to send REJ to
+ * @return int      Number of bytes sent, if successful; -1 otherwise
+ */
+int ll_send_REJ(int port_fd) __attribute__((warn_unused_result));
+
+/**
  * @brief Expect for S/U-frame to arrive from port.
  * 
  * @param port_fd   Port to expect the frame comes from
@@ -215,7 +231,7 @@ ssize_t ll_send_I(int port_fd, const uint8_t *buffer, size_t length){
     return length;
 }
 
-ssize_t ll_send_RR(int port_fd){
+int ll_send_RR(int port_fd){
     uint8_t frame[5];
     frame[0] = LL_FLAG;
     frame[1] = (ll_status == TRANSMITTER ? LL_A_RECV : LL_A_SEND);
@@ -224,11 +240,13 @@ ssize_t ll_send_RR(int port_fd){
     frame[4] = LL_FLAG;
 
     int res = write(port_fd, frame, sizeof(frame));
-    if(res == sizeof(frame))  fprintf(stderr, "Sent RR\n");
-    return res;
+    if(res == sizeof(frame)){
+        fprintf(stderr, "Sent RR\n");
+        return EXIT_SUCCESS;
+    } else return EXIT_FAILURE;
 }
 
-ssize_t ll_send_REJ(int port_fd){
+int ll_send_REJ(int port_fd){
     uint8_t frame[5];
     frame[0] = LL_FLAG;
     frame[1] = (ll_status == TRANSMITTER ? LL_A_RECV : LL_A_SEND);
@@ -237,8 +255,10 @@ ssize_t ll_send_REJ(int port_fd){
     frame[4] = LL_FLAG;
 
     int res = write(port_fd, frame, sizeof(frame));
-    if(res == sizeof(frame))  fprintf(stderr, "Sent REJ\n");
-    return res;
+    if(res == sizeof(frame)){
+        fprintf(stderr, "Sent REJ\n");
+        return EXIT_SUCCESS;
+    } else return EXIT_FAILURE;
 }
 
 int ll_expect_SUframe(int port_fd, uint8_t *a_rcv, uint8_t *c_rcv){
