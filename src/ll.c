@@ -11,6 +11,7 @@
 #include <termios.h>
 #include <unistd.h>
 #include <signal.h>
+#include <stdbool.h>
 
 #include "flags.h"
 #include "ll_su_statemachine.h"
@@ -108,19 +109,33 @@ int ll_send_UA(int port_fd){
     return res;
 }
 
-ssize_t ll_escape(uint8_t *buf_esc, const uint8_t *buf, size_t length){
+ssize_t ll_stuffing(uint8_t *out, const uint8_t *in, size_t length){
     ssize_t j = 0;
     for(size_t i = 0; i < length; ++i){
-        uint8_t c = buf[i];
+        uint8_t c = in[i];
         switch(c){
             case SP_FLAG:
             case SP_ESC :
-                buf_esc[j++] = SP_ESC;
-                buf_esc[j++] = LL_ESCAPE(c);
+                out[j++] = SP_ESC;
+                out[j++] = LL_ESCAPE(c);
                 break;
             default:
-                buf_esc[j++] = c;
+                out[j++] = c;
                 break;
+        }
+    }
+    return j;
+}
+
+ssize_t ll_destuffing(uint8_t *out, const uint8_t *in, size_t length){
+    ssize_t j = 0;
+    for(size_t i = 0; i < length; ++i){
+        uint8_t c = in[i];
+        if(c == SP_ESC){
+            uint8_t c_ = in[++i];
+            out[j++] = LL_ESCAPE(c_);
+        } else {
+            out[j++] = c;
         }
     }
     return j;
@@ -143,7 +158,7 @@ ssize_t ll_send_I(int port_fd, const uint8_t *buffer, size_t length){
     if(write(port_fd, frame_header, sizeof(frame_header)) != sizeof(frame_header)){ perror("write"); return -1; }
     
     uint8_t buffer_escaped[2*LL_MAX_SIZE];
-    ssize_t written_chars = ll_escape(buffer_escaped, buffer, length);
+    ssize_t written_chars = ll_stuffing(buffer_escaped, buffer, length);
     if(written_chars < length) return -1;
 
     uint8_t frame_tail[2];
