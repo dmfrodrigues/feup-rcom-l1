@@ -119,11 +119,20 @@ ssize_t ll_send_I(int port_fd, const uint8_t *buffer, size_t length){
     ssize_t written_chars = ll_stuffing(buffer_escaped, buffer, length);
     if(written_chars < (ssize_t)length) return -1;
 
-    uint8_t frame_tail[2];
-    frame_tail[0] = ll_bcc(buffer, buffer+length);
-    frame_tail[1] = LL_FLAG;
-    if(write(port_fd, frame_tail, sizeof(frame_tail)) != sizeof(frame_tail)){ perror("write"); return -1; }
-
+    uint8_t bcc2 = ll_bcc(buffer, buffer+length);
+    if(bcc2 == LL_FLAG || bcc2 == LL_ESC){
+        uint8_t frame_tail[3];
+        frame_tail[0] = LL_ESC;
+        frame_tail[1] = LL_STUFF(bcc2);
+        frame_tail[2] = LL_FLAG;
+        if(write(port_fd, frame_tail, sizeof(frame_tail)) != sizeof(frame_tail)){ perror("write"); return -1; }
+    } else {
+        uint8_t frame_tail[2];
+        frame_tail[0] = bcc2;
+        frame_tail[1] = LL_FLAG;
+        if(write(port_fd, frame_tail, sizeof(frame_tail)) != sizeof(frame_tail)){ perror("write"); return -1; }
+    }
+    
     return length;
 }
 
