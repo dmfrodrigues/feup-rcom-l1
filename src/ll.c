@@ -19,6 +19,8 @@
 struct termios oldtio;
 
 int llopen(int com, ll_status_t status){
+    fprintf(stderr, "Preparing to open\n");
+
     ll_status = status;
 
     // Get serial port path
@@ -78,7 +80,7 @@ int llopen(int com, ll_status_t status){
                     else        fprintf(stderr, "ERROR: emitter was interrupted due to unknown reason\n");
                 } else perror("read");
             } else if(a_rcv == LL_A_SEND && c_rcv == LL_C_UA){
-                fprintf(stderr, "Got UA\n");
+                fprintf(stderr, "    Got UA\n");
                 break;
             } else{
                 fprintf(stderr, "ERROR: c_rcv or a_rcv are not correct\na_rcv=0x%02X (should be 0x%02X)\nc_rcv=0x%02X (should be 0x%02X)\n", a_rcv, LL_A_SEND, c_rcv, LL_C_UA);
@@ -94,7 +96,7 @@ int llopen(int com, ll_status_t status){
             perror("read");
             return -1;
         } else if(a_rcv == LL_A_SEND && c_rcv == LL_C_SET){
-            fprintf(stderr, "Got SET\n");
+            fprintf(stderr, "    Got SET\n");
             res = ll_send_UA(port_fd);
             if(res < 0) return -1;
         } else {
@@ -103,10 +105,14 @@ int llopen(int com, ll_status_t status){
         }
     }
 
+    fprintf(stderr, "Successfully opened\n");
+
     return port_fd;
 }
 
 int llwrite(int port_fd, const char *buffer, int length){
+    fprintf(stderr, "Preparing to write\n");
+
     if(ll_status == RECEIVER) return -1;
 
     sequence_number = (sequence_number+1)%2;
@@ -136,10 +142,10 @@ int llwrite(int port_fd, const char *buffer, int length){
             } else perror("read");
         } else if(a_rcv == LL_A_SEND){
             if(c_rcv == ll_get_expected_RR()){
-                fprintf(stderr, "Got RR\n");
+                fprintf(stderr, "    Got RR\n");
                 break;
             } else if(c_rcv == ll_get_expected_REJ()){
-                fprintf(stderr, "Got REJ\n");
+                fprintf(stderr, "    Got REJ\n");
             } else fprintf(stderr, "Don't know what I got; a=0x%02X, c=0x%02X\n", a_rcv, c_rcv);
         } else{
             fprintf(stderr, "ERROR: c_rcv or a_rcv are not correct\na_rcv=0x%02X (should be 0x%02X)\nc_rcv=0x%02X (should be 0x%02X, 0x%02X)\n", a_rcv, LL_A_SEND, c_rcv, ll_get_expected_RR(), ll_get_expected_REJ());
@@ -148,10 +154,14 @@ int llwrite(int port_fd, const char *buffer, int length){
     if(attempts == ll_config.retransmissions) return -1;
     alarm(0);
 
+    fprintf(stderr, "Successfully wrote\n");
+
     return ret;
 }
 
 int llread(int port_fd, char *buffer){
+    fprintf(stderr, "Preparing to read\n");
+
     if(ll_status == TRANSMITTER) return -1;
     
     ssize_t sz = -1;
@@ -168,13 +178,19 @@ int llread(int port_fd, char *buffer){
         } else {
             // Send RR
             if(ll_send_RR(port_fd)) return -1;
+            break;
         }
     }
     if(attempts == ll_config.retransmissions) return -1;
+
+    fprintf(stderr, "Successfully read\n");
+
     return sz;
 }
 
 int llclose(int port_fd){
+    fprintf(stderr, "Preparing to close\n");
+
     int res;
 
     if(ll_status == TRANSMITTER){  
@@ -198,7 +214,7 @@ int llclose(int port_fd){
                 } else perror("read");
             } 
             else if(a_rcv == LL_A_RECV && c_rcv == LL_C_DISC) {
-                fprintf(stderr, "Got DISC\n");
+                fprintf(stderr, "    Got DISC\n");
                 break;
             } else fprintf(stderr, "ERROR: c_rcv or a_rcv are not correct\n");
         }
@@ -218,7 +234,7 @@ int llclose(int port_fd){
             perror("read"); return -1;
         }
         else if(a_rcv == LL_A_SEND && c_rcv == LL_C_DISC){
-            fprintf(stderr, "Got DISC\n");
+            fprintf(stderr, "    Got DISC\n");
         } else{ 
             fprintf(stderr, "ERROR: c_rcv or a_rcv are not correct\n"); return -1;
         }
@@ -233,7 +249,7 @@ int llclose(int port_fd){
             perror("read"); return -1;
         }
         else if(a_rcv == LL_A_RECV && c_rcv == LL_C_UA){
-            fprintf(stderr, "Got UA\n");
+            fprintf(stderr, "    Got UA\n");
         } else{ 
             fprintf(stderr, "ERROR: c_rcv or a_rcv are not correct\n"); return -1;
         }
@@ -245,7 +261,7 @@ int llclose(int port_fd){
     // Close port
     if(close(port_fd) == -1) { perror("close"); return -1; };
     
-    fprintf(stderr, "Successfully disconnected\n");
+    fprintf(stderr, "Closed successfully\n");
 
     return 0;
 }

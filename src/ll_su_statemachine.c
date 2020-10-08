@@ -4,6 +4,7 @@
 #include <stdlib.h>
 
 #include "ll_flags.h"
+#include "ll_internal.h"
 
 int ll_su_state_update(ll_su_statemachine_t *machine, uint8_t byte){
     switch (machine->state) {
@@ -25,7 +26,10 @@ int ll_su_state_update(ll_su_statemachine_t *machine, uint8_t byte){
             case LL_C_DISC:
             case LL_C_UA  : machine->c_rcv = byte; machine->state = LL_SU_C_RCV   ; break;
             case LL_FLAG  :                        machine->state = LL_SU_Flag_RCV; break;
-            default       :                        machine->state = LL_SU_Start   ; break;
+            default       :
+                if(byte == ll_get_expected_RR() || byte == ll_get_expected_REJ()) { machine->c_rcv = byte; machine->state = LL_SU_C_RCV; }
+                else machine->state = LL_SU_Start;
+                break;
         } break;
     case LL_SU_C_RCV:
         switch(byte){

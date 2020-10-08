@@ -18,6 +18,12 @@ int main(int argc, char** argv){
     int port_fd = llopen(atoi(argv[1]), TRANSMITTER);
     if(port_fd < 0) return -1;
 
+    char buffer[] = "hello";
+    ssize_t sz = llwrite(port_fd, buffer, strlen(buffer));
+    if(sz != (ssize_t)strlen(buffer)){
+        fprintf(stderr, "ERROR: failed to send string '%s'\n", buffer);
+    }
+
     int res = llclose(port_fd);
     if(res) return -1;
 

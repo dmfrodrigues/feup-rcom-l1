@@ -77,7 +77,7 @@ int ll_send_SET(int port_fd){
     frame[4] = LL_FLAG;
 
     int res = write(port_fd, frame, sizeof(frame));
-    if(res == sizeof(frame)) fprintf(stderr, "Sent SET\n");
+    if(res == sizeof(frame)) fprintf(stderr, "    Sent SET\n");
     return res;
 }
 
@@ -90,7 +90,7 @@ int ll_send_DISC(int port_fd){
     frame[4] = LL_FLAG;
 
     int res = write(port_fd, frame, sizeof(frame));
-    if(res == sizeof(frame))  fprintf(stderr, "Sent DISC\n");
+    if(res == sizeof(frame))  fprintf(stderr, "    Sent DISC\n");
     return res;
 }
 
@@ -103,14 +103,20 @@ int ll_send_UA(int port_fd){
     frame[4] = LL_FLAG;
 
     int res = write(port_fd, frame, sizeof(frame));
-    if(res == sizeof(frame))  fprintf(stderr, "Sent UA\n");
+    if(res == sizeof(frame))  fprintf(stderr, "    Sent UA\n");
     return res;
 }
 
 ssize_t ll_send_I(int port_fd, const uint8_t *buffer, size_t length){
+    fprintf(stderr, "Sending '");
+    for(size_t i = 0; i < length; ++i) fprintf(stderr, "%c", buffer[i]);
+    fprintf(stderr, "' (");
+    for(size_t i = 0; i < length; ++i) fprintf(stderr, "%02X ", buffer[i]);
+    fprintf(stderr, ")\n");
+
     uint8_t frame_header[4];
     frame_header[0] = LL_FLAG;
-    frame_header[1] = (ll_status == TRANSMITTER ? LL_A_RECV : LL_A_SEND);
+    frame_header[1] = (ll_status == TRANSMITTER ? LL_A_SEND : LL_A_RECV);
     frame_header[2] = ll_get_Iframe_C();
     frame_header[3] = ll_bcc(frame_header+1, frame_header+3);
     if(write(port_fd, frame_header, sizeof(frame_header)) != sizeof(frame_header)){ perror("write"); return -1; }
@@ -118,6 +124,12 @@ ssize_t ll_send_I(int port_fd, const uint8_t *buffer, size_t length){
     uint8_t buffer_escaped[2*LL_MAX_SIZE];
     ssize_t written_chars = ll_stuffing(buffer_escaped, buffer, length);
     if(written_chars < (ssize_t)length) return -1;
+    fprintf(stderr, "Stuffed bits, preparing to send %ld bytes:", written_chars);
+    for(ssize_t i = 0; i < written_chars; ++i){
+        fprintf(stderr, " %02X", buffer_escaped[i]);
+    }
+    fprintf(stderr, "\n");
+    if(write(port_fd, buffer_escaped, written_chars) != written_chars){ perror("write"); return -1; }
 
     uint8_t bcc2 = ll_bcc(buffer, buffer+length);
     if(bcc2 == LL_FLAG || bcc2 == LL_ESC){
@@ -132,6 +144,8 @@ ssize_t ll_send_I(int port_fd, const uint8_t *buffer, size_t length){
         frame_tail[1] = LL_FLAG;
         if(write(port_fd, frame_tail, sizeof(frame_tail)) != sizeof(frame_tail)){ perror("write"); return -1; }
     }
+
+    fprintf(stderr, "    Sent I\n");
     
     return length;
 }
@@ -146,7 +160,7 @@ int ll_send_RR(int port_fd){
 
     int res = write(port_fd, frame, sizeof(frame));
     if(res == sizeof(frame)){
-        fprintf(stderr, "Sent RR\n");
+        fprintf(stderr, "    Sent RR\n");
         return EXIT_SUCCESS;
     } else return EXIT_FAILURE;
 }
@@ -161,12 +175,13 @@ int ll_send_REJ(int port_fd){
 
     int res = write(port_fd, frame, sizeof(frame));
     if(res == sizeof(frame)){
-        fprintf(stderr, "Sent REJ\n");
+        fprintf(stderr, "    Sent REJ\n");
         return EXIT_SUCCESS;
     } else return EXIT_FAILURE;
 }
 
 int ll_expect_SUframe(int port_fd, uint8_t *a_rcv, uint8_t *c_rcv){
+    fprintf(stderr, "    Expecting S/U-frame\n");
     ll_su_statemachine_t machine = {
         .state = LL_SU_Start,
         .a_rcv = 0,
@@ -176,7 +191,7 @@ int ll_expect_SUframe(int port_fd, uint8_t *a_rcv, uint8_t *c_rcv){
         uint8_t byte;
         int res = read(port_fd, &byte, 1);
         if(res == 1){
-            fprintf(stderr, "Read byte 0x%02X\n", byte);
+            fprintf(stderr, "        Read byte 0x%02X | ", byte);
             fprintf(stderr, "Transitioned from state %d", machine.state);
             res = ll_su_state_update(&machine, byte);
             fprintf(stderr, " to %d\n", machine.state);
@@ -192,6 +207,7 @@ int ll_expect_SUframe(int port_fd, uint8_t *a_rcv, uint8_t *c_rcv){
 }
 
 ssize_t ll_expect_Iframe(int port_fd, uint8_t *buffer){
+    fprintf(stderr, "    Expecting I-frame\n");
     ll_i_statemachine_t machine = {
         .state = LL_I_Start,
         .escaped = false,
@@ -201,7 +217,7 @@ ssize_t ll_expect_Iframe(int port_fd, uint8_t *buffer){
         uint8_t byte;
         int res = read(port_fd, &byte, 1);
         if(res == 1){
-            fprintf(stderr, "Read byte 0x%02X\n", byte);
+            fprintf(stderr, "        Read byte 0x%02X | ", byte);
             fprintf(stderr, "Transitioned from state %d", machine.state);
             res = ll_i_state_update(&machine, byte);
             fprintf(stderr, " to %d\n", machine.state);
@@ -218,7 +234,7 @@ ssize_t ll_expect_Iframe(int port_fd, uint8_t *buffer){
     ssize_t written_chars = ll_destuffing(buffer, machine.data, machine.length);
     if(written_chars <= 0) return -1;
 
-    uint8_t bcc2  = buffer[written_chars];
+    uint8_t bcc2  = buffer[written_chars-1];
     uint8_t bcc2_ = ll_bcc(buffer, buffer+written_chars-1);
     if(bcc2 != bcc2_){
         fprintf(stderr, "ERROR: bcc2 is not correct (is 0x%02X, should be 0x%02X)\n", bcc2, bcc2_);
