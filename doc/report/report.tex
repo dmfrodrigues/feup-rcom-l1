@@ -18,6 +18,9 @@
 
 % Graphics and images
 \usepackage{graphicx} \graphicspath{{./images/}}
+\usepackage{tikz}
+\usepackage{tikz-qtree}
+\usetikzlibrary{automata, positioning, arrows}
 \usepackage{subcaption}
 \usepackage{float}
 
@@ -99,7 +102,84 @@ This report is an artifact of the corresponding project, with the purpose of gui
 
 \section{Architecture} \label{sec:Architecture}
 
+First of all, we designed the generic architecture of our system. It essentially consists of a lower, data link layer, which is responsible for dealing with the serial port through its driver and the facilities of abstraction through files/terminals provided by a Linux operating system, providing a simple interface to allow synchronous communication between two computers (a transmitter and a receiver), allowing to open/close ports and write/read generic data to them, and implementing some sort of error-control method; on top of that lower layer, is a high-level application made of two executable files, \texttt{transmitter} and \texttt{receiver}, which take advantage of the data link layer to transfer a file from the transmitter to the receiver, and provide a simple command line interface to the user.
+
+\begin{figure}[H]
+	\centering
+	\begin{tikzpicture}[->,>=stealth',node distance=1.4cm,initial text=$ $,]
+		\node[align=center, draw, minimum width=7cm, minimum height=1.4cm] (app) {Application};
+		\node[align=center, draw, minimum width=7cm, minimum height=1.4cm, fill=black!10, below of=app] (link) {Data link};
+		\node[align=center, draw, minimum width=7cm, minimum height=1.4cm, fill=black!20, below of=link] (driver) {Serial port driver \\ {\footnotesize \texttt{/dev/ttyS0}}};
+		\node[align=center, draw, minimum width=7cm, minimum height=1.4cm, fill=black!30, below of=driver] (hardware) {Hardware \\ {\footnotesize RS-232 asynchronous serial port}};
+		\node[align=center, above of=app] at (0, +0.7) (user){\includegraphics[scale=0.25]{actor.png}};
+	
+		\draw   (app) 		edge[align=center, left , bend right=88.5		] node{\small open port \\[-0.2em] \small write to port \\[-0.2em] \small close port} (link)
+				(link) 		edge[align=center, right, bend right=88.5		] node{\small read from port} (app)
+				(link) 		edge[align=center, left , bend right=88.5		] node{\small \texttt{open} \\[-0.2em] \small \texttt{tcsetattr} \\[-0.2em] \small \texttt{write}} (driver)
+				(driver) 	edge[align=center, right, bend right=88.5		] node{\small \texttt{tcgetattr} \\[-0.2em] \small \texttt{read}} (link)
+				(user) 		edge[align=center, left , bend right=60			] node{\small file to be transferred} (app)
+				(app) 		edge[align=center, right, bend right=60			] node{\small transferred file} (user)
+			;
+	\end{tikzpicture}
+	\caption{Architecture of the program to be developed}
+\end{figure}
+
 \section{Code structure} \label{sec:CodeStructure}
+
+\begin{figure}[H]
+	\centering
+	\begin{tikzpicture}[->,>=stealth',node distance=2cm,initial text=$ $,]
+		\node[align=center] at (-4.5, +2.2) (actor-transmitter){\includegraphics[scale=0.2]{actor.png}};
+		\node[align=center] at (+4, +2.2) (actor-receiver)   {\includegraphics[scale=0.2]{actor.png}};
+		\node[align=center, draw, minimum width=5cm, minimum height=1.3cm] at (-4.5, -0.3) (transmitter) {Transmitter \\ \footnotesize \texttt{transmitter} at \texttt{COM1}};
+		\node[align=center, draw, minimum width=5cm, minimum height=1.3cm] at (+4, -0.3) (receiver) {Receiver \\ \footnotesize \texttt{receiver} at \texttt{COM2}};
+		\node[align=center, draw, minimum width=5cm, minimum height=1.3cm, fill=black!10] at (-4.5, -2.6) (ll-transmitter) {Link Layer (LL) \\ \footnotesize \texttt{status=TRANSMITTER}};
+		\node[align=center, draw, minimum width=5cm, minimum height=1.3cm, fill=black!10] at (+4, -2.6) (ll-receiver) {Link Layer (LL) \\ \footnotesize \texttt{status=RECEIVER}};
+		\node[align=center, draw, minimum width=5cm, minimum height=1.3cm, fill=black!20] at (-4.5, -5.2) (driver-transmitter) {Serial port driver \\ \footnotesize \texttt{/dev/ttyS0}};
+		\node[align=center, draw, minimum width=5cm, minimum height=1.3cm, fill=black!20] at (+4, -5.2) (driver-receiver) {Serial port driver \\ \footnotesize \texttt{/dev/ttyS1}};
+		\node[align=center, draw, minimum width=5cm, minimum height=1.3cm, fill=black!30] at (-4.5, -7.2) (port-transmitter) {RS-232 serial port \\ \footnotesize \texttt{COM1}};
+		\node[align=center, draw, minimum width=5cm, minimum height=1.3cm, fill=black!30] at (+4, -7.2) (port-receiver) {RS-232 serial port \\ \footnotesize \texttt{COM2}};
+
+		\node[align=right] at (-8.3, -0.3) (app) {Application \\ layer};
+		\node[align=right] at (-8.15, -2.6) (ll) {Data link \\ layer};
+		\node[align=right] at (-8.25, -5.2) (app) {Serial port \\ drivers};
+		\node[align=right] at (-8.2, -7.2) (app) {Hardware};
+		
+		\path   (-5, -3.25) 	edge[align=center, left		] node{\small \texttt{open}, \texttt{close} \\[-0.2em] \small \texttt{tcsetattr}} (-5, -4.55)
+				(+3.5, -3.25) 	edge[align=center, left		] node{\small \texttt{open}, \texttt{close} \\[-0.2em] \small \texttt{tcsetattr}} (+3.5, -4.55)
+
+				(-4, -4.55) 	edge[align=center, right	] node{\small \texttt{tcgetattr}} (-4, -3.25)
+				(+4.5, -4.55) 	edge[align=center, right	] node{\small \texttt{tcgetattr}} (+4.5, -3.25)
+
+				(-5, -5.85) 	edge[align=center, left		] node{} (-5, -6.55)
+				(+3.5, -5.85) 	edge[align=center, left		] node{} (+3.5, -6.55)
+
+				(-4, -6.55) 	edge[align=center, right	] node{} (-4, -5.85)
+				(+4.5, -6.55) 	edge[align=center, right	] node{} (+4.5, -5.85)
+
+				;
+
+			\draw	(actor-transmitter)		edge[								]	node{\small \texttt{./transmitter 1 pinguim.gif}}	(transmitter)
+					(receiver)				edge[								]	node{\small \texttt{./receiver 2 pinguim.gif}}	(actor-receiver)
+
+					(transmitter)			edge[dashed, above					] node{\textit{transferring file...}} (receiver)
+
+					(transmitter) 			edge[align=center, right	] node{\small \texttt{llopen}, \texttt{llclose}} (ll-transmitter)
+					(receiver) 				edge[align=center, left		] node{\small \texttt{llopen}, \texttt{llclose}} (ll-receiver)
+
+					(ll-transmitter) 		edge[dashed, align=center, above	] node{\small \texttt{llwrite} / \texttt{llread}} (ll-receiver)
+
+					(driver-transmitter) 	edge[dashed, align=center, above	] node{\small \texttt{write} / \texttt{read}} (driver-receiver)
+
+					(port-transmitter) 		edge[-, double, double distance=3pt, align=center, above	] node{\small physical cable} (port-receiver)
+				;
+	\end{tikzpicture}
+	\caption{Architecture of the program to be developed}
+\end{figure}
+
+, and implementing a \textit{stop-and-wait} error-control protocol
+
+which take advantage of the data link layer to transfer a file in chunks
 
 \section{Main use cases} \label{sec:UseCases}
 
