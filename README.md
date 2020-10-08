@@ -4,6 +4,7 @@
 
 ![Compile report](https://github.com/dmfrodrigues/feup-rcom-l1/workflows/Compile%20report/badge.svg)
 ![Test](https://github.com/dmfrodrigues/feup-rcom-l1/workflows/Test/badge.svg)
+![Documentation](https://github.com/dmfrodrigues/feup-rcom-l1/workflows/Documentation/badge.svg)
 
 - **Project name:** Serial port data protocol
 - **Short description:** Serial port data protocol and API, for communicating between two computers
