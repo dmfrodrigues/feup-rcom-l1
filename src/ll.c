@@ -158,11 +158,11 @@ uint8_t ll_get_Iframe_C(void){
 
 int ll_send_SET(int port_fd){
     uint8_t frame[5];
-    frame[0] = SP_FLAG;
-    frame[1] = (ll_status == TRANSMITTER ? SP_A_SEND : SP_A_RECV);;
-    frame[2] = SP_C_SET;
+    frame[0] = LL_FLAG;
+    frame[1] = (ll_status == TRANSMITTER ? LL_A_SEND : LL_A_RECV);;
+    frame[2] = LL_C_SET;
     frame[3] = ll_bcc(frame+1, frame+3);
-    frame[4] = SP_FLAG;
+    frame[4] = LL_FLAG;
 
     int res = write(port_fd, frame, sizeof(frame));
     if(res == sizeof(frame)) fprintf(stderr, "Sent SET\n");
@@ -171,11 +171,11 @@ int ll_send_SET(int port_fd){
 
 int ll_send_DISC(int port_fd){
     uint8_t frame[5];
-    frame[0] = SP_FLAG;
-    frame[1] = (ll_status == TRANSMITTER ? SP_A_SEND : SP_A_RECV);
-    frame[2] = SP_C_DISC;
+    frame[0] = LL_FLAG;
+    frame[1] = (ll_status == TRANSMITTER ? LL_A_SEND : LL_A_RECV);
+    frame[2] = LL_C_DISC;
     frame[3] = ll_bcc(frame+1, frame+3);
-    frame[4] = SP_FLAG;
+    frame[4] = LL_FLAG;
 
     int res = write(port_fd, frame, sizeof(frame));
     if(res == sizeof(frame))  fprintf(stderr, "Sent DISC\n");
@@ -184,11 +184,11 @@ int ll_send_DISC(int port_fd){
 
 int ll_send_UA(int port_fd){
     uint8_t frame[5];
-    frame[0] = SP_FLAG;
-    frame[1] = (ll_status == TRANSMITTER ? SP_A_RECV : SP_A_SEND);
-    frame[2] = SP_C_UA;
+    frame[0] = LL_FLAG;
+    frame[1] = (ll_status == TRANSMITTER ? LL_A_RECV : LL_A_SEND);
+    frame[2] = LL_C_UA;
     frame[3] = ll_bcc(frame+1, frame+3);
-    frame[4] = SP_FLAG;
+    frame[4] = LL_FLAG;
 
     int res = write(port_fd, frame, sizeof(frame));
     if(res == sizeof(frame))  fprintf(stderr, "Sent UA\n");
@@ -197,8 +197,8 @@ int ll_send_UA(int port_fd){
 
 ssize_t ll_send_I(int port_fd, const uint8_t *buffer, size_t length){
     uint8_t frame_header[4];
-    frame_header[0] = SP_FLAG;
-    frame_header[1] = (ll_status == TRANSMITTER ? SP_A_RECV : SP_A_SEND);
+    frame_header[0] = LL_FLAG;
+    frame_header[1] = (ll_status == TRANSMITTER ? LL_A_RECV : LL_A_SEND);
     frame_header[2] = ll_get_Iframe_C();
     frame_header[3] = ll_bcc(frame_header+1, frame_header+3);
     if(write(port_fd, frame_header, sizeof(frame_header)) != sizeof(frame_header)){ perror("write"); return -1; }
@@ -209,7 +209,7 @@ ssize_t ll_send_I(int port_fd, const uint8_t *buffer, size_t length){
 
     uint8_t frame_tail[2];
     frame_tail[0] = ll_bcc(buffer, buffer+length);
-    frame_tail[1] = SP_FLAG;
+    frame_tail[1] = LL_FLAG;
     if(write(port_fd, frame_tail, sizeof(frame_tail)) != sizeof(frame_tail)){ perror("write"); return -1; }
 
     return length;
@@ -217,11 +217,11 @@ ssize_t ll_send_I(int port_fd, const uint8_t *buffer, size_t length){
 
 ssize_t ll_send_RR(int port_fd){
     uint8_t frame[5];
-    frame[0] = SP_FLAG;
-    frame[1] = (ll_status == TRANSMITTER ? SP_A_RECV : SP_A_SEND);
+    frame[0] = LL_FLAG;
+    frame[1] = (ll_status == TRANSMITTER ? LL_A_RECV : LL_A_SEND);
     frame[2] = LL_RR(sequence_number);
-    frame[3] = bcc(frame+1, frame+3);
-    frame[4] = SP_FLAG;
+    frame[3] = ll_bcc(frame+1, frame+3);
+    frame[4] = LL_FLAG;
 
     int res = write(port_fd, frame, sizeof(frame));
     if(res == sizeof(frame))  fprintf(stderr, "Sent RR\n");
@@ -230,11 +230,11 @@ ssize_t ll_send_RR(int port_fd){
 
 ssize_t ll_send_REJ(int port_fd){
     uint8_t frame[5];
-    frame[0] = SP_FLAG;
-    frame[1] = (ll_status == TRANSMITTER ? SP_A_RECV : SP_A_SEND);
+    frame[0] = LL_FLAG;
+    frame[1] = (ll_status == TRANSMITTER ? LL_A_RECV : LL_A_SEND);
     frame[2] = LL_REJ(sequence_number);
-    frame[3] = bcc(frame+1, frame+3);
-    frame[4] = SP_FLAG;
+    frame[3] = ll_bcc(frame+1, frame+3);
+    frame[4] = LL_FLAG;
 
     int res = write(port_fd, frame, sizeof(frame));
     if(res == sizeof(frame))  fprintf(stderr, "Sent REJ\n");
@@ -327,11 +327,11 @@ int llopen(int com, ll_status_t status){
                     if(timeout) fprintf(stderr, "WARNING: gave up due to timeout\n");
                     else        fprintf(stderr, "ERROR: emitter was interrupted due to unknown reason\n");
                 } else perror("read");
-            } else if(a_rcv == SP_A_SEND && c_rcv == SP_C_UA){
+            } else if(a_rcv == LL_A_SEND && c_rcv == LL_C_UA){
                 fprintf(stderr, "Got UA\n");
                 break;
             } else{
-                fprintf(stderr, "ERROR: c_rcv or a_rcv are not correct\na_rcv=0x%02X (should be 0x%02X)\nc_rcv=0x%02X (should be 0x%02X)\n", a_rcv, SP_A_SEND, c_rcv, SP_C_UA);
+                fprintf(stderr, "ERROR: c_rcv or a_rcv are not correct\na_rcv=0x%02X (should be 0x%02X)\nc_rcv=0x%02X (should be 0x%02X)\n", a_rcv, LL_A_SEND, c_rcv, LL_C_UA);
             }
         }
         if(attempts == ll_config.retransmissions) return -1;
@@ -343,11 +343,11 @@ int llopen(int com, ll_status_t status){
         if(res){
             perror("read");
             return -1;
-        } else if(a_rcv == SP_A_SEND && c_rcv == SP_C_SET){
+        } else if(a_rcv == LL_A_SEND && c_rcv == LL_C_SET){
             fprintf(stderr, "Got SET\n");
             res = ll_send_UA(port_fd);
         } else {
-            fprintf(stderr, "ERROR: c_rcv or a_rcv are not correct\na_rcv=0x%02X (should be 0x%02X)\nc_rcv=0x%02X (should be 0x%02X)\n", a_rcv, SP_A_SEND, c_rcv, SP_C_SET);
+            fprintf(stderr, "ERROR: c_rcv or a_rcv are not correct\na_rcv=0x%02X (should be 0x%02X)\nc_rcv=0x%02X (should be 0x%02X)\n", a_rcv, LL_A_SEND, c_rcv, LL_C_SET);
             return -1;
         }
     }
@@ -381,7 +381,7 @@ int llwrite(int port_fd, const char *buffer, int length){
                 if(timeout) fprintf(stderr, "WARNING: gave up due to timeout\n");
                 else        fprintf(stderr, "ERROR: emitter was interrupted due to unknown reason\n");
             } else perror("read");
-        } else if(a_rcv == SP_A_SEND){
+        } else if(a_rcv == LL_A_SEND){
             if(c_rcv == ll_get_expected_RR()){
                 fprintf(stderr, "Got RR\n");
                 break;
@@ -389,7 +389,7 @@ int llwrite(int port_fd, const char *buffer, int length){
                 fprintf(stderr, "Got REJ\n");
             } else fprintf(stderr, "Don't know what I got; a=0x%02X, c=0x%02X\n", a_rcv, c_rcv);
         } else{
-            fprintf(stderr, "ERROR: c_rcv or a_rcv are not correct\na_rcv=0x%02X (should be 0x%02X)\nc_rcv=0x%02X (should be 0x%02X, 0x%02X)\n", a_rcv, SP_A_SEND, c_rcv, ll_get_expected_RR(), ll_get_expected_REJ());
+            fprintf(stderr, "ERROR: c_rcv or a_rcv are not correct\na_rcv=0x%02X (should be 0x%02X)\nc_rcv=0x%02X (should be 0x%02X, 0x%02X)\n", a_rcv, LL_A_SEND, c_rcv, ll_get_expected_RR(), ll_get_expected_REJ());
         }
     }
     if(attempts == ll_config.retransmissions) return -1;
@@ -426,7 +426,7 @@ int llclose(int port_fd){
                     else        fprintf(stderr, "ERROR: interrupted due to unknown reason\n");
                 } else perror("read");
             } 
-            else if(a_rcv == SP_A_RECV && c_rcv == SP_C_DISC) {
+            else if(a_rcv == LL_A_RECV && c_rcv == LL_C_DISC) {
                 fprintf(stderr, "Got DISC\n");
                 break;
             } else fprintf(stderr, "ERROR: c_rcv or a_rcv are not correct\n");
@@ -446,7 +446,7 @@ int llclose(int port_fd){
         if(res){
             perror("read"); return -1;
         }
-        else if(a_rcv == SP_A_SEND && c_rcv == SP_C_DISC){
+        else if(a_rcv == LL_A_SEND && c_rcv == LL_C_DISC){
             fprintf(stderr, "Got DISC\n");
         } else{ 
             fprintf(stderr, "ERROR: c_rcv or a_rcv are not correct\n"); return -1;
@@ -461,7 +461,7 @@ int llclose(int port_fd){
         if(res){
             perror("read"); return -1;
         }
-        else if(a_rcv == SP_A_RECV && c_rcv == SP_C_UA){
+        else if(a_rcv == LL_A_RECV && c_rcv == LL_C_UA){
             fprintf(stderr, "Got UA\n");
         } else{ 
             fprintf(stderr, "ERROR: c_rcv or a_rcv are not correct\n"); return -1;

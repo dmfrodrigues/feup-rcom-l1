@@ -15,9 +15,9 @@ ssize_t ll_stuffing(uint8_t *out, const uint8_t *in, size_t length){
     for(size_t i = 0; i < length; ++i){
         uint8_t c = in[i];
         switch(c){
-            case SP_FLAG:
-            case SP_ESC :
-                out[j++] = SP_ESC;
+            case LL_FLAG:
+            case LL_ESC :
+                out[j++] = LL_ESC;
                 out[j++] = LL_ESCAPE(c);
                 break;
             default:
@@ -32,7 +32,7 @@ ssize_t ll_destuffing(uint8_t *out, const uint8_t *in, size_t length){
     ssize_t j = 0;
     for(size_t i = 0; i < length; ++i){
         uint8_t c = in[i];
-        if(c == SP_ESC){
+        if(c == LL_ESC){
             uint8_t c_ = in[++i];
             out[j++] = LL_DEESCAPE(c_);
         } else {

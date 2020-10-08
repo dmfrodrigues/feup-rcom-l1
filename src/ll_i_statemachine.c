@@ -1,11 +1,11 @@
-#include "ll_su_statemachine.h"
+#include "ll_i_statemachine.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 
 #include "ll_flags.h"
 
-int ll_su_state_update(ll_su_statemachine_t *machine, uint8_t byte){
+int ll_i_state_update(ll_i_statemachine_t *machine, uint8_t byte){
     switch (machine->state) {
     case Start:
         switch(byte){
