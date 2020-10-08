@@ -1,6 +1,9 @@
-#define LL_MAX_SIZE 1024
+/**
+ * @defgroup    ll  LL
+ * @brief       Logical link (LL) protocol.
+ */
 
-#include "ll_utils.h"
+#define LL_MAX_SIZE 1024        ///< @ingroup ll Maximum size for a message to be sent using llwrite
 
 typedef struct {
     int baud_rate;
@@ -16,6 +19,7 @@ typedef enum {
 ll_config_t ll_config;
 
 /**
+ * @ingroup ll
  * @brief Open serial port.
  * 
  * Since there is usually COM1-COM4, you should pass a value 1-4,
@@ -28,6 +32,7 @@ ll_config_t ll_config;
 int llopen(int com, ll_status_t status) __attribute__((warn_unused_result));
 
 /**
+ * @ingroup ll
  * @brief Write to serial port.
  * 
  * @param id        Port to write to.
@@ -38,6 +43,7 @@ int llopen(int com, ll_status_t status) __attribute__((warn_unused_result));
 int llwrite(int id, const char *buffer, int length) __attribute__((warn_unused_result));
 
 /**
+ * @ingroup ll
  * @brief Close serial port.
  * 
  * @param id        Port to close.
