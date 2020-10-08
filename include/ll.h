@@ -3,6 +3,11 @@
  * @brief       Logical link (LL) protocol.
  */
 
+#ifndef _LL_H_
+#define _LL_H_
+
+#include "ll_flags.h"
+
 #define LL_MAX_SIZE 1024        ///< @ingroup ll Maximum size for a message to be sent using llwrite
 
 typedef struct {
@@ -50,7 +55,7 @@ int llwrite(int id, const char *buffer, int length) __attribute__((warn_unused_r
  * @param buffer    Data to be read.
  * @return int      Number of read characters, or a negative value if error.
  */
-int llread(int id, const char *buffer) __attribute__((warn_unused_result));
+int llread(int id, char *buffer) __attribute__((warn_unused_result));
 
 /**
  * @ingroup ll
@@ -60,3 +65,5 @@ int llread(int id, const char *buffer) __attribute__((warn_unused_result));
  * @return int      positive value if successful, negative otherwise
  */
 int llclose(int id) __attribute__((warn_unused_result));
+
+#endif //_LL_H_

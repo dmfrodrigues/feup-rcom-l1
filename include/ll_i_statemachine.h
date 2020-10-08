@@ -4,10 +4,11 @@
  * @brief       Logical link (LL) state machine that allows to receive I-frames; for internal use.
  */
 
-#ifndef _LL_SU_STATEMACHINE_H_
-#define _LL_SU_STATEMACHINE_H_
+#ifndef _LL_I_STATEMACHINE_H_
+#define _LL_I_STATEMACHINE_H_
 
 #include <stdint.h>
+#include <sys/types.h>
 
 #include "ll.h"
 
@@ -18,12 +19,13 @@
  * I-frame: information frames
  */
 typedef enum {
-    Start,      ///< Start state
-    Flag_RCV,   ///< Received flag
-    A_RCV,      ///< Received address
-    C_RCV,      ///< Received control byte
-    BCC_OK,     ///< Received BCC, and it is correct
-    Stop        ///< Stop (final) state
+    LL_I_Start,      ///< Start state
+    LL_I_Flag_RCV,   ///< Received flag
+    LL_I_A_RCV,      ///< Received address
+    LL_I_C_RCV,      ///< Received control byte
+    LL_I_Data,       ///< Received BCC1, and it is correct; going for data now
+    LL_I_Data_ESC,   ///< Received ESC, waiting data to escape
+    LL_I_Stop        ///< Stop (final) state
 } ll_i_state_t;
 
 /**
@@ -34,9 +36,11 @@ typedef enum {
  */
 typedef struct {
     ll_i_state_t state;             ///< Machine state
-    uint8_t a_rcv;                  ///< Value of received Address (A) byte
-    uint8_t c_rcv;                  ///< Value of received Control (C) byte
+//    uint8_t a_rcv;                  ///< Value of received Address (A) byte
+//    uint8_t c_rcv;                  ///< Value of received Control (C) byte
+    int     escaped;
     uint8_t data[2*LL_MAX_SIZE];    ///< Data in I-frame
+    size_t  length;                 ///< Length of data
 } ll_i_statemachine_t;
 
 /**
@@ -49,4 +53,4 @@ typedef struct {
  */
 int ll_i_state_update(ll_i_statemachine_t *machine, uint8_t byte) __attribute__((warn_unused_result));
 
-#endif
+#endif // _LL_I_STATEMACHINE_H_

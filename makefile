@@ -17,7 +17,7 @@ CFLAGS=$(CFLAGS_PARANOID)
 TRANSMITTER_O_FILES=$(ODIR)/transmitter.o
 RECEIVER_O_FILES   =$(ODIR)/receiver.o
 
-O_FILES=$(ODIR)/ll_su_statemachine.o $(ODIR)/ll_i_statemachine.o $(ODIR)/ll_utils.o $(ODIR)/ll.o
+O_FILES=$(ODIR)/ll.o $(ODIR)/ll_internal.o $(ODIR)/ll_su_statemachine.o $(ODIR)/ll_i_statemachine.o $(ODIR)/ll_utils.o
 
 all: $(TRANSMITTER) $(RECEIVER)
 

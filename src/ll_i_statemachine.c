@@ -1,45 +1,53 @@
 #include "ll_i_statemachine.h"
 
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "ll_flags.h"
+#include "ll.h"
+#include "ll_internal.h"
 
 int ll_i_state_update(ll_i_statemachine_t *machine, uint8_t byte){
     switch (machine->state) {
-    case Start:
+    case LL_I_Start:
         switch(byte){
-            case LL_FLAG  :                        machine->state = Flag_RCV; break;
-            default       :                        machine->state = Start   ; break;
+            case LL_FLAG  : machine->state = LL_I_Flag_RCV; break;
+            default       : machine->state = LL_I_Start   ; break;
         } break;
-    case Flag_RCV:
+    case LL_I_Flag_RCV:
         switch(byte){
-            case LL_A_SEND:
-            case LL_A_RECV: machine->a_rcv = byte; machine->state = A_RCV   ; break;
-            case LL_FLAG  :                        machine->state = Flag_RCV; break;
-            default       :                        machine->state = Start   ; break;
+            case LL_A_SEND: machine->state = LL_I_A_RCV   ; break;
+            case LL_FLAG  : machine->state = LL_I_Flag_RCV; break;
+            default       : machine->state = LL_I_Start   ; break;
         } break;
-    case A_RCV:
+    case LL_I_A_RCV:
         switch(byte){
-            case LL_C_SET :
-            case LL_C_DISC:
-            case LL_C_UA  : machine->c_rcv = byte; machine->state = C_RCV   ; break;
-            case LL_FLAG  :                        machine->state = Flag_RCV; break;
-            default       :                        machine->state = Start   ; break;
+            case LL_FLAG  : machine->state = LL_I_Flag_RCV; break;
+            default       :
+                if(byte == ll_get_expected_Iframe_C()) machine->state = LL_I_C_RCV;
+                else                                   machine->state = LL_I_Start;
+                break;
         } break;
-    case C_RCV:
+    case LL_I_C_RCV:
         switch(byte){
-            case LL_FLAG  : machine->state = Flag_RCV; break;
-            default       : machine->state = (byte == (machine->a_rcv^machine->c_rcv) ? BCC_OK : Start); break;
+            case LL_FLAG  : machine->state = LL_I_Flag_RCV; break;
+            default       : machine->state = (byte == (LL_A_SEND^ll_get_expected_Iframe_C()) ? LL_I_Data : LL_I_Start); break;
         } break;
-    case BCC_OK:
+    case LL_I_Data:
         switch(byte){
-            case LL_FLAG  : machine->state = Stop ; break;
-            default       : machine->state = Start; break;
+            case LL_ESC   : machine->state = LL_I_Data_ESC; machine->escaped = true; break;
+            case LL_FLAG  : machine->state = LL_I_Stop    ; break;
+            default       : machine->data[machine->length++] = byte; break;
         } break;
-    case Stop:
-        machine->state = Stop;
-        break;
+    case LL_I_Data_ESC:
+        switch(byte){
+            case LL_ESC   :
+            case LL_FLAG  : return EXIT_FAILURE;
+            default       : machine->data[machine->length++] = LL_STUFF(byte); break;
+        } break;
+    case LL_I_Stop:
+        fprintf(stderr, "can't transition from LL_I_Stop\n");
+        return EXIT_FAILURE;
     default:
         fprintf(stderr, "No such state %d\n", machine->state);
         return EXIT_FAILURE;

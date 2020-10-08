@@ -4,6 +4,9 @@
  * @brief       Logical link (LL) utilities, for internal use.
  */
 
+#ifndef _LL_UTILS_H_
+#define _LL_UTILS_H_
+
 #include <stdint.h>
 #include <sys/types.h>
 
@@ -48,3 +51,5 @@ ssize_t ll_stuffing(uint8_t *out, const uint8_t *in, size_t length) __attribute_
  * @see             ll_stuffing(uint8_t*, const uint8_t*, size_t)
  */
 ssize_t ll_destuffing(uint8_t *out, const uint8_t *in, size_t length) __attribute__((warn_unused_result));
+
+#endif // _LL_UTILS_H_

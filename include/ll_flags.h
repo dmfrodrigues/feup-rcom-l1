@@ -1,10 +1,14 @@
-#include <stdint.h>
-
 /**
  * @defgroup    ll_flags LL flags
  * @ingroup     ll
  * @brief       Flags for Logical Link (LL).
  */
+
+#ifndef _LL_FLAGS_H_
+#define _LL_FLAGS_H_
+
+#include <stdint.h>
+
 
 #define LL_FLAG         0x7E                        ///< @ingroup ll_flags FLAG
 #define LL_A_SEND       0x03                        ///< @ingroup ll_flags Address of sender; used on sender messages, or receiver responses
@@ -21,5 +25,6 @@
 #define LL_RR(N)        (LL_RR_MASK  | (N << 7))    ///< @ingroup ll_flags Get Receiver Ready (RR) flag from sequence number
 #define LL_REJ(N)       (LL_REJ_MASK | (N << 7))    ///< @ingroup ll_flags Get Rejected (REJ) flag from sequence number
 
-#define LL_ESCAPE(c)    (c ^ 0x20)                  ///< @ingroup ll_flags Escape character
-#define LL_DEESCAPE(c)  (c ^ 0x20)                  ///< @ingroup ll_flags Deescape character
+#define LL_STUFF(c)     (c ^ 0x20)                  ///< @ingroup ll_flags Bit stuff a character
+
+#endif // _LL_FLAGS_H_

@@ -17,12 +17,12 @@
  * U-frame: unnumbered frames
  */
 typedef enum {
-    Start,      ///< Start state
-    Flag_RCV,   ///< Received flag
-    A_RCV,      ///< Received address
-    C_RCV,      ///< Received control byte
-    BCC_OK,     ///< Received BCC, and it is correct
-    Stop        ///< Stop (final) state
+    LL_SU_Start,      ///< Start state
+    LL_SU_Flag_RCV,   ///< Received flag
+    LL_SU_A_RCV,      ///< Received address
+    LL_SU_C_RCV,      ///< Received control byte
+    LL_SU_BCC_OK,     ///< Received BCC, and it is correct
+    LL_SU_Stop        ///< Stop (final) state
 } ll_su_state_t;
 
 /**
@@ -47,4 +47,4 @@ typedef struct {
  */
 int ll_su_state_update(ll_su_statemachine_t *machine, uint8_t byte) __attribute__((warn_unused_result));
 
-#endif
+#endif // _LL_SU_STATEMACHINE_H_
