@@ -7,12 +7,12 @@ ODIR   	   =./obj
 CC		=gcc
 
 IFLAGS	=-I$(IDIR)
-CFLAGS_PARANOID =-Wall -Wextra -Wformat-nonliteral -Wcast-align -Wpointer-arith -Wbad-function-cast \
--Wstrict-prototypes -Winline -Wundef \
--Wnested-externs -Wcast-qual -Wshadow -Wwrite-strings -Wunused-parameter \
--Wfloat-equal -pedantic -Wno-long-long -Wno-endif-labels -Wunused-result -g 
-CFLAGS 	=-Wall -g #-O3
-#CFLAGS=$(CFLAGS_PARANOID)
+CFLAGS_PARANOID =-pedantic -Wall -Wbad-function-cast -Wcast-align -Wcast-qual -Wextra -Wfloat-equal -Wformat-nonliteral \
+				 -Winline -Wmissing-declarations -Wmissing-prototypes -Wnested-externs -Wno-unused-parameter \
+				 -Wpointer-arith -Wshadow -Wstrict-prototypes -Wundef -Wunused-parameter -Wunused-result -Wwrite-strings
+
+#CFLAGS=-Wall -g #-O3
+CFLAGS=$(CFLAGS_PARANOID)
 
 TRANSMITTER_O_FILES=$(ODIR)/transmitter.o
 RECEIVER_O_FILES   =$(ODIR)/receiver.o
