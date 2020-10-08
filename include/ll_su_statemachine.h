@@ -1,5 +1,5 @@
-#ifndef _STATEMACHINE_H_
-#define _STATEMACHINE_H_
+#ifndef _LL_SU_STATEMACHINE_H_
+#define _LL_SU_STATEMACHINE_H_
 
 #include <stdint.h>
 

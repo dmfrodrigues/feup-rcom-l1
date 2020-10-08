@@ -85,23 +85,33 @@ Class 2, group 4 \vspace{0.5em} \\
 
 \section*{Summary}
 
-\section{Introduction}
+This project was elaborated in the context of the curricular unit Computer Networks (\textit{Redes de Computadores} - RCOM) as the first laboratory project. It concerns the design and implementation of a data link layer/protocol to allow two computers to communicate in a reliable way through serial ports. Additionally, an application was developed on top of that layer, to allow a computer to transfer a file to another.
 
-\section{Architecture}
+Our main conclusions were...
 
-\section{Code structure}
+% TODO
 
-\section{Main use cases}
+\section{Introduction} \label{sec:Introduction}
 
-\section{Logical link protocol}
+The present project aims at arriving at a design and implementation of a data link layer (LL) suited with its own data transfer protocol to allow communication between two computers physically connected through their serial ports (specifically, through RS-232 serial ports with asynchronous communication). The resulting source code was developed in the C language, targetting Linux devices.
 
-\section{Application protocol}
+This report is an artifact of the corresponding project, with the purpose of guiding readers through the process that was used to arrive at the project's goals. As such, this report is divided into seven main sections (excluding the \hyperref[sec:Introduction]{introduction} and \hyperref[sec:Conclusion]{conclusion}). In section \ref{sec:Architecture} we start by describing the generic architecture our program will follow in terms of layers and generic interfaces between layers, to then specity in section \ref{sec:CodeStructure} which specific layers implement the generic blocks of the previous section, the APIs each block will make available for inter-layer communication, and data structures used in each layer. Specific information for the end user on the main ways to use the program is presented in section \ref{sec:UseCases}. In sections \ref{sec:LLProtocol} and \ref{sec:AppProtocol} we identify the main functional aspects and implementation details of the logical link and application protocols respectively. Finally, in section \ref{sec:Validation} we test the program to validate it in terms of robustness of the program and results (efficacy) in face of errors or faulty communication media, and in section \ref{sec:Efficiency} we statistically describe the protocols' experimental efficiency and compare it to a theoretical Stop\&Wait protocol.
 
-\section{Validation}
+\section{Architecture} \label{sec:Architecture}
 
-\section{Efficiency of the data link protocol}
+\section{Code structure} \label{sec:CodeStructure}
 
-\section{Conclusion}
+\section{Main use cases} \label{sec:UseCases}
+
+\section{Logical link protocol} \label{sec:LLProtocol}
+
+\section{Application protocol} \label{sec:AppProtocol}
+
+\section{Validation} \label{sec:Validation}
+
+\section{Efficiency of the data link protocol} \label{sec:Efficiency}
+
+\section{Conclusion} \label{sec:Conclusion}
 
 \pagebreak
 
@@ -109,5 +119,11 @@ Class 2, group 4 \vspace{0.5em} \\
 \appendixpage
 \addappheadtotoc
 \section{Source code}
+
+The source code of this project can be obtained in \href{https://github.com/dmfrodrigues/feup-rcom-l1}{github.com/dmfrodrigues/feup-rcom-l1}. The source code is made available by \textcopyright~Diogo Rodrigues and Breno Pimentel under the \href{https://www.gnu.org/licenses/gpl-3.0.en.html}{GNU General Public License v3} (GPLv3), which you should have received together with the source code, or that you can otherwise obtain online.
+
+During project development and evaluation the repository remained private, although it can be shared with evaluators on request to clarify the development process. It will be made public once all equivalent curricular unit projects have been evaluated in the present school year.
+
+% TODO: files
 
 \end{document}
