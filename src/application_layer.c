@@ -12,8 +12,9 @@ int application(int port_fd, ll_status_t status, int baud_rate, unsigned int tim
     
     llopen(app.fileDescriptor , app.status);
 
+    // TODO
     if(app.status == TRANSMITTER){
-        app_send_data();
+        app_send_data("", 0);
     }else{
         app_receive_data();
     }
@@ -84,12 +85,30 @@ int app_send_data_packet(uint8_t *data, size_t data_size, unsigned int seq_numbe
     return 1;
 }
 
-int app_send_data(){
-    // TODO
+int app_send_file(char *file_name, size_t file_size){
+
+    if(app_send_ctrl_packet(CTRL_START, file_name, file_size) < 0)
+        return -1;
+
+    unsigned int seq_number = 0;
+
+    FILE *file = fopen(file_name, "r");
+
+    // Sending just one byte in a packet now
+    uint8_t *buf =(uint8_t*)malloc(1);
+
+    while(fread(buf, sizeof(uint8_t), 1, file) > 0){
+        app_send_data_packet(buf, file_size, seq_number);
+        seq_number++;
+    }
+
+    if(app_send_ctrl_packet(CTRL_END, file_name, file_size) < 0)
+        return -1;
+
     return -1;
 }
 
-int app_receive_data(){
+int app_receive_file(){
     // TODO
     return -1;
 }

@@ -23,8 +23,8 @@ int app_send_ctrl_packet(int ctrl, size_t file_size, char *file_name);
 
 int app_send_data_packet(uint8_t *data, size_t data_size, unsigned int seq_number);
 
-int app_send_data();
+int app_send_file(char *file_name, size_t file_size);
 
-int app_receive_data();
+int app_receive_file();
 
 #endif // _APPLICATION_LAYER_H_
