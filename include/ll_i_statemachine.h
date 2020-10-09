@@ -27,7 +27,9 @@ typedef enum {
     LL_I_Data_ESC,   ///< Received ESC, waiting data to escape
     LL_I_Stop,       ///< Stop (final) state
     LL_I_C_UNXP_RCV, ///< Unexpected C received (retransmission)
-    LL_I_Stop_RR     ///< Stop (final) state, should send RR
+    LL_I_Stop_RR,    ///< Stop (final) state, should send RR
+    LL_I_C_SET_RCV,  ///< Unexpected C received (SET)
+    LL_I_Stop_UA     ///< Stop (final) state, should send UA
 } ll_i_state_t;
 
 /**
