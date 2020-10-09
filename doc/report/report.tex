@@ -21,6 +21,7 @@
 \usepackage{tikz}
 \usepackage{tikz-qtree}
 \usetikzlibrary{automata, positioning, arrows}
+\usepackage[justification=centering]{caption}
 \usepackage{subcaption}
 \usepackage{float}
 
@@ -111,7 +112,7 @@ First of all, we designed the generic architecture of our system. It essentially
 		\node[align=center, draw, minimum width=7cm, minimum height=1.4cm, fill=black!10, below of=app] (link) {Data link};
 		\node[align=center, draw, minimum width=7cm, minimum height=1.4cm, fill=black!20, below of=link] (driver) {Serial port driver \\ {\footnotesize \texttt{/dev/ttyS0}}};
 		\node[align=center, draw, minimum width=7cm, minimum height=1.4cm, fill=black!30, below of=driver] (hardware) {Hardware \\ {\footnotesize RS-232 asynchronous serial port}};
-		\node[align=center, above of=app] at (0, +0.7) (user){\includegraphics[scale=0.25]{actor.png}};
+		\node[align=center, above of=app] at (0, +0.7) (user){\includegraphics[scale=0.2]{actor.png}};
 	
 		\draw   (app) 		edge[align=center, left , bend right=88.5		] node{\small open port \\[-0.2em] \small write to port \\[-0.2em] \small close port} (link)
 				(link) 		edge[align=center, right, bend right=88.5		] node{\small read from port} (app)
@@ -174,7 +175,7 @@ First of all, we designed the generic architecture of our system. It essentially
 					(port-transmitter) 		edge[-, double, double distance=3pt, align=center, above	] node{\small physical cable} (port-receiver)
 				;
 	\end{tikzpicture}
-	\caption{Architecture of the program to be developed}
+	\caption{Specific code structure to be implemented for this project}
 \end{figure}
 
 , and implementing a \textit{stop-and-wait} error-control protocol
