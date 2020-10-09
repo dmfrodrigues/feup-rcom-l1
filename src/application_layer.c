@@ -27,7 +27,7 @@ int application(int com, ll_status_t status, int baud_rate, unsigned int timeout
 int app_send_ctrl_packet(int ctrl, size_t file_size, const char *file_name){
     
     size_t packet_size = 5 + sizeof(size_t) + strlen(file_name);
-    uint8_t *ctrl_packet = (uint8_t *) malloc(packet_size);
+    char *ctrl_packet = (char *) malloc(packet_size);
 
     ctrl_packet[0] = ctrl;
 
@@ -61,13 +61,12 @@ int app_send_ctrl_packet(int ctrl, size_t file_size, const char *file_name){
 int app_send_data_packet(uint8_t *data, size_t data_size, unsigned int seq_number){
 
     size_t packet_size = 4 + data_size;
-    uint8_t *data_packet = (uint8_t*) malloc(packet_size);
+    char *data_packet = (char*) malloc(packet_size);
 
     data_packet[0] = CTRL_DATA;
     data_packet[1] = seq_number % 255;
 
     // data_size = 256*L2 + L1 
-    // is it right?
     data_packet[2] = (data_size & 0xFF00);    //L2
     data_packet[3] = (data_size & 0xFF);      //L1
 
@@ -114,7 +113,7 @@ int app_send_file(const char *file_name){
 
 int app_rcv_ctrl_packet(int ctrl, int * file_size, char * file_name){
 
-    char * ctrl_packet = (char*)malloc(LL_MAX_SIZE);
+    char * ctrl_packet = (char*)malloc(5 + sizeof(size_t) + FILE_NAME_MAX_SIZE);
 
     if(llread(app.fileDescriptor, ctrl_packet) < 0){
         fprintf(stderr, "ERROR: unable to read ctrl packet\n");
@@ -147,7 +146,7 @@ int app_rcv_ctrl_packet(int ctrl, int * file_size, char * file_name){
 
 int app_rcv_data_packet(uint8_t * data, int seq_number){
 
-    uint8_t * data_packet = (uint8_t*) malloc(LL_MAX_SIZE);
+    char * data_packet = (char*) malloc(LL_MAX_SIZE);
     
     if(llread(app.fileDescriptor, data_packet) < 0){
         fprintf(stderr, "ERROR: unable to read data packet\n");
