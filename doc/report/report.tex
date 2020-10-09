@@ -357,7 +357,7 @@ Communication through this protocol is done by \textit{framing} messages in thre
 		(\textit{a}) & & (\textit{b})
 	\end{tabular}
 	\caption{Sequence diagrams of communication through the LL protocol: \\ (\textit{a}) complete diagram without errors; (\textit{b}) transmission phase with errors}
-	\label{fig:frames}
+	\label{fig:diagrams}
 \end{figure}
 
 This protocol is suited with a mechanism that allows the receiver to identify if the arriving frame is a retransmission or not: the sequence number. It is a single bit, referred to as $N_s$ when it is sent by the sender, and $N_r$ when sent by the receiver. It is sent along with I-frames, and when $N_s=0$ the response must have $N_r = 1$, and when $N_s = 1$, $N_r = 0$.  
