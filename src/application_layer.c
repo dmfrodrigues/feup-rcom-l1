@@ -2,29 +2,29 @@
 
 application_layer app;
 
-int application(int port_fd, ll_status_t status, int baud_rate, unsigned int timeout, unsigned int retransmissions){
+int application(int com, ll_status_t status, int baud_rate, unsigned int timeout, unsigned int retransmissions){
 
-    app.fileDescriptor = port_fd;
     app.status = status;
     app.ll_config.baud_rate = baud_rate;
     app.ll_config.timeout = timeout;
     app.ll_config.retransmissions = retransmissions;
     
-    llopen(app.fileDescriptor , app.status);
+    app.fileDescriptor = llopen(com, app.status);
 
     // TODO
     if(app.status == TRANSMITTER){
-        app_send_data("", 0);
+        app_send_file("somefile");
     }else{
-        app_receive_data();
+        app_receive_file();
     }
 
-    //ll_close();
+    if(llclose(app.fileDescriptor) < 0)
+        return -1;
 
-    return -1;
+    return 1;
 }
 
-int app_send_ctrl_packet(int ctrl, size_t file_size, char *file_name){
+int app_send_ctrl_packet(int ctrl, size_t file_size, const char *file_name){
     
     size_t packet_size = 5 + sizeof(size_t) + strlen(file_name);
     uint8_t *ctrl_packet = (uint8_t *) malloc(packet_size);
@@ -43,9 +43,8 @@ int app_send_ctrl_packet(int ctrl, size_t file_size, char *file_name){
     ctrl_packet[8] = strlen(file_name); // L2
     
     // V2
-    for(int i = 0; i < strlen(file_name); i++){
-        ctrl_packet[i+9] = file_name[i];
-    }
+    memcpy(ctrl_packet + 9, file_name, strlen(file_name));
+    
     
     if(llwrite(app.fileDescriptor, ctrl_packet, packet_size) < 0){
         fprintf(stderr, "ERROR: unable to write control packet\n");
@@ -72,9 +71,7 @@ int app_send_data_packet(uint8_t *data, size_t data_size, unsigned int seq_numbe
     data_packet[2] = (data_size & 0xFF00);    //L2
     data_packet[3] = (data_size & 0xFF);      //L1
 
-    for(int i = 0; i < data_size; i++){
-        data_packet[i+4] = data[i];
-    }
+    memcpy(data_packet + 4, data, data_size);
 
     if(llwrite(app.fileDescriptor, data_packet, packet_size) < 0){
         fprintf(stderr, "ERROR: unable to write data packet\n");
@@ -87,9 +84,13 @@ int app_send_data_packet(uint8_t *data, size_t data_size, unsigned int seq_numbe
     return 1;
 }
 
-int app_send_file(char *file_name, size_t file_size){
+int app_send_file(const char *file_name){
 
-    if(app_send_ctrl_packet(CTRL_START, file_name, file_size) < 0)
+    struct stat st;
+    stat(file_name, &st);
+    size_t file_size = st.st_size;
+
+    if(app_send_ctrl_packet(CTRL_START, file_size, file_name) < 0)
         return -1;
 
     unsigned int seq_number = 0;
@@ -103,7 +104,7 @@ int app_send_file(char *file_name, size_t file_size){
         seq_number++;
     }
 
-    if(app_send_ctrl_packet(CTRL_END, file_name, file_size) < 0)
+    if(app_send_ctrl_packet(CTRL_END, file_size, file_name) < 0)
         return -1;
 
     fclose(file);
@@ -113,8 +114,8 @@ int app_send_file(char *file_name, size_t file_size){
 
 int app_rcv_ctrl_packet(int ctrl, int * file_size, char * file_name){
 
-    char * ctrl_packet;
-    
+    char * ctrl_packet = (char*)malloc(LL_MAX_SIZE);
+
     if(llread(app.fileDescriptor, ctrl_packet) < 0){
         fprintf(stderr, "ERROR: unable to read ctrl packet\n");
         return -1;
@@ -127,9 +128,7 @@ int app_rcv_ctrl_packet(int ctrl, int * file_size, char * file_name){
     
     int file_size_octets = ctrl_packet[2];
     
-    for(int i = 0; i < file_size_octets; i++){
-        file_size[i] = ctrl_packet[3+i];
-    }
+    memcpy(file_size, ctrl_packet + 3, file_size_octets);
 
     if(ctrl_packet[7] != T_FILE_NAME){
         fprintf(stderr, "ERROR: unable to read ctrl packet\n");
@@ -138,16 +137,17 @@ int app_rcv_ctrl_packet(int ctrl, int * file_size, char * file_name){
 
     int file_name_length = ctrl_packet[8];
 
-    for(int i = 0; i < strlen(file_name); i++){
-        file_name[i] = ctrl_packet[i+9];
-    }
+
+    memcpy(file_name, ctrl_packet + 9, file_name_length);
+
+    free(ctrl_packet);
 
     return 1;
 }
 
 int app_rcv_data_packet(uint8_t * data, int seq_number){
 
-    uint8_t * data_packet;
+    uint8_t * data_packet = (uint8_t*) malloc(LL_MAX_SIZE);
     
     if(llread(app.fileDescriptor, data_packet) < 0){
         fprintf(stderr, "ERROR: unable to read data packet\n");
@@ -166,9 +166,9 @@ int app_rcv_data_packet(uint8_t * data, int seq_number){
 
     int data_length = 256*data_packet[2] + data_packet[3];
 
-    for(int i=0; i < data_length; i++){
-        data[i] = data_packet[4 + i];
-    }
+    memcpy(data, data_packet + 4, data_length);
+
+    free(data_packet);
 
     return data_length;
 }
@@ -176,9 +176,9 @@ int app_rcv_data_packet(uint8_t * data, int seq_number){
 int app_receive_file(){
     
     int file_size;
-    char *file_name;
+    char *file_name = (char*) malloc(FILE_NAME_MAX_SIZE);
 
-    if(app_rcv_ctrl_packet(CTRL_START, &file_size, &file_name) < 0){
+    if(app_rcv_ctrl_packet(CTRL_START, &file_size, file_name) < 0){
         return -1;
     }
 
@@ -190,7 +190,7 @@ int app_receive_file(){
 
     while(file_size > data_bytes_read){
         
-        int data_length = app_rcv_data_packet(&buf, seq_number);
+        int data_length = app_rcv_data_packet(buf, seq_number);
         fwrite(buf, sizeof(uint8_t), data_length, file);
         data_bytes_read += data_length;
         seq_number++;
@@ -199,9 +199,9 @@ int app_receive_file(){
     fclose(file);
 
     int file_size_;
-    char *file_name_;
+    char *file_name_ = (char*) malloc(FILE_NAME_MAX_SIZE);
 
-    if(app_rcv_ctrl_packet(CTRL_END, &file_size_, &file_name_) < 0){
+    if(app_rcv_ctrl_packet(CTRL_END, &file_size_, file_name_) < 0){
         return -1;
     }
 
