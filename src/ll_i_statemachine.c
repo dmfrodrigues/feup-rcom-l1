@@ -24,8 +24,10 @@ int ll_i_state_update(ll_i_statemachine_t *machine, uint8_t byte){
         switch(byte){
             case LL_FLAG  : machine->state = LL_I_Flag_RCV; break;
             default       :
-                if(byte == ll_get_expected_Iframe_C()) machine->state = LL_I_C_RCV;
-                else                                   machine->state = LL_I_Start;
+                if     (byte == ll_get_expected_Iframe_C  ()) machine->state = LL_I_C_RCV;
+                else if(byte == ll_get_unexpected_Iframe_C()) machine->state = LL_I_C_UNXP_RCV;
+                else if(byte == LL_C_SET                    ) machine->state = LL_I_C_SET_RCV;
+                else                                          machine->state = LL_I_Start;
                 break;
         } break;
     case LL_I_C_RCV:
@@ -47,6 +49,24 @@ int ll_i_state_update(ll_i_statemachine_t *machine, uint8_t byte){
         } break;
     case LL_I_Stop:
         fprintf(stderr, "can't transition from LL_I_Stop\n");
+        return EXIT_FAILURE;
+    case LL_I_C_UNXP_RCV:
+        switch(byte){
+            case LL_FLAG  : machine->state = LL_I_Stop_RR; break;
+            default       : machine->state = LL_I_C_UNXP_RCV; break;
+        }
+        break;
+    case LL_I_Stop_RR:
+        fprintf(stderr, "can't transition from LL_I_Stop_RR\n");
+        return EXIT_FAILURE;
+    case LL_I_C_SET_RCV:
+        switch(byte){
+            case LL_FLAG  : machine->state = LL_I_Stop_UA; break;
+            default       : machine->state = LL_I_C_SET_RCV; break;
+        }
+        break;
+    case LL_I_Stop_UA:
+        fprintf(stderr, "can't transition from LL_I_Stop_UA\n");
         return EXIT_FAILURE;
     default:
         fprintf(stderr, "No such state %d\n", machine->state);

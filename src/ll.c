@@ -123,18 +123,18 @@ int llwrite(int port_fd, const char *buffer, int length){
         timeout = 0;
         alarm(ll_config.timeout);
         
-        // Send SET
+        // Send I
         ret = ll_send_I(port_fd, (const uint8_t *)buffer, length);
         if(ret != length){
             fprintf(stderr, "ERROR: only wrote %d chars\n", ret);
             continue;
         }
 
-        // Get UA
+        // Get RR or REJ
         uint8_t a_rcv, c_rcv;
         res = ll_expect_SUframe(port_fd, &a_rcv, &c_rcv);
         
-        // Validate UA
+        // Validate RR or REJ
         if(res){
             if(errno == EINTR){
                 if(timeout) fprintf(stderr, "WARNING: gave up due to timeout\n");

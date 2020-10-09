@@ -63,6 +63,12 @@ uint8_t ll_get_expected_Iframe_C(void){
     return LL_C(Nr);
 }
 
+uint8_t ll_get_unexpected_Iframe_C(void){
+    uint8_t Ns = (sequence_number+1)%2;
+    uint8_t Nr = (Ns+1)%2;
+    return LL_C(Nr);
+}
+
 uint8_t ll_get_Iframe_C(void){
     uint8_t Ns = sequence_number;
     return LL_C(Ns);
@@ -165,6 +171,21 @@ int ll_send_RR(int port_fd){
     } else return EXIT_FAILURE;
 }
 
+int ll_send_RR_resend(int port_fd){
+    uint8_t frame[5];
+    frame[0] = LL_FLAG;
+    frame[1] = (ll_status == TRANSMITTER ? LL_A_RECV : LL_A_SEND);
+    frame[2] = LL_RR((sequence_number+1)%2);
+    frame[3] = ll_bcc(frame+1, frame+3);
+    frame[4] = LL_FLAG;
+
+    int res = write(port_fd, frame, sizeof(frame));
+    if(res == sizeof(frame)){
+        fprintf(stderr, "    Sent RR resend\n");
+        return EXIT_SUCCESS;
+    } else return EXIT_FAILURE;
+}
+
 int ll_send_REJ(int port_fd){
     uint8_t frame[5];
     frame[0] = LL_FLAG;
@@ -208,26 +229,34 @@ int ll_expect_SUframe(int port_fd, uint8_t *a_rcv, uint8_t *c_rcv){
 
 ssize_t ll_expect_Iframe(int port_fd, uint8_t *buffer){
     fprintf(stderr, "    Expecting I-frame\n");
-    ll_i_statemachine_t machine = {
-        .state = LL_I_Start,
-        .escaped = false,
-        .length = 0
-    };
-    do {
-        uint8_t byte;
-        int res = read(port_fd, &byte, 1);
-        if(res == 1){
-            fprintf(stderr, "        Read byte 0x%02X | ", byte);
-            fprintf(stderr, "Transitioned from state %d", machine.state);
-            res = ll_i_state_update(&machine, byte);
-            fprintf(stderr, " to %d\n", machine.state);
-            if(res){
-                fprintf(stderr, "ERROR: failed to update state\n");
+    ll_i_statemachine_t machine;
+    do{
+        machine.state = LL_I_Start;
+        machine.escaped = false;
+        machine.length = 0;
+        do {
+            uint8_t byte;
+            int res = read(port_fd, &byte, 1);
+            if(res == 1){
+                fprintf(stderr, "        Read byte 0x%02X | ", byte);
+                fprintf(stderr, "Transitioned from state %d", machine.state);
+                res = ll_i_state_update(&machine, byte);
+                fprintf(stderr, " to %d\n", machine.state);
+                if(res){
+                    fprintf(stderr, "ERROR: failed to update state\n");
+                    return -1;
+                }
+            } else {
+                perror("read");
                 return -1;
             }
-        } else {
-            perror("read");
-            return -1;
+        } while(machine.state != LL_I_Stop && machine.state != LL_I_Stop_RR);
+        if(machine.state == LL_I_Stop_RR){
+            fprintf(stderr, "    Got unexpected data (sending RR and ignoring data)\n");
+            if(ll_send_RR_resend(port_fd)){
+                fprintf(stderr, "    ERROR: Failed to send RR\n");
+                return -1;
+            }
         }
     } while(machine.state != LL_I_Stop);
 

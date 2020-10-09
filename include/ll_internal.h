@@ -39,6 +39,13 @@ tcflag_t ll_get_baud_rate(void) __attribute__((warn_unused_result));
 uint8_t ll_get_expected_Iframe_C(void) __attribute__((warn_unused_result));
 
 /**
+ * @brief Get I-frame C byte unexpected from the other end of the communication.
+ * 
+ * @return uint8_t  Unexpected I-frame C byte
+ */
+uint8_t ll_get_unexpected_Iframe_C(void) __attribute__((warn_unused_result));
+
+/**
  * @brief Get RR byte expected from the other end of the communication.
  * 
  * @return uint8_t  Expected RR byte
@@ -100,6 +107,14 @@ ssize_t ll_send_I(int port_fd, const uint8_t *buffer, size_t length) __attribute
  * @return int      0 if successful; -1 otherwise
  */
 int ll_send_RR(int port_fd) __attribute__((warn_unused_result));
+
+/**
+ * @brief Send Receiver Ready (RR) to port after receiving unexpected I-frame.
+ * 
+ * @param port_fd   Port to send RR to
+ * @return int      0 if successful; -1 otherwise
+ */
+int ll_send_RR_resend(int port_fd) __attribute__((warn_unused_result));
 
 /**
  * @brief Send Rejected (REJ) to port.
