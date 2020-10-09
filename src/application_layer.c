@@ -143,8 +143,32 @@ int app_rcv_ctrl_packet(int ctrl, int * file_size, char * file_name){
     return 1;
 }
 
-int app_rcv_data_packet(){
-    return -1;
+int app_rcv_data_packet(uint8_t * data, int seq_number){
+
+    uint8_t * data_packet;
+    
+    if(llread(app.fileDescriptor, data_packet) < 0){
+        fprintf(stderr, "ERROR: unable to read data packet\n");
+        return -1;
+    }
+
+    if(data_packet[0] != CTRL_DATA){
+        fprintf(stderr, "ERROR: data control is not correct\n");
+        return -1;
+    }
+
+    if(data_packet[1] != seq_number){
+        fprintf(stderr, "ERROR: sequence number is not correct\n");
+        return -1;
+    }
+
+    int data_length = 256*data_packet[2] + data_packet[3];
+
+    for(int i=0; i < data_length; i++){
+        data[i] = data_packet[4 + i];
+    }
+
+    return 1;
 }
 
 int app_receive_file(){
