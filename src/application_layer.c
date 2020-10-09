@@ -106,6 +106,8 @@ int app_send_file(char *file_name, size_t file_size){
     if(app_send_ctrl_packet(CTRL_END, file_name, file_size) < 0)
         return -1;
 
+    fclose(file);
+
     return 1;
 }
 
@@ -168,10 +170,44 @@ int app_rcv_data_packet(uint8_t * data, int seq_number){
         data[i] = data_packet[4 + i];
     }
 
-    return 1;
+    return data_length;
 }
 
 int app_receive_file(){
-    // TODO
-    return -1;
+    
+    int file_size;
+    char *file_name;
+
+    if(app_rcv_ctrl_packet(CTRL_START, &file_size, &file_name) < 0){
+        return -1;
+    }
+
+    FILE *file = fopen(file_name, "w");
+
+    int data_bytes_read = 0;
+    unsigned int seq_number = 0;
+    uint8_t *buf =(uint8_t*)malloc(LL_MAX_SIZE);
+
+    while(file_size > data_bytes_read){
+        
+        int data_length = app_rcv_data_packet(&buf, seq_number);
+        fwrite(buf, sizeof(uint8_t), data_length, file);
+        data_bytes_read += data_length;
+        seq_number++;
+    }
+
+    fclose(file);
+
+    int file_size_;
+    char *file_name_;
+
+    if(app_rcv_ctrl_packet(CTRL_END, &file_size_, &file_name_) < 0){
+        return -1;
+    }
+
+    if(file_size != file_size_ || file_name != file_name_){
+        return -1;
+    }
+
+    return 1;
 }
