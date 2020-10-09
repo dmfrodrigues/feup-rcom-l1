@@ -19,6 +19,8 @@ int application(int port_fd, ll_status_t status, int baud_rate, unsigned int tim
         app_receive_data();
     }
 
+    //ll_close();
+
     return -1;
 }
 
@@ -94,10 +96,9 @@ int app_send_file(char *file_name, size_t file_size){
 
     FILE *file = fopen(file_name, "r");
 
-    // Sending just one byte in a packet now
-    uint8_t *buf =(uint8_t*)malloc(1);
+    uint8_t *buf =(uint8_t*)malloc(LL_MAX_SIZE);
 
-    while(fread(buf, sizeof(uint8_t), 1, file) > 0){
+    while(fread(buf, sizeof(uint8_t), LL_MAX_SIZE, file) > 0){
         app_send_data_packet(buf, file_size, seq_number);
         seq_number++;
     }
@@ -105,6 +106,44 @@ int app_send_file(char *file_name, size_t file_size){
     if(app_send_ctrl_packet(CTRL_END, file_name, file_size) < 0)
         return -1;
 
+    return 1;
+}
+
+int app_rcv_ctrl_packet(int ctrl, int * file_size, char * file_name){
+
+    char * ctrl_packet;
+    
+    if(llread(app.fileDescriptor, ctrl_packet) < 0){
+        fprintf(stderr, "ERROR: unable to read ctrl packet\n");
+        return -1;
+    }
+
+    if(ctrl_packet[0] != ctrl || ctrl_packet[1] != T_FILE_SIZE){
+        fprintf(stderr, "ERROR: control is not correct\n");
+        return -1;
+    }
+    
+    int file_size_octets = ctrl_packet[2];
+    
+    for(int i = 0; i < file_size_octets; i++){
+        file_size[i] = ctrl_packet[3+i];
+    }
+
+    if(ctrl_packet[7] != T_FILE_NAME){
+        fprintf(stderr, "ERROR: unable to read ctrl packet\n");
+        return -1;
+    }
+
+    int file_name_length = ctrl_packet[8];
+
+    for(int i = 0; i < strlen(file_name); i++){
+        file_name[i] = ctrl_packet[i+9];
+    }
+
+    return 1;
+}
+
+int app_rcv_data_packet(){
     return -1;
 }
 
@@ -112,4 +151,3 @@ int app_receive_file(){
     // TODO
     return -1;
 }
-
