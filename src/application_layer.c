@@ -2,18 +2,13 @@
 
 application_layer app;
 
-int application(int com, ll_status_t status, int baud_rate, unsigned int timeout, unsigned int retransmissions){
+int application(int com, ll_status_t status, const char *file_name){
 
     app.status = status;
-    app.ll_config.baud_rate = baud_rate;
-    app.ll_config.timeout = timeout;
-    app.ll_config.retransmissions = retransmissions;
-    
     app.fileDescriptor = llopen(com, app.status);
 
-    // TODO
     if(app.status == TRANSMITTER){
-        app_send_file("somefile");
+        app_send_file(file_name);
     }else{
         app_receive_file();
     }

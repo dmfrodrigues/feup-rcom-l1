@@ -19,10 +19,9 @@
 typedef struct {
     int fileDescriptor; /*Descritor correspondente à porta série*/
     ll_status_t status; /*TRANSMITTER | RECEIVER*/
-    ll_config_t ll_config;
 } application_layer;
 
-int application(int port_fd, ll_status_t status, int baud_rate, unsigned int timeout, unsigned int retransmissions);
+int application(int com, ll_status_t status, const char *file_name);
 
 int app_send_ctrl_packet(int ctrl, size_t file_size, const char *file_name);
 
