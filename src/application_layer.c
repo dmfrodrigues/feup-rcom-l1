@@ -19,21 +19,21 @@ int application(int com, ll_status_t status, const char *file_name){
     return 1;
 }
 
-int app_send_ctrl_packet(int ctrl, size_t file_size, const char *file_name){
+int app_send_ctrl_packet(int ctrl, uint32_t file_size, const char *file_name){
     
     size_t packet_size = 5 + sizeof(size_t) + strlen(file_name);
-    char *ctrl_packet = (char *) malloc(packet_size);
+    uint8_t *ctrl_packet = (uint8_t *) malloc(packet_size);
 
     ctrl_packet[0] = ctrl;
 
     ctrl_packet[1] = T_FILE_SIZE;    // T1
-    ctrl_packet[2] = sizeof(size_t); // L1 -> 4 octets
+    ctrl_packet[2] = sizeof(uint32_t); // L1 -> 4 octets
     // V1
     ctrl_packet[3] = (file_size & 0xFF);
     ctrl_packet[4] = (file_size & 0xFF00) >> 8;  
     ctrl_packet[5] = (file_size & 0xFF0000) >> 16;  
     ctrl_packet[6] = (file_size & 0xFF000000) >> 24;  
-    
+
     ctrl_packet[7] = T_FILE_NAME;       // T2
     ctrl_packet[8] = strlen(file_name); // L2
     
@@ -56,7 +56,7 @@ int app_send_ctrl_packet(int ctrl, size_t file_size, const char *file_name){
 int app_send_data_packet(uint8_t *data, size_t data_size, unsigned int seq_number){
 
     size_t packet_size = 4 + data_size;
-    char *data_packet = (char*) malloc(packet_size);
+    uint8_t *data_packet = (uint8_t*) malloc(packet_size);
 
     data_packet[0] = CTRL_DATA;
     data_packet[1] = seq_number % 255;
@@ -116,7 +116,7 @@ int app_send_file(const char *file_name){
 
 int app_rcv_ctrl_packet(int ctrl, int * file_size, char * file_name){
 
-    char * ctrl_packet = (char*)malloc(5 + sizeof(size_t) + FILE_NAME_MAX_SIZE);
+    uint8_t * ctrl_packet = (uint8_t*)malloc(5 + sizeof(size_t) + FILE_NAME_MAX_SIZE);
 
     if(llread(app.fileDescriptor, ctrl_packet) < 0){
         fprintf(stderr, "ERROR: unable to read ctrl packet\n");
@@ -149,7 +149,7 @@ int app_rcv_ctrl_packet(int ctrl, int * file_size, char * file_name){
 
 int app_rcv_data_packet(uint8_t * data, int seq_number){
 
-    char * data_packet = (char*) malloc(LL_MAX_SIZE);
+    uint8_t * data_packet = (uint8_t*) malloc(LL_MAX_SIZE);
     
     if(llread(app.fileDescriptor, data_packet) < 0){
         fprintf(stderr, "ERROR: unable to read data packet\n");

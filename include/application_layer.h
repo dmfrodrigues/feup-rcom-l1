@@ -23,7 +23,7 @@ typedef struct {
 
 int application(int com, ll_status_t status, const char *file_name);
 
-int app_send_ctrl_packet(int ctrl, size_t file_size, const char *file_name);
+int app_send_ctrl_packet(int ctrl, uint32_t file_size, const char *file_name);
 
 int app_send_data_packet(uint8_t *data, size_t data_size, unsigned int seq_number);
 

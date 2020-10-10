@@ -49,7 +49,7 @@ int llopen(int com, ll_status_t status)
  * @param length    Length of data to be written to port.
  * @return int      Number of written characters, or a negative value if error.
  */
-int llwrite(int id, const char *buffer, int length)
+int llwrite(int id, const uint8_t *buffer, int length)
     __attribute__((warn_unused_result));
 
 /**
@@ -60,7 +60,7 @@ int llwrite(int id, const char *buffer, int length)
  * @param buffer    Data to be read.
  * @return int      Number of read characters, or a negative value if error.
  */
-int llread(int id, char *buffer)
+int llread(int id, uint8_t *buffer)
     __attribute__((warn_unused_result));
 
 /**

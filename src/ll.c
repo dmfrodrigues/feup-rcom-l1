@@ -125,7 +125,7 @@ int llopen(int com, ll_status_t status){
     return port_fd;
 }
 
-int llwrite(int port_fd, const char *buffer, int length){
+int llwrite(int port_fd, const uint8_t *buffer, int length){
     fprintf(stderr, "Preparing to write\n");
 
     if(ll_status == RECEIVER) return -1;
@@ -178,7 +178,7 @@ int llwrite(int port_fd, const char *buffer, int length){
     return ret;
 }
 
-int llread(int port_fd, char *buffer){
+int llread(int port_fd, uint8_t *buffer){
     fprintf(stderr, "Preparing to read\n");
 
     if(ll_status == TRANSMITTER) return -1;
