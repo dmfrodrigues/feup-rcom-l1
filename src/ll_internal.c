@@ -205,7 +205,7 @@ int ll_send_REJ(int port_fd){
 int ll_expect_Sframe(int port_fd, uint8_t *a_rcv, uint8_t *c_rcv){
     fprintf(stderr, "    Expecting S-frame\n");
     ll_s_statemachine_t machine = {
-        .state = LL_S_Start,
+        .state = LL_S_START,
         .a_rcv = 0,
         .c_rcv = 0
     };
@@ -222,7 +222,7 @@ int ll_expect_Sframe(int port_fd, uint8_t *a_rcv, uint8_t *c_rcv){
             perror("read");
             return EXIT_FAILURE;
         }
-    } while(machine.state != LL_S_Stop);
+    } while(machine.state != LL_S_STOP);
     *a_rcv = machine.a_rcv;
     *c_rcv = machine.c_rcv;
     return EXIT_SUCCESS;
@@ -231,7 +231,7 @@ int ll_expect_Sframe(int port_fd, uint8_t *a_rcv, uint8_t *c_rcv){
 int ll_expect_Uframe(int port_fd, uint8_t *a_rcv, uint8_t *c_rcv){
     fprintf(stderr, "    Expecting U-frame\n");
     ll_u_statemachine_t machine = {
-        .state = LL_U_Start,
+        .state = LL_U_START,
         .a_rcv = 0,
         .c_rcv = 0
     };
@@ -248,7 +248,7 @@ int ll_expect_Uframe(int port_fd, uint8_t *a_rcv, uint8_t *c_rcv){
             perror("read");
             return EXIT_FAILURE;
         }
-    } while(machine.state != LL_U_Stop);
+    } while(machine.state != LL_U_STOP);
     *a_rcv = machine.a_rcv;
     *c_rcv = machine.c_rcv;
     return EXIT_SUCCESS;
@@ -258,7 +258,7 @@ ssize_t ll_expect_Iframe(int port_fd, uint8_t *buffer){
     fprintf(stderr, "    Expecting I-frame\n");
     ll_i_statemachine_t machine;
     do{
-        machine.state = LL_I_Start;
+        machine.state = LL_I_START;
         machine.escaped = false;
         machine.length = 0;
         do {
@@ -277,15 +277,15 @@ ssize_t ll_expect_Iframe(int port_fd, uint8_t *buffer){
                 perror("read");
                 return -1;
             }
-        } while(machine.state != LL_I_Stop && machine.state != LL_I_Stop_RR);
-        if(machine.state == LL_I_Stop_RR){
+        } while(machine.state != LL_I_STOP && machine.state != LL_I_STOP_RR);
+        if(machine.state == LL_I_STOP_RR){
             fprintf(stderr, "    Got unexpected data (sending RR and ignoring data)\n");
             if(ll_send_RR_resend(port_fd)){
                 fprintf(stderr, "    ERROR: Failed to send RR\n");
                 return -1;
             }
         }
-    } while(machine.state != LL_I_Stop);
+    } while(machine.state != LL_I_STOP);
 
     ssize_t written_chars = ll_destuffing(buffer, machine.data, machine.length);
     if(written_chars <= 0) return -1;

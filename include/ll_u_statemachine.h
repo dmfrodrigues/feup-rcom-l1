@@ -17,12 +17,12 @@
  * U-frame: unnumbered frames
  */
 typedef enum {
-    LL_U_Start,      ///< Start state
-    LL_U_Flag_RCV,   ///< Received flag
+    LL_U_START,      ///< Start state
+    LL_U_FLAG_RCV,   ///< Received flag
     LL_U_A_RCV,      ///< Received address
     LL_U_C_RCV,      ///< Received control byte
     LL_U_BCC_OK,     ///< Received BCC, and it is correct
-    LL_U_Stop        ///< Stop (final) state
+    LL_U_STOP        ///< Stop (final) state
 } ll_u_state_t;
 
 /**
