@@ -30,9 +30,9 @@ int app_send_ctrl_packet(int ctrl, size_t file_size, const char *file_name){
     ctrl_packet[2] = sizeof(size_t); // L1 -> 4 octets
     // V1
     ctrl_packet[3] = (file_size & 0xFF);
-    ctrl_packet[4] = (file_size & 0xFF00);  
-    ctrl_packet[5] = (file_size & 0xFF0000);  
-    ctrl_packet[6] = (file_size & 0xFF000000);  
+    ctrl_packet[4] = (file_size & 0xFF00) >> 8;  
+    ctrl_packet[5] = (file_size & 0xFF0000) >> 16;  
+    ctrl_packet[6] = (file_size & 0xFF000000) >> 24;  
     
     ctrl_packet[7] = T_FILE_NAME;       // T2
     ctrl_packet[8] = strlen(file_name); // L2
