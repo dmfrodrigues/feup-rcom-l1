@@ -87,21 +87,29 @@ int app_send_file(const char *file_name){
     if(app_send_ctrl_packet(CTRL_START, file_size, file_name) < 0)
         return -1;
 
-    unsigned int seq_number = 0;
+    FILE *file = fopen(file_name, "rb");
 
-    FILE *file = fopen(file_name, "r");
+    if(file == NULL) {
+		printf("ERROR: error opening file %s\n", file_name);
+		return -1;
+	}
 
     uint8_t *buf =(uint8_t*)malloc(LL_MAX_SIZE);
 
-    while(fread(buf, sizeof(uint8_t), LL_MAX_SIZE, file) > 0){
-        app_send_data_packet(buf, file_size, seq_number);
-        seq_number++;
+    int res = 0;
+    unsigned int seq_number = 0;
+
+    while((res = fread(buf, sizeof(uint8_t), LL_MAX_SIZE, file)) > 0){
+        if(app_send_data_packet(buf, res, seq_number) < 0)
+            return -1;
+        seq_number = (seq_number+1)%255;
     }
 
     if(app_send_ctrl_packet(CTRL_END, file_size, file_name) < 0)
         return -1;
 
     fclose(file);
+    free(buf);
 
     return 1;
 }
@@ -149,7 +157,7 @@ int app_rcv_data_packet(uint8_t * data, int seq_number){
     }
 
     if(data_packet[0] != CTRL_DATA){
-        fprintf(stderr, "ERROR: data control is not correct\n");
+        fprintf(stderr, "ERROR: data control is not correct\n data control=0x%02X (should be 0x%02X)\n", data_packet[0], CTRL_DATA);
         return -1;
     }
 
@@ -176,16 +184,29 @@ int app_receive_file(){
         return -1;
     }
 
-    FILE *file = fopen(file_name, "w");
+    FILE *file = fopen(file_name, "wb");
+
+    if(file == NULL) {
+		printf("ERROR: error opening file %s\n", file_name);
+		return -1;
+	}
 
     int data_bytes_read = 0;
     unsigned int seq_number = 0;
     uint8_t *buf =(uint8_t*)malloc(LL_MAX_SIZE);
 
+    fprintf(stderr, "app_receive_file: file_size=%d\n", file_size);
+    
     while(file_size > data_bytes_read){
-        
         int data_length = app_rcv_data_packet(buf, seq_number);
+        
+        if(data_length < 0){
+            fprintf(stderr, "ERROR: app_rcv_data_packet\n");
+            return -1;
+        }
+
         fwrite(buf, sizeof(uint8_t), data_length, file);
+
         data_bytes_read += data_length;
         seq_number++;
     }

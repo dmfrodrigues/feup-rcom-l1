@@ -3,6 +3,7 @@
 #include <string.h>
 
 #include "ll.h"
+#include "application_layer.h"
 
 #define BAUDRATE B38400
 #define _POSIX_SOURCE 1 /* POSIX compliant source */
@@ -16,6 +17,11 @@ int main(int argc, char** argv){
         exit(1);
     }
 
+    if(application(atoi(argv[1]), RECEIVER, NULL) < 0)
+        return 1;
+
+
+    /*
     // OPEN SERIAL PORT
     int port_fd = llopen(atoi(argv[1]), RECEIVER);
     if(port_fd < 0) return -1;
@@ -35,6 +41,6 @@ int main(int argc, char** argv){
     
     int res = llclose(port_fd);
     if(res) return -1;
-
+    */
     return 0;
 }

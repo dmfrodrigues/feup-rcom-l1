@@ -3,6 +3,7 @@
 #include <string.h>
 
 #include "ll.h"
+#include "application_layer.h"
 
 #define _POSIX_SOURCE 1 /* POSIX compliant source */
 
@@ -10,10 +11,16 @@ int main(int argc, char** argv){
 
     // CHECK ARGUMENTS
     if(argc < 2){
-        printf("Usage:\tnserial SerialPort\n\tex: nserial 2\n");
+        printf("Usage:\tnserial SerialPort FileName\n\tex: nserial 2 pinguim.gif\n");
         exit(1);
     }
 
+
+    if(application(atoi(argv[1]), TRANSMITTER, argv[2]) < 0)
+        return 1;
+
+
+    /* Just for tests
     // OPEN SERIAL PORT
     int port_fd = llopen(atoi(argv[1]), TRANSMITTER);
     if(port_fd < 0) return -1;
@@ -32,6 +39,7 @@ int main(int argc, char** argv){
 
     int res = llclose(port_fd);
     if(res) return -1;
+    */
 
     return 0;
 }
