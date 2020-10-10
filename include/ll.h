@@ -8,7 +8,7 @@
 
 #include "ll_flags.h"
 
-#define LL_MAX_SIZE 1024        ///< @ingroup ll Maximum size for a message to be sent using llwrite
+#define LL_MAX_SIZE 1024    ///< @ingroup ll Maximum message size
 
 typedef struct {
     int baud_rate;
@@ -34,7 +34,8 @@ ll_config_t ll_config;
  * @param status    Whether the caller is a transmitter or receiver
  * @return int      ID of connection, or a negative value if an error occured.
  */
-int llopen(int com, ll_status_t status) __attribute__((warn_unused_result));
+int llopen(int com, ll_status_t status)
+    __attribute__((warn_unused_result));
 
 /**
  * @ingroup ll
@@ -45,7 +46,8 @@ int llopen(int com, ll_status_t status) __attribute__((warn_unused_result));
  * @param length    Length of data to be written to port.
  * @return int      Number of written characters, or a negative value if error.
  */
-int llwrite(int id, const char *buffer, int length) __attribute__((warn_unused_result));
+int llwrite(int id, const char *buffer, int length)
+    __attribute__((warn_unused_result));
 
 /**
  * @ingroup ll
@@ -55,7 +57,8 @@ int llwrite(int id, const char *buffer, int length) __attribute__((warn_unused_r
  * @param buffer    Data to be read.
  * @return int      Number of read characters, or a negative value if error.
  */
-int llread(int id, char *buffer) __attribute__((warn_unused_result));
+int llread(int id, char *buffer)
+    __attribute__((warn_unused_result));
 
 /**
  * @ingroup ll
@@ -64,6 +67,7 @@ int llread(int id, char *buffer) __attribute__((warn_unused_result));
  * @param id        Port to close.
  * @return int      positive value if successful, negative otherwise
  */
-int llclose(int id) __attribute__((warn_unused_result));
+int llclose(int id)
+    __attribute__((warn_unused_result));
 
 #endif //_LL_H_

@@ -24,11 +24,13 @@ int main(int argc, char** argv){
     
     strcpy(buffer, "hello");
     sz = llwrite(port_fd, buffer, strlen(buffer));
-    if(sz != (ssize_t)strlen(buffer)) fprintf(stderr, "ERROR: failed to send string '%s'\n", buffer);
+    if(sz != (ssize_t)strlen(buffer))
+        fprintf(stderr, "ERROR: failed to send string '%s'\n", buffer);
 
     strcpy(buffer, "world");
     sz = llwrite(port_fd, buffer, strlen(buffer));
-    if(sz != (ssize_t)strlen(buffer)) fprintf(stderr, "ERROR: failed to send string '%s'\n", buffer);
+    if(sz != (ssize_t)strlen(buffer))
+        fprintf(stderr, "ERROR: failed to send string '%s'\n", buffer);
 
     int res = llclose(port_fd);
     if(res) return -1;

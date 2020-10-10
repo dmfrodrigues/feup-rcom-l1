@@ -1,7 +1,8 @@
 /**
  * @defgroup    ll_i_statemachine LL I-frame state machine
  * @ingroup     ll
- * @brief       Logical link (LL) state machine that allows to receive I-frames; for internal use.
+ * @brief       Logical link (LL) state machine that allows
+ *              to receive I-frames; for internal use.
  */
 
 #ifndef _LL_I_STATEMACHINE_H_
@@ -55,6 +56,7 @@ typedef struct {
  * @param byte      Byte received, will decide the transition
  * @return int      0 on success, other value otherwise
  */
-int ll_i_state_update(ll_i_statemachine_t *machine, uint8_t byte) __attribute__((warn_unused_result));
+int ll_i_state_update(ll_i_statemachine_t *machine, uint8_t byte)
+    __attribute__((warn_unused_result));
 
 #endif // _LL_I_STATEMACHINE_H_

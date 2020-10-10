@@ -29,7 +29,8 @@ int llopen(int com, ll_status_t status){
 
     // Open serial port
     // O_RDWR   - Open for reading and writing
-    // O_NOCTTY - Open serial port not as controlling tty, because we don't want to get killed if linenoise sends CTRL-C
+    // O_NOCTTY - Open serial port not as controlling tty,
+    //            because we don't want to get killed if linenoise sends CTRL-C
     int port_fd = open(port_path, O_RDWR | O_NOCTTY);
     if(port_fd < 0){ perror(port_path); return -1; }
 
@@ -37,7 +38,7 @@ int llopen(int com, ll_status_t status){
     if(tcgetattr(port_fd, &oldtio) == -1) { perror("tcgetattr"); return -1; }
 
     // Set port settings
-    // VTIME and VMIN should be changed to protect reads of the following character(s) with a timer
+    // VTIME/VMIN should be changed to protect reads of following character(s) with timer
     struct termios newtio;
     bzero(&newtio, sizeof(newtio)); // fills struct newtio with zeros
     tcflag_t baud_rate = ll_get_baud_rate();
@@ -48,7 +49,8 @@ int llopen(int com, ll_status_t status){
     newtio.c_cc[VTIME]  = 1; // inter-character timer unused
     newtio.c_cc[VMIN]   = 1; // blocking read until 5 chars received
 
-    tcflush(port_fd, TCIOFLUSH);    // flush data received but not read, and data written but not transmitted
+    // flush data received but not read, and data written but not transmitted
+    tcflush(port_fd, TCIOFLUSH);
 
     if(tcsetattr(port_fd, TCSANOW, &newtio) == -1) { perror("tcsetattr"); return -1; }
 
@@ -83,13 +85,15 @@ int llopen(int com, ll_status_t status){
             if(res){
                 if(errno == EINTR){
                     if(timeout) fprintf(stderr, "WARNING: gave up due to timeout\n");
-                    else        fprintf(stderr, "ERROR: emitter was interrupted due to unknown reason\n");
+                    else        fprintf(stderr, "ERROR: emitter was interrupted\n");
                 } else perror("read");
             } else if(a_rcv == LL_A_SEND && c_rcv == LL_C_UA){
                 fprintf(stderr, "    Got UA\n");
                 break;
             } else{
-                fprintf(stderr, "ERROR: c_rcv or a_rcv are not correct\na_rcv=0x%02X (should be 0x%02X)\nc_rcv=0x%02X (should be 0x%02X)\n", a_rcv, LL_A_SEND, c_rcv, LL_C_UA);
+                fprintf(stderr, "ERROR: c_rcv or a_rcv are not correct\n");
+                fprintf(stderr, "a_rcv=0x%02X (should be 0x%02X)\n", a_rcv, LL_A_SEND);
+                fprintf(stderr, "c_rcv=0x%02X (should be 0x%02X)\n", c_rcv, LL_C_UA);
             }
         }
         if(attempts == ll_config.retransmissions) return -1;
@@ -106,7 +110,9 @@ int llopen(int com, ll_status_t status){
             res = ll_send_UA(port_fd);
             if(res < 0) return -1;
         } else {
-            fprintf(stderr, "ERROR: c_rcv or a_rcv are not correct\na_rcv=0x%02X (should be 0x%02X)\nc_rcv=0x%02X (should be 0x%02X)\n", a_rcv, LL_A_SEND, c_rcv, LL_C_SET);
+            fprintf(stderr, "ERROR: c_rcv or a_rcv are not correct\n");
+            fprintf(stderr, "a_rcv=0x%02X (should be 0x%02X)\n", a_rcv, LL_A_SEND);
+            fprintf(stderr, "c_rcv=0x%02X (should be 0x%02X)\n", c_rcv, LL_C_SET);
             return -1;
         }
     }
@@ -144,7 +150,7 @@ int llwrite(int port_fd, const char *buffer, int length){
         if(res){
             if(errno == EINTR){
                 if(timeout) fprintf(stderr, "WARNING: gave up due to timeout\n");
-                else        fprintf(stderr, "ERROR: emitter was interrupted due to unknown reason\n");
+                else        fprintf(stderr, "ERROR: emitter was interrupted\n");
             } else perror("read");
         } else if(a_rcv == LL_A_SEND){
             if(c_rcv == ll_get_expected_RR()){
@@ -152,9 +158,13 @@ int llwrite(int port_fd, const char *buffer, int length){
                 break;
             } else if(c_rcv == ll_get_expected_REJ()){
                 fprintf(stderr, "    Got REJ\n");
-            } else fprintf(stderr, "Don't know what I got; a=0x%02X, c=0x%02X\n", a_rcv, c_rcv);
+            } else fprintf(stderr,
+                "Don't know what I got; a=0x%02X, c=0x%02X\n", a_rcv, c_rcv);
         } else{
-            fprintf(stderr, "ERROR: c_rcv or a_rcv are not correct\na_rcv=0x%02X (should be 0x%02X)\nc_rcv=0x%02X (should be 0x%02X, 0x%02X)\n", a_rcv, LL_A_SEND, c_rcv, ll_get_expected_RR(), ll_get_expected_REJ());
+            fprintf(stderr, "ERROR: c_rcv or a_rcv are not correct\n");
+            fprintf(stderr, "a_rcv=0x%02X (should be 0x%02X)\n", a_rcv, LL_A_SEND);
+            fprintf(stderr, "c_rcv=0x%02X (should be 0x%02X, 0x%02X)\n",
+                c_rcv, ll_get_expected_RR(), ll_get_expected_REJ());
         }
     }
     if(attempts == ll_config.retransmissions) return -1;
@@ -218,7 +228,7 @@ int llclose(int port_fd){
             if(res){
                 if(errno == EINTR){
                     if(timeout) fprintf(stderr, "WARNING: gave up due to timeout\n");
-                    else        fprintf(stderr, "ERROR: interrupted due to unknown reason\n");
+                    else        fprintf(stderr, "ERROR: interrupted\n");
                 } else perror("read");
             } 
             else if(a_rcv == LL_A_RECV && c_rcv == LL_C_DISC) {
