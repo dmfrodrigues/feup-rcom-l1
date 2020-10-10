@@ -21,13 +21,18 @@ int main(int argc, char** argv){
     if(port_fd < 0) return -1;
 
     char buffer[LL_MAX_SIZE+1];
-    ssize_t sz = llread(port_fd, buffer);
-    if(sz <= 0){
-        fprintf(stderr, "ERROR: failed to receive string\n");
-    }
+    ssize_t sz;
+    
+    sz = llread(port_fd, buffer);
+    if(sz <= 0) fprintf(stderr, "ERROR: failed to receive string\n");
     buffer[sz] = '\0';
     fprintf(stderr, "Read string: '%s'\n", buffer);
 
+    sz = llread(port_fd, buffer);
+    if(sz <= 0) fprintf(stderr, "ERROR: failed to receive string\n");
+    buffer[sz] = '\0';
+    fprintf(stderr, "Read string: '%s'\n", buffer);
+    
     int res = llclose(port_fd);
     if(res) return -1;
 
