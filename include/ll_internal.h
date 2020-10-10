@@ -9,6 +9,11 @@
 #include <termios.h>
 
 #include "ll.h"
+#include "ll_flags.h"
+#include "ll_utils.h"
+#include "ll_u_statemachine.h"
+#include "ll_s_statemachine.h"
+#include "ll_i_statemachine.h"
 
 ll_status_t ll_status;
 int timeout;
