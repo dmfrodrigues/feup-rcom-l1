@@ -62,7 +62,7 @@ int app_send_data_packet(uint8_t *data, size_t data_size, unsigned int seq_numbe
     data_packet[1] = seq_number % 255;
 
     // data_size = 256*L2 + L1 
-    data_packet[2] = (data_size & 0xFF00);    //L2
+    data_packet[2] = (data_size & 0xFF00) >> 8;    //L2
     data_packet[3] = (data_size & 0xFF);      //L1
 
     memcpy(data_packet + 4, data, data_size);
