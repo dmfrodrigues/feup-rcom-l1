@@ -6,8 +6,9 @@
 #include <unistd.h>
 
 #include "ll_flags.h"
-#include "ll_i_statemachine.h"
+#include "ll_u_statemachine.h"
 #include "ll_s_statemachine.h"
+#include "ll_i_statemachine.h"
 #include "ll_utils.h"
 
 ll_config_t ll_config = {
@@ -201,10 +202,10 @@ int ll_send_REJ(int port_fd){
     } else return EXIT_FAILURE;
 }
 
-int ll_expect_SUframe(int port_fd, uint8_t *a_rcv, uint8_t *c_rcv){
-    fprintf(stderr, "    Expecting S/U-frame\n");
+int ll_expect_Sframe(int port_fd, uint8_t *a_rcv, uint8_t *c_rcv){
+    fprintf(stderr, "    Expecting S-frame\n");
     ll_s_statemachine_t machine = {
-        .state = LL_SU_Start,
+        .state = LL_S_Start,
         .a_rcv = 0,
         .c_rcv = 0
     };
@@ -221,7 +222,33 @@ int ll_expect_SUframe(int port_fd, uint8_t *a_rcv, uint8_t *c_rcv){
             perror("read");
             return EXIT_FAILURE;
         }
-    } while(machine.state != LL_SU_Stop);
+    } while(machine.state != LL_S_Stop);
+    *a_rcv = machine.a_rcv;
+    *c_rcv = machine.c_rcv;
+    return EXIT_SUCCESS;
+}
+
+int ll_expect_Uframe(int port_fd, uint8_t *a_rcv, uint8_t *c_rcv){
+    fprintf(stderr, "    Expecting U-frame\n");
+    ll_u_statemachine_t machine = {
+        .state = LL_U_Start,
+        .a_rcv = 0,
+        .c_rcv = 0
+    };
+    do {
+        uint8_t byte;
+        int res = read(port_fd, &byte, 1);
+        if(res == 1){
+            fprintf(stderr, "        Read byte 0x%02X | ", byte);
+            fprintf(stderr, "Transitioned from state %d", machine.state);
+            res = ll_u_state_update(&machine, byte);
+            fprintf(stderr, " to %d\n", machine.state);
+            if(res) fprintf(stderr, "ERROR: failed to update state\n");
+        } else {
+            perror("read");
+            return EXIT_FAILURE;
+        }
+    } while(machine.state != LL_U_Stop);
     *a_rcv = machine.a_rcv;
     *c_rcv = machine.c_rcv;
     return EXIT_SUCCESS;

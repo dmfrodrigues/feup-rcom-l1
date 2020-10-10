@@ -4,8 +4,8 @@
  * @brief       Logical link (LL) state machine that allows to receive S-frames and U-frames; for internal use.
  */
 
-#ifndef _LL_SU_STATEMACHINE_H_
-#define _LL_SU_STATEMACHINE_H_
+#ifndef _LL_S_STATEMACHINE_H_
+#define _LL_S_STATEMACHINE_H_
 
 #include <stdint.h>
 
@@ -17,12 +17,12 @@
  * U-frame: unnumbered frames
  */
 typedef enum {
-    LL_SU_Start,      ///< Start state
-    LL_SU_Flag_RCV,   ///< Received flag
-    LL_SU_A_RCV,      ///< Received address
-    LL_SU_C_RCV,      ///< Received control byte
-    LL_SU_BCC_OK,     ///< Received BCC, and it is correct
-    LL_SU_Stop        ///< Stop (final) state
+    LL_S_Start,      ///< Start state
+    LL_S_Flag_RCV,   ///< Received flag
+    LL_S_A_RCV,      ///< Received address
+    LL_S_C_RCV,      ///< Received control byte
+    LL_S_BCC_OK,     ///< Received BCC, and it is correct
+    LL_S_Stop        ///< Stop (final) state
 } ll_s_state_t;
 
 /**
@@ -47,4 +47,4 @@ typedef struct {
  */
 int ll_s_state_update(ll_s_statemachine_t *machine, uint8_t byte) __attribute__((warn_unused_result));
 
-#endif // _LL_SU_STATEMACHINE_H_
+#endif // _LL_S_STATEMACHINE_H_

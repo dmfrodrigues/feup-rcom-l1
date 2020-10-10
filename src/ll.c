@@ -71,7 +71,7 @@ int llopen(int com, ll_status_t status){
 
             // Get UA
             uint8_t a_rcv, c_rcv;
-            res = ll_expect_SUframe(port_fd, &a_rcv, &c_rcv);
+            res = ll_expect_Uframe(port_fd, &a_rcv, &c_rcv);
             
             // Validate UA
             if(res){
@@ -91,7 +91,7 @@ int llopen(int com, ll_status_t status){
     } else if(status == RECEIVER){
         // Get SET
         uint8_t a_rcv, c_rcv;
-        res = ll_expect_SUframe(port_fd, &a_rcv, &c_rcv);
+        res = ll_expect_Sframe(port_fd, &a_rcv, &c_rcv);
         if(res){
             perror("read");
             return -1;
@@ -132,7 +132,7 @@ int llwrite(int port_fd, const char *buffer, int length){
 
         // Get RR or REJ
         uint8_t a_rcv, c_rcv;
-        res = ll_expect_SUframe(port_fd, &a_rcv, &c_rcv);
+        res = ll_expect_Sframe(port_fd, &a_rcv, &c_rcv);
         
         // Validate RR or REJ
         if(res){
@@ -204,7 +204,7 @@ int llclose(int port_fd){
 
             // Get DISC
             uint8_t a_rcv, c_rcv;
-            res = ll_expect_SUframe(port_fd, &a_rcv, &c_rcv);
+            res = ll_expect_Sframe(port_fd, &a_rcv, &c_rcv);
             
             // Validate DISC
             if(res){
@@ -228,7 +228,7 @@ int llclose(int port_fd){
     else{
         // Get DISC
         uint8_t a_rcv, c_rcv;
-        res = ll_expect_SUframe(port_fd, &a_rcv, &c_rcv);
+        res = ll_expect_Sframe(port_fd, &a_rcv, &c_rcv);
 
         if(res){
             perror("read"); return -1;
@@ -243,7 +243,7 @@ int llclose(int port_fd){
 
 
         // Get UA
-        res = ll_expect_SUframe(port_fd, &a_rcv, &c_rcv);
+        res = ll_expect_Uframe(port_fd, &a_rcv, &c_rcv);
 
         if(res){
             perror("read"); return -1;

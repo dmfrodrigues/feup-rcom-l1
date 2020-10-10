@@ -125,14 +125,24 @@ int ll_send_RR_resend(int port_fd) __attribute__((warn_unused_result));
 int ll_send_REJ(int port_fd) __attribute__((warn_unused_result));
 
 /**
- * @brief Expect for S/U-frame to arrive from port.
+ * @brief Expect for S-frame to arrive from port.
  * 
  * @param port_fd   Port to expect the frame comes from
  * @param a_rcv     Pointer to memory where address (A) byte will be saved
  * @param c_rcv     Pointer to memory where control (C) byte will be saved
  * @return int      On success, 0; on error, another value, and errno is set
  */
-int ll_expect_SUframe(int port_fd, uint8_t *a_rcv, uint8_t *c_rcv) __attribute__((warn_unused_result));
+int ll_expect_Sframe(int port_fd, uint8_t *a_rcv, uint8_t *c_rcv) __attribute__((warn_unused_result));
+
+/**
+ * @brief Expect for U-frame to arrive from port.
+ * 
+ * @param port_fd   Port to expect the frame comes from
+ * @param a_rcv     Pointer to memory where address (A) byte will be saved
+ * @param c_rcv     Pointer to memory where control (C) byte will be saved
+ * @return int      On success, 0; on error, another value, and errno is set
+ */
+int ll_expect_Uframe(int port_fd, uint8_t *a_rcv, uint8_t *c_rcv) __attribute__((warn_unused_result));
 
 /**
  * @brief Expect for I-frame to arrive from port.
