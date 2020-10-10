@@ -584,8 +584,7 @@ An I-frame state machine must be ready to handle to following scenarios:
 		\node[align=center, state, below of=A_RCV						] (C_UNXP_RCV)	{C\\UNXP\\RCV};
 		\node[align=center, state, left=1.2cm of C_UNXP_RCV				] (C_RCV) 		{C\\RCV};
 		\node[align=center, state, below of=C_RCV						] (D) 			{D};
-		\node[align=center, state, below of=D							] (D_ESC) 		{D\\ESC};
-		\node[align=center, state, right=1.2cm of D_ESC, accepting		] (STOP) 		{STOP};
+		\node[align=center, state, below of=D, accepting				] (STOP) 		{STOP};
 
 		
 		\node[align=center, state, below of=C_UNXP_RCV, accepting		] (STOP_RR) 	{STOP\\RR};
@@ -599,17 +598,15 @@ An I-frame state machine must be ready to handle to following scenarios:
 				(A_RCV)			edge[left					]	node{C\_EXP}				(C_RCV)
 				(C_RCV)			edge[bend left, left		]	node{FLAG}					(FLAG_RCV)
 				(C_RCV)			edge[left					]	node{BCC1}					(D)
-				(D)				edge[loop left, looseness=2	]	node{$\Sigma-\text{ESC}$}	(D)
-				(D)				edge[bend right=10, left	]	node{ESC}					(D_ESC)
-				(D_ESC)			edge[bend right=10, right	]	node{$\Sigma$}				(D)
+				(D)				edge[align=center, loop left, looseness=2	]	node{$\Sigma-$\\FLAG}	(D)
 				(D)				edge[right					]	node{FLAG}					(STOP)
 
 				(A_RCV)			edge[						]	node{C\_UNXP}	(C_UNXP_RCV)
-				(C_UNXP_RCV)	edge[align=center, loop right, looseness=2]	node{$\Sigma-$\\ESC}	(C_UNXP_RCV)
+				(C_UNXP_RCV)	edge[align=center, loop right, looseness=2]	node{$\Sigma-$\\FLAG}	(C_UNXP_RCV)
 				(C_UNXP_RCV)	edge[left					]	node{FLAG}		(STOP_RR)
 
 				(A_RCV)			edge[right					]	node{C\_SET}	(C_SET_RCV)
-				(C_SET_RCV)		edge[align=center, loop right, looseness=2]	node{$\Sigma-$\\ESC}	(C_SET_RCV)
+				(C_SET_RCV)		edge[align=center, loop right, looseness=2]	node{$\Sigma-$\\FLAG}	(C_SET_RCV)
 				(C_SET_RCV)		edge[left					]	node{FLAG}		(STOP_UA)
 				;
 		
