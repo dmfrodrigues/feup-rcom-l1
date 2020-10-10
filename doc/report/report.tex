@@ -48,6 +48,9 @@
 \clearrow
 \usepackage{multirow}
 
+% Tables with vertical center alignment
+\usepackage{array}
+
 % Lists and items
 \usepackage{enumitem}
 
@@ -364,7 +367,8 @@ This protocol is suited with a mechanism that allows the receiver to identify if
 
 \begin{figure}[H]
 	\centering
-	\begin{minipage}{11cm}
+	\begin{tabular}{m{6mm} m{108mm}}
+		(\textit{a}) & 
 		\begin{tikzpicture}[->,>=stealth',node distance=2cm,initial text=$ $,]
 			\small
 			\node[align=center, draw, minimum width=1.2cm, minimum height=1.2cm] at (0, 0) (f-start) {F};
@@ -373,6 +377,7 @@ This protocol is suited with a mechanism that allows the receiver to identify if
 			\node[align=center, draw, minimum width=1.2cm, minimum height=1.2cm] at (3.6, 0) (bcc) {BCC};
 			\node[align=center, draw, minimum width=1.2cm, minimum height=1.2cm] at (4.8, 0) (f-end) {F};
 		\end{tikzpicture}\\[10pt]
+		(\textit{b}) & 
 		\begin{tikzpicture}[->,>=stealth',node distance=2cm,initial text=$ $,]
 			\small
 			\node[align=center, draw, minimum width=1.2cm, minimum height=1.2cm] at (0, 0) (f-start) {F};
@@ -384,8 +389,8 @@ This protocol is suited with a mechanism that allows the receiver to identify if
 			\node[align=center, draw, minimum width=1.2cm, minimum height=1.2cm] at (8.4, 0) (bcc2) {BCC2};
 			\node[align=center, draw, minimum width=1.2cm, minimum height=1.2cm] at (9.6, 0) (f-end) {F};
 		\end{tikzpicture}
-	\end{minipage}
-	\caption{Structure of the S/U-frames (top) and I-frames (bottom). Each square represents a byte, each of type F (flag), A (address), C (control), BCC (block check character) or D (data).}
+	\end{tabular}
+	\caption{Structure of the S/U-frames (\textit{a}) and I-frames (\textit{b}). Each square represents a byte, which can be F (flag), A (address), C (control), BCC (block check character) or D (data).}
 	\label{fig:frames}
 \end{figure}
 
