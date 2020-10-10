@@ -22,7 +22,9 @@ typedef enum {
     LL_S_A_RCV,      ///< Received address
     LL_S_C_RCV,      ///< Received control byte
     LL_S_BCC_OK,     ///< Received BCC, and it is correct
-    LL_S_STOP        ///< Stop (final) state
+    LL_S_STOP,       ///< Stop (final) state
+    LL_S_C_I_RCV,    ///< Received unexpected I-frame
+    LL_S_STOP_RR     ///< Stop (final) state, send RR
 } ll_s_state_t;
 
 /**

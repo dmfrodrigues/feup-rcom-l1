@@ -502,7 +502,7 @@ A S-frame state machine must be ready to handle the following scenarios:
 				(BCC_OK)		edge[right						]	node{FLAG}		(STOP)
 
 				(A_RCV)			edge[							]	node{C\_I}		(C_I_RCV)
-				(C_I_RCV)		edge[align=center, loop right	]	node{$\Sigma$-\\ESC}	(C_I_RCV)
+				(C_I_RCV)		edge[align=center, loop right	]	node{$\Sigma$-\\FLAG}	(C_I_RCV)
 				(C_I_RCV)		edge[right						]	node{FLAG}		(STOP_RR)
 				;
 		
