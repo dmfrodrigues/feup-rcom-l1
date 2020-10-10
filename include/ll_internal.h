@@ -1,3 +1,6 @@
+// Copyright (C) 2020 Diogo Rodrigues, Breno Pimentel
+// Distributed under the terms of the GNU General Public License, version 3
+
 #ifndef _LL_INTERNAL_H_
 #define _LL_INTERNAL_H_
 

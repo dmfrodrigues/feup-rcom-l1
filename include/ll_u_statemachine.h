@@ -1,3 +1,6 @@
+// Copyright (C) 2020 Diogo Rodrigues, Breno Pimentel
+// Distributed under the terms of the GNU General Public License, version 3
+
 /**
  * @defgroup    ll_u_statemachine LL U-frame state machine
  * @ingroup     ll
