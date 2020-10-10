@@ -2,7 +2,7 @@ name: Compile report
 
 on:
   push:
-    branches: [ master ]
+    branches: [ master , report ]
 
 jobs:
   build:

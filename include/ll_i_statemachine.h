@@ -19,13 +19,17 @@
  * I-frame: information frames
  */
 typedef enum {
-    LL_I_Start,      ///< Start state
-    LL_I_Flag_RCV,   ///< Received flag
+    LL_I_START,      ///< Start state
+    LL_I_FLAG_RCV,   ///< Received flag
     LL_I_A_RCV,      ///< Received address
     LL_I_C_RCV,      ///< Received control byte
-    LL_I_Data,       ///< Received BCC1, and it is correct; going for data now
-    LL_I_Data_ESC,   ///< Received ESC, waiting data to escape
-    LL_I_Stop        ///< Stop (final) state
+    LL_I_DATA,       ///< Received BCC1, and it is correct; going for data now
+    LL_I_DATA_ESC,   ///< Received ESC, waiting data to escape
+    LL_I_STOP,       ///< Stop (final) state
+    LL_I_C_UNXP_RCV, ///< Unexpected C received (retransmission)
+    LL_I_STOP_RR,    ///< Stop (final) state, should send RR
+    LL_I_C_SET_RCV,  ///< Unexpected C received (SET)
+    LL_I_STOP_UA     ///< Stop (final) state, should send UA
 } ll_i_state_t;
 
 /**

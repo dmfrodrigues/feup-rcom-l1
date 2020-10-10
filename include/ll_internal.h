@@ -39,6 +39,13 @@ tcflag_t ll_get_baud_rate(void) __attribute__((warn_unused_result));
 uint8_t ll_get_expected_Iframe_C(void) __attribute__((warn_unused_result));
 
 /**
+ * @brief Get I-frame C byte unexpected from the other end of the communication.
+ * 
+ * @return uint8_t  Unexpected I-frame C byte
+ */
+uint8_t ll_get_unexpected_Iframe_C(void) __attribute__((warn_unused_result));
+
+/**
  * @brief Get RR byte expected from the other end of the communication.
  * 
  * @return uint8_t  Expected RR byte
@@ -102,6 +109,14 @@ ssize_t ll_send_I(int port_fd, const uint8_t *buffer, size_t length) __attribute
 int ll_send_RR(int port_fd) __attribute__((warn_unused_result));
 
 /**
+ * @brief Send Receiver Ready (RR) to port after receiving unexpected I-frame.
+ * 
+ * @param port_fd   Port to send RR to
+ * @return int      0 if successful; -1 otherwise
+ */
+int ll_send_RR_resend(int port_fd) __attribute__((warn_unused_result));
+
+/**
  * @brief Send Rejected (REJ) to port.
  * 
  * @param port_fd   Port to send REJ to
@@ -110,14 +125,24 @@ int ll_send_RR(int port_fd) __attribute__((warn_unused_result));
 int ll_send_REJ(int port_fd) __attribute__((warn_unused_result));
 
 /**
- * @brief Expect for S/U-frame to arrive from port.
+ * @brief Expect for S-frame to arrive from port.
  * 
  * @param port_fd   Port to expect the frame comes from
  * @param a_rcv     Pointer to memory where address (A) byte will be saved
  * @param c_rcv     Pointer to memory where control (C) byte will be saved
  * @return int      On success, 0; on error, another value, and errno is set
  */
-int ll_expect_SUframe(int port_fd, uint8_t *a_rcv, uint8_t *c_rcv) __attribute__((warn_unused_result));
+int ll_expect_Sframe(int port_fd, uint8_t *a_rcv, uint8_t *c_rcv) __attribute__((warn_unused_result));
+
+/**
+ * @brief Expect for U-frame to arrive from port.
+ * 
+ * @param port_fd   Port to expect the frame comes from
+ * @param a_rcv     Pointer to memory where address (A) byte will be saved
+ * @param c_rcv     Pointer to memory where control (C) byte will be saved
+ * @return int      On success, 0; on error, another value, and errno is set
+ */
+int ll_expect_Uframe(int port_fd, uint8_t *a_rcv, uint8_t *c_rcv) __attribute__((warn_unused_result));
 
 /**
  * @brief Expect for I-frame to arrive from port.
