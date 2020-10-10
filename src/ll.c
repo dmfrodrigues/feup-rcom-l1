@@ -54,6 +54,12 @@ int llopen(int com, ll_status_t status){
 
     int res;
 
+    switch(status){
+        case TRANSMITTER: sequence_number = 1; break;
+        case RECEIVER   : sequence_number = 0; break;
+        default: fprintf(stderr, "ERROR: no such status %d\n", status); return -1;
+    }
+
     if(status == TRANSMITTER){
         struct sigaction action;
         action.sa_handler = alarmHandler;
@@ -163,6 +169,8 @@ int llread(int port_fd, char *buffer){
     fprintf(stderr, "Preparing to read\n");
 
     if(ll_status == TRANSMITTER) return -1;
+
+    sequence_number = (sequence_number+1)%2;
     
     ssize_t sz = -1;
 
