@@ -28,7 +28,6 @@ typedef enum {
     LL_I_A_RCV,      ///< Received address
     LL_I_C_RCV,      ///< Received control byte
     LL_I_DATA,       ///< Received BCC1, and it is correct; going for data now
-    LL_I_DATA_ESC,   ///< Received ESC, waiting data to escape
     LL_I_STOP,       ///< Stop (final) state
     LL_I_C_UNXP_RCV, ///< Unexpected C received (retransmission)
     LL_I_STOP_RR,    ///< Stop (final) state, should send RR
@@ -46,7 +45,6 @@ typedef struct {
     ll_i_state_t state;             ///< Machine state
 //    uint8_t a_rcv;                  ///< Value of received Address (A) byte
 //    uint8_t c_rcv;                  ///< Value of received Control (C) byte
-    int     escaped;
     uint8_t data[2*LL_MAX_SIZE];    ///< Data in I-frame
     size_t  length;                 ///< Length of data
 } ll_i_statemachine_t;

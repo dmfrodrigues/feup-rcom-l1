@@ -46,15 +46,8 @@ int ll_i_state_update(ll_i_statemachine_t *m, uint8_t b){
         } break;
     case LL_I_DATA:
         switch(b){
-            case LL_ESC   : m->state = LL_I_DATA_ESC; m->escaped = true; break;
             case LL_FLAG  : m->state = LL_I_STOP    ; break;
             default       : m->data[m->length++] = b; break;
-        } break;
-    case LL_I_DATA_ESC:
-        switch(b){
-            case LL_ESC   :
-            case LL_FLAG  : return EXIT_FAILURE;
-            default       : m->data[m->length++] = LL_STUFF(b); break;
         } break;
     case LL_I_STOP:
         fprintf(stderr, "can't transition from LL_I_STOP\n");

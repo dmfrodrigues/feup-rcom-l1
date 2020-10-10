@@ -118,9 +118,13 @@ int ll_send_UA(int port_fd){
 }
 
 ssize_t ll_send_I(int port_fd, const uint8_t *buffer, size_t length){
-    fprintf(stderr, "Sending '");
+    fprintf(stderr, "Sending");
+    /*
+    fprintf(stderr, " '");
     for(size_t i = 0; i < length; ++i) fprintf(stderr, "%c", buffer[i]);
-    fprintf(stderr, "' (");
+    fprintf(stderr, "'");
+    */
+    fprintf(stderr, " (");
     for(size_t i = 0; i < length; ++i) fprintf(stderr, "%02X ", buffer[i]);
     fprintf(stderr, ")\n");
 
@@ -282,7 +286,6 @@ ssize_t ll_expect_Iframe(int port_fd, uint8_t *buffer){
     ll_i_statemachine_t machine;
     do{
         machine.state = LL_I_START;
-        machine.escaped = false;
         machine.length = 0;
         do {
             uint8_t byte;
