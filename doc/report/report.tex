@@ -1,3 +1,6 @@
+% Copyright (C) 2020 Diogo Rodrigues, Breno Pimentel
+% Distributed under the terms of the GNU General Public License, version 3
+
 \documentclass[a4paper, 11pt]{report}
 \usepackage[top=35mm,bottom=35mm,left=25mm,right=25mm]{geometry} % Margins
 
@@ -6,6 +9,9 @@
 
 % Appendix
 \usepackage{appendix}
+
+% Landscape pages
+\usepackage{pdflscape}
 
 % Decent underlines
 \usepackage[normalem]{ulem}
@@ -37,8 +43,15 @@
 \usepackage[noend]{algpseudocode}
 \usepackage{listings}
 \lstset{
-	basicstyle=\ttfamily,
-	columns=fullflexible,
+	basicstyle=\linespread{0.85}\ttfamily,
+	basewidth  = {0.50em,1em},
+    frame=tb, % draw frame at top and bottom of the code
+    tabsize=4, % tab space width
+    numbers=left, % display line numbers on the left
+	showstringspaces=false, % don't mark spaces in strings    
+    commentstyle=\color{green}, % comment color
+    keywordstyle=\color{blue}, % keyword color
+	stringstyle=\color{red} % string color
 }
 
 % Tables with bold rows
@@ -47,6 +60,9 @@
 \newcommand\clearrow{\global\let\rowmac\relax}
 \clearrow
 \usepackage{multirow}
+
+% Tables with vertical center alignment
+\usepackage{array}
 
 % Lists and items
 \usepackage{enumitem}
@@ -364,7 +380,8 @@ This protocol is suited with a mechanism that allows the receiver to identify if
 
 \begin{figure}[H]
 	\centering
-	\begin{minipage}{11cm}
+	\begin{tabular}{m{6mm} m{108mm}}
+		(\textit{a}) & 
 		\begin{tikzpicture}[->,>=stealth',node distance=2cm,initial text=$ $,]
 			\small
 			\node[align=center, draw, minimum width=1.2cm, minimum height=1.2cm] at (0, 0) (f-start) {F};
@@ -373,6 +390,7 @@ This protocol is suited with a mechanism that allows the receiver to identify if
 			\node[align=center, draw, minimum width=1.2cm, minimum height=1.2cm] at (3.6, 0) (bcc) {BCC};
 			\node[align=center, draw, minimum width=1.2cm, minimum height=1.2cm] at (4.8, 0) (f-end) {F};
 		\end{tikzpicture}\\[10pt]
+		(\textit{b}) & 
 		\begin{tikzpicture}[->,>=stealth',node distance=2cm,initial text=$ $,]
 			\small
 			\node[align=center, draw, minimum width=1.2cm, minimum height=1.2cm] at (0, 0) (f-start) {F};
@@ -384,8 +402,8 @@ This protocol is suited with a mechanism that allows the receiver to identify if
 			\node[align=center, draw, minimum width=1.2cm, minimum height=1.2cm] at (8.4, 0) (bcc2) {BCC2};
 			\node[align=center, draw, minimum width=1.2cm, minimum height=1.2cm] at (9.6, 0) (f-end) {F};
 		\end{tikzpicture}
-	\end{minipage}
-	\caption{Structure of the S/U-frames (top) and I-frames (bottom). Each square represents a byte, each of type F (flag), A (address), C (control), BCC (block check character) or D (data).}
+	\end{tabular}
+	\caption{Structure of the S/U-frames (\textit{a}) and I-frames (\textit{b}). Each square represents a byte, which can be F (flag), A (address), C (control), BCC (block check character) or D (data).}
 	\label{fig:frames}
 \end{figure}
 
@@ -430,6 +448,44 @@ The source code of this project can be obtained in \href{https://github.com/dmfr
 During project development and evaluation the repository remained private, although it can be shared with evaluators on request to clarify the development process. It will be made public once all equivalent curricular unit projects have been evaluated in the present school year.
 
 % TODO: files
+
+\newgeometry{top=24mm,bottom=24mm,left=14mm,right=14mm}
+\fancyhfoffset[E,O]{0pt}
+
+\subsection{Link Layer (LL)}
+\lstinputlisting[caption=\texttt{ll.h}, language=C]{../../include/ll.h}
+\lstinputlisting[caption=\texttt{ll.c}, language=C]{../../src/ll.c}
+
+\subsubsection{Internal code}
+\lstinputlisting[caption=\texttt{ll\_internal.h}, language=C]{../../include/ll_internal.h}
+\lstinputlisting[caption=\texttt{ll\_internal.c}, language=C]{../../src/ll_internal.c}
+
+\subsubsection{Utilities}
+\lstinputlisting[caption=\texttt{ll\_utils.h}, language=C]{../../include/ll_utils.h}
+\lstinputlisting[caption=\texttt{ll\_utils.c}, language=C]{../../src/ll_utils.c}
+
+\begin{landscape}
+\subsubsection{Flags}
+\lstinputlisting[caption=\texttt{ll\_flags.h}, language=C]{../../include/ll_flags.h}
+\end{landscape}
+
+\subsubsection{S-frame state machine}
+\lstinputlisting[caption=\texttt{ll\_s\_statemachine.h}, language=C]{../../include/ll_s_statemachine.h}
+\lstinputlisting[caption=\texttt{ll\_s\_statemachine.c}, language=C]{../../src/ll_s_statemachine.c}
+
+\subsubsection{U-frame state machine}
+\lstinputlisting[caption=\texttt{ll\_u\_statemachine.h}, language=C]{../../include/ll_u_statemachine.h}
+\lstinputlisting[caption=\texttt{ll\_u\_statemachine.c}, language=C]{../../src/ll_u_statemachine.c}
+
+\subsubsection{I-frame state machine}
+\lstinputlisting[caption=\texttt{ll\_i\_statemachine.h}, language=C]{../../include/ll_i_statemachine.h}
+\lstinputlisting[caption=\texttt{ll\_i\_statemachine.c}, language=C]{../../src/ll_i_statemachine.c}
+
+\subsection{Application}
+\lstinputlisting[caption=\texttt{transmitter.c}, language=C]{../../src/transmitter.c}
+\lstinputlisting[caption=\texttt{receiver.c}, language=C]{../../src/receiver.c}
+
+\restoregeometry
 
 \newpage
 \section{U-frame state machine}

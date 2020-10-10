@@ -1,3 +1,6 @@
+// Copyright (C) 2020 Diogo Rodrigues, Breno Pimentel
+// Distributed under the terms of the GNU General Public License, version 3
+
 #ifndef _LL_INTERNAL_H_
 #define _LL_INTERNAL_H_
 
@@ -29,66 +32,75 @@ void alarmHandler(__attribute__((unused)) int signum);
  * 
  * @return tcflag_t     Valid baud rate flag for termios.c_cflag
  */
-tcflag_t ll_get_baud_rate(void) __attribute__((warn_unused_result));
+tcflag_t ll_get_baud_rate(void)
+    __attribute__((warn_unused_result));
 
 /**
  * @brief Get I-frame C byte expected from the other end of the communication.
  * 
  * @return uint8_t  Expected I-frame C byte
  */
-uint8_t ll_get_expected_Iframe_C(void) __attribute__((warn_unused_result));
+uint8_t ll_get_expected_Iframe_C(void)
+    __attribute__((warn_unused_result));
 
 /**
  * @brief Get I-frame C byte unexpected from the other end of the communication.
  * 
  * @return uint8_t  Unexpected I-frame C byte
  */
-uint8_t ll_get_unexpected_Iframe_C(void) __attribute__((warn_unused_result));
+uint8_t ll_get_unexpected_Iframe_C(void)
+    __attribute__((warn_unused_result));
 
 /**
  * @brief Get RR byte expected from the other end of the communication.
  * 
  * @return uint8_t  Expected RR byte
  */
-uint8_t ll_get_expected_RR(void) __attribute__((warn_unused_result));
+uint8_t ll_get_expected_RR(void)
+    __attribute__((warn_unused_result));
 
 /**
  * @brief Get REJ byte expected from the other end of the communication.
  * 
  * @return uint8_t  Expected REJ byte
  */
-uint8_t ll_get_expected_REJ(void) __attribute__((warn_unused_result));
+uint8_t ll_get_expected_REJ(void)
+    __attribute__((warn_unused_result));
 
 /**
  * @brief Get I-frame C byte (according to the value of sequence_number, aka Ns).
  * 
  * @return uint8_t  I-frame C byte
  */
-uint8_t ll_get_Iframe_C(void) __attribute__((warn_unused_result));
+uint8_t ll_get_Iframe_C(void)
+    __attribute__((warn_unused_result));
 
 /**
  * @brief Send SET message (a S-frame) to serial port.
  * 
  * @param port_fd   Port to send SET message to
- * @return int      On success, the number of bytes written; on error, -1, and errno is set
+ * @return int      On success, the number of bytes written; on error, -1
  */
-int ll_send_SET(int port_fd) __attribute__((warn_unused_result));
+int ll_send_SET(int port_fd)
+    __attribute__((warn_unused_result));
 
 /**
  * @brief Send DISC message (a S-frame) to serial port.
  * 
  * @param port_fd   Port to send DISC message to
- * @return int      On success, the number of bytes written; on error, -1, and errno is set
+ * @return int      On success, the number of bytes written; on error, -1
  */
-int ll_send_DISC(int port_fd) __attribute__((warn_unused_result));
+int ll_send_DISC(int port_fd)
+    __attribute__((warn_unused_result));
 
 /**
  * @brief Send UA message (a U-frame) to serial port.
  * 
  * @param port_fd   Port to send UA message to
- * @return int      On success, the number of bytes written; on error, -1, and errno is set
+ * @return int      On success, the number of bytes written; on error, -1
  */
-int ll_send_UA(int port_fd) __attribute__((warn_unused_result));
+int ll_send_UA(int port_fd)
+    __attribute__((warn_unused_result));
 
 /**
  * @brief Send data message (I-frame) to serial port.
@@ -96,9 +108,10 @@ int ll_send_UA(int port_fd) __attribute__((warn_unused_result));
  * @param port_fd   Port to send data message to
  * @param buffer    Raw (destuffed) data to send to port
  * @param length    Length of data to send, in bytes
- * @return ssize_t  On success, the number of bytes written; on error, -1, and errno is set
+ * @return ssize_t  On success, the number of bytes written; on error, -1
  */
-ssize_t ll_send_I(int port_fd, const uint8_t *buffer, size_t length) __attribute__((warn_unused_result));
+ssize_t ll_send_I(int port_fd, const uint8_t *buffer, size_t length)
+    __attribute__((warn_unused_result));
 
 /**
  * @brief Send Receiver Ready (RR) to port.
@@ -106,7 +119,8 @@ ssize_t ll_send_I(int port_fd, const uint8_t *buffer, size_t length) __attribute
  * @param port_fd   Port to send RR to
  * @return int      0 if successful; -1 otherwise
  */
-int ll_send_RR(int port_fd) __attribute__((warn_unused_result));
+int ll_send_RR(int port_fd)
+    __attribute__((warn_unused_result));
 
 /**
  * @brief Send Receiver Ready (RR) to port after receiving unexpected I-frame.
@@ -114,7 +128,8 @@ int ll_send_RR(int port_fd) __attribute__((warn_unused_result));
  * @param port_fd   Port to send RR to
  * @return int      0 if successful; -1 otherwise
  */
-int ll_send_RR_resend(int port_fd) __attribute__((warn_unused_result));
+int ll_send_RR_resend(int port_fd)
+    __attribute__((warn_unused_result));
 
 /**
  * @brief Send Rejected (REJ) to port.
@@ -122,7 +137,8 @@ int ll_send_RR_resend(int port_fd) __attribute__((warn_unused_result));
  * @param port_fd   Port to send REJ to
  * @return int      Number of bytes sent, if successful; -1 otherwise
  */
-int ll_send_REJ(int port_fd) __attribute__((warn_unused_result));
+int ll_send_REJ(int port_fd)
+    __attribute__((warn_unused_result));
 
 /**
  * @brief Expect for S-frame to arrive from port.
@@ -132,7 +148,8 @@ int ll_send_REJ(int port_fd) __attribute__((warn_unused_result));
  * @param c_rcv     Pointer to memory where control (C) byte will be saved
  * @return int      On success, 0; on error, another value, and errno is set
  */
-int ll_expect_Sframe(int port_fd, uint8_t *a_rcv, uint8_t *c_rcv) __attribute__((warn_unused_result));
+int ll_expect_Sframe(int port_fd, uint8_t *a_rcv, uint8_t *c_rcv)
+    __attribute__((warn_unused_result));
 
 /**
  * @brief Expect for U-frame to arrive from port.
@@ -142,7 +159,8 @@ int ll_expect_Sframe(int port_fd, uint8_t *a_rcv, uint8_t *c_rcv) __attribute__(
  * @param c_rcv     Pointer to memory where control (C) byte will be saved
  * @return int      On success, 0; on error, another value, and errno is set
  */
-int ll_expect_Uframe(int port_fd, uint8_t *a_rcv, uint8_t *c_rcv) __attribute__((warn_unused_result));
+int ll_expect_Uframe(int port_fd, uint8_t *a_rcv, uint8_t *c_rcv)
+    __attribute__((warn_unused_result));
 
 /**
  * @brief Expect for I-frame to arrive from port.
@@ -151,6 +169,7 @@ int ll_expect_Uframe(int port_fd, uint8_t *a_rcv, uint8_t *c_rcv) __attribute__(
  * @param buffer    Pointer to buffer where data will be saved
  * @return ssize_t  On success, number of characters read; on error, -1, and errno is set
  */
-ssize_t ll_expect_Iframe(int port_fd, uint8_t *buffer) __attribute__((warn_unused_result));
+ssize_t ll_expect_Iframe(int port_fd, uint8_t *buffer)
+    __attribute__((warn_unused_result));
 
 #endif // _LL_INTERNAL_H_

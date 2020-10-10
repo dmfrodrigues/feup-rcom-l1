@@ -1,3 +1,6 @@
+// Copyright (C) 2020 Diogo Rodrigues, Breno Pimentel
+// Distributed under the terms of the GNU General Public License, version 3
+
 #include "ll_internal.h"
 
 #include <stdbool.h>
@@ -126,7 +129,8 @@ ssize_t ll_send_I(int port_fd, const uint8_t *buffer, size_t length){
     frame_header[1] = (ll_status == TRANSMITTER ? LL_A_SEND : LL_A_RECV);
     frame_header[2] = ll_get_Iframe_C();
     frame_header[3] = ll_bcc(frame_header+1, frame_header+3);
-    if(write(port_fd, frame_header, sizeof(frame_header)) != sizeof(frame_header)){ perror("write"); return -1; }
+    if(write(port_fd, frame_header, sizeof(frame_header)) != sizeof(frame_header))
+        { perror("write"); return -1; }
     
     uint8_t buffer_escaped[2*LL_MAX_SIZE];
     ssize_t written_chars = ll_stuffing(buffer_escaped, buffer, length);
@@ -136,7 +140,8 @@ ssize_t ll_send_I(int port_fd, const uint8_t *buffer, size_t length){
         fprintf(stderr, " %02X", buffer_escaped[i]);
     }
     fprintf(stderr, "\n");
-    if(write(port_fd, buffer_escaped, written_chars) != written_chars){ perror("write"); return -1; }
+    if(write(port_fd, buffer_escaped, written_chars) != written_chars)
+        { perror("write"); return -1; }
 
     uint8_t bcc2 = ll_bcc(buffer, buffer+length);
     if(bcc2 == LL_FLAG || bcc2 == LL_ESC){
@@ -144,12 +149,14 @@ ssize_t ll_send_I(int port_fd, const uint8_t *buffer, size_t length){
         frame_tail[0] = LL_ESC;
         frame_tail[1] = LL_STUFF(bcc2);
         frame_tail[2] = LL_FLAG;
-        if(write(port_fd, frame_tail, sizeof(frame_tail)) != sizeof(frame_tail)){ perror("write"); return -1; }
+        if(write(port_fd, frame_tail, sizeof(frame_tail)) != sizeof(frame_tail))
+            { perror("write"); return -1; }
     } else {
         uint8_t frame_tail[2];
         frame_tail[0] = bcc2;
         frame_tail[1] = LL_FLAG;
-        if(write(port_fd, frame_tail, sizeof(frame_tail)) != sizeof(frame_tail)){ perror("write"); return -1; }
+        if(write(port_fd, frame_tail, sizeof(frame_tail)) != sizeof(frame_tail))
+            { perror("write"); return -1; }
     }
 
     fprintf(stderr, "    Sent I\n");
@@ -309,7 +316,8 @@ ssize_t ll_expect_Iframe(int port_fd, uint8_t *buffer){
     uint8_t bcc2  = buffer[written_chars-1];
     uint8_t bcc2_ = ll_bcc(buffer, buffer+written_chars-1);
     if(bcc2 != bcc2_){
-        fprintf(stderr, "ERROR: bcc2 is not correct (is 0x%02X, should be 0x%02X)\n", bcc2, bcc2_);
+        fprintf(stderr, "        ERROR: bcc2 incorrect");
+        fprintf(stderr, " (is 0x%02X, should be 0x%02X)\n", bcc2, bcc2_);
         return -1;
     }
 

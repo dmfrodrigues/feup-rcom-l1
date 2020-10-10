@@ -1,7 +1,11 @@
+// Copyright (C) 2020 Diogo Rodrigues, Breno Pimentel
+// Distributed under the terms of the GNU General Public License, version 3
+
 /**
  * @defgroup    ll_u_statemachine LL U-frame state machine
  * @ingroup     ll
- * @brief       Logical link (LL) state machine that allows to receive U-frames; for internal use.
+ * @brief       Logical link (LL) state machine that allows
+ *              to receive U-frames; for internal use.
  */
 
 #ifndef _LL_U_STATEMACHINE_H_
@@ -47,6 +51,7 @@ typedef struct {
  * @param byte      Byte received, will decide the transition
  * @return int      0 on success, other value otherwise
  */
-int ll_u_state_update(ll_u_statemachine_t *machine, uint8_t byte) __attribute__((warn_unused_result));
+int ll_u_state_update(ll_u_statemachine_t *machine, uint8_t byte)
+    __attribute__((warn_unused_result));
 
 #endif // _LL_U_STATEMACHINE_H_
