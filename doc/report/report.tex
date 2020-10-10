@@ -450,8 +450,8 @@ A U-frame state machine must be ready to handle the following scenarios:
 		\node[align=center, state, below of=C_RCV						] (BCC_OK) 		{BCC\\OK};
 		\node[align=center, state, below of=BCC_OK, accepting			] (STOP) 		{STOP};
 
-		\node[align=center, state, below right of=A_RCV					] (C_SET_RCV) 		{C\\SET\\RCV};
-		\node[align=center, state, below of=C_SET_RCV, accepting		] (STOP_DISC) 		{STOP\\DISC};
+		\node[align=center, state, below right of=A_RCV					] (C_DISC_RCV) 		{C\\DISC\\RCV};
+		\node[align=center, state, below of=C_DISC_RCV, accepting		] (STOP_DISC) 		{STOP\\DISC};
 
 		\draw	(START)			edge[right						]	node{FLAG}		(FLAG_RCV)
 				(FLAG_RCV)		edge[loop right					]	node{FLAG}		(FLAG_RCV)
@@ -462,9 +462,9 @@ A U-frame state machine must be ready to handle the following scenarios:
 				(C_RCV)			edge[right						]	node{BCC}		(BCC_OK)
 				(BCC_OK)		edge[right						]	node{FLAG}		(STOP)
 
-				(A_RCV)			edge[							]	node{C\_SET}	(C_SET_RCV)
-				(C_SET_RCV)		edge[align=center, loop right	]	node{$\Sigma$-\\ESC}	(C_SET_RCV)
-				(C_SET_RCV)		edge[right						]	node{FLAG}		(STOP_DISC)
+				(A_RCV)			edge[							]	node{C\_DISC}	(C_DISC_RCV)
+				(C_DISC_RCV)	edge[align=center, loop right	]	node{$\Sigma$-\\FLAG}	(C_DISC_RCV)
+				(C_DISC_RCV)	edge[right						]	node{FLAG}		(STOP_DISC)
 				;
 		
 	\end{tikzpicture}

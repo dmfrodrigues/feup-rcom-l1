@@ -22,14 +22,10 @@ int ll_u_state_update(ll_u_statemachine_t *machine, uint8_t byte){
         } break;
     case LL_U_A_RCV:
         switch(byte){
-            case LL_C_SET :
-            case LL_C_DISC:
             case LL_C_UA  : machine->c_rcv = byte; machine->state = LL_U_C_RCV   ; break;
+            case LL_C_DISC: machine->c_rcv = byte; machine->state = LL_U_C_DISC_RCV; break;
             case LL_FLAG  :                        machine->state = LL_U_FLAG_RCV; break;
-            default       :
-                if(byte == ll_get_expected_RR() || byte == ll_get_expected_REJ()) { machine->c_rcv = byte; machine->state = LL_U_C_RCV; }
-                else machine->state = LL_U_START;
-                break;
+            default       :                        machine->state = LL_U_START   ; break;
         } break;
     case LL_U_C_RCV:
         switch(byte){
@@ -43,6 +39,14 @@ int ll_u_state_update(ll_u_statemachine_t *machine, uint8_t byte){
         } break;
     case LL_U_STOP:
         fprintf(stderr, "can't transition from LL_U_STOP\n");
+        return EXIT_FAILURE;
+    case LL_U_C_DISC_RCV:
+        switch(byte){
+            case LL_FLAG  : machine->state = LL_U_STOP_DISC; break;
+            default       : machine->state = LL_U_C_DISC_RCV; break;
+        } break;
+    case LL_U_STOP_DISC:
+        fprintf(stderr, "can't transition from LL_U_STOP_DISC\n");
         return EXIT_FAILURE;
     default:
         fprintf(stderr, "No such state %d\n", machine->state);
