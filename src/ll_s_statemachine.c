@@ -1,4 +1,4 @@
-#include "ll_su_statemachine.h"
+#include "ll_s_statemachine.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -6,7 +6,7 @@
 #include "ll_flags.h"
 #include "ll_internal.h"
 
-int ll_su_state_update(ll_su_statemachine_t *machine, uint8_t byte){
+int ll_s_state_update(ll_s_statemachine_t *machine, uint8_t byte){
     switch (machine->state) {
     case LL_SU_Start:
         switch(byte){

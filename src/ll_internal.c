@@ -7,7 +7,7 @@
 
 #include "ll_flags.h"
 #include "ll_i_statemachine.h"
-#include "ll_su_statemachine.h"
+#include "ll_s_statemachine.h"
 #include "ll_utils.h"
 
 ll_config_t ll_config = {
@@ -203,7 +203,7 @@ int ll_send_REJ(int port_fd){
 
 int ll_expect_SUframe(int port_fd, uint8_t *a_rcv, uint8_t *c_rcv){
     fprintf(stderr, "    Expecting S/U-frame\n");
-    ll_su_statemachine_t machine = {
+    ll_s_statemachine_t machine = {
         .state = LL_SU_Start,
         .a_rcv = 0,
         .c_rcv = 0
@@ -214,7 +214,7 @@ int ll_expect_SUframe(int port_fd, uint8_t *a_rcv, uint8_t *c_rcv){
         if(res == 1){
             fprintf(stderr, "        Read byte 0x%02X | ", byte);
             fprintf(stderr, "Transitioned from state %d", machine.state);
-            res = ll_su_state_update(&machine, byte);
+            res = ll_s_state_update(&machine, byte);
             fprintf(stderr, " to %d\n", machine.state);
             if(res) fprintf(stderr, "ERROR: failed to update state\n");
         } else {
