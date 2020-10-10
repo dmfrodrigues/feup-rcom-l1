@@ -15,6 +15,29 @@
 
 /**
  * @ingroup ll_utils
+ * @brief Log LL activity.
+ * 
+ * If the message is too verbose it is not printed, according to ll_config.verbosity
+ * 
+ * @param verbosity     Verbosity of the message (1 to 3)
+ * @param format        Same as printf
+ * @param ...           Same as printf
+ * @return int          Same as printf, or 0 if too verbose
+ */
+int ll_log(int verbosity, const char *format, ...);
+
+/**
+ * @ingroup ll_utils
+ * @brief Log LL errors.
+ * 
+ * @param format        Same as printf
+ * @param ...           Same as printf
+ * @return int          Same as printf
+ */
+int ll_err(const char *format, ...);
+
+/**
+ * @ingroup ll_utils
  * @brief Determine BCC byte value.
  * 
  * BCC is a checksum, composed from the XOR of all bytes in the segment one

@@ -43,7 +43,7 @@ int ll_u_state_update(ll_u_statemachine_t *m, uint8_t b){
             default       : m->state = LL_U_START; break;
         } break;
     case LL_U_STOP:
-        fprintf(stderr, "can't transition from LL_U_STOP\n");
+        ll_err("ERROR: can't transition from LL_U_STOP\n");
         return EXIT_FAILURE;
     case LL_U_C_DISC_RCV:
         switch(b){
@@ -51,10 +51,10 @@ int ll_u_state_update(ll_u_statemachine_t *m, uint8_t b){
             default       : m->state = LL_U_C_DISC_RCV; break;
         } break;
     case LL_U_STOP_DISC:
-        fprintf(stderr, "can't transition from LL_U_STOP_DISC\n");
+        ll_err("ERROR: can't transition from LL_U_STOP_DISC\n");
         return EXIT_FAILURE;
     default:
-        fprintf(stderr, "No such state %d\n", m->state);
+        ll_err("ERROR: No such state %d\n", m->state);
         return EXIT_FAILURE;
     }
     return EXIT_SUCCESS;

@@ -3,7 +3,31 @@
 
 #include "ll_utils.h"
 
+#include <stdarg.h>
+#include <stdio.h>
+
+#include "ll.h"
 #include "ll_flags.h"
+
+int ll_log(int verbosity, const char *format, ...) {
+
+    if(verbosity <= ll_config.verbosity){
+        va_list args;
+        va_start(args, format);
+        int res = vfprintf(stderr, format, args);
+        va_end(args);
+        return res;
+    } else return 0;
+
+}
+
+int ll_err(const char *format, ...) {
+    va_list args;
+    va_start(args, format);
+    int res = vfprintf(stderr, format, args);
+    va_end(args);
+    return res;
+}
 
 uint8_t ll_bcc(const uint8_t *start, const uint8_t *end){
     uint8_t ret = 0;

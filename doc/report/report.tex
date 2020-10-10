@@ -232,7 +232,8 @@ To use these functions, one just needs to allocate the buffers with proper sizes
 		\textbf{Field}           & \textbf{Description} \\ \hline
 		\texttt{baud\_rate}      & Baud rate, the number of bits transmitted per second; defaults to 38400. Any number may be specified, but only a few specific baud rates can be used (see \texttt{termios(3)}); as such, the baud rate is rounded up to the next allowed baud rate, unless it is above the maximum baud rate, 230400. Is loaded on call to \texttt{llopen}. \\ \hline
 		\texttt{timeout}         & Time the transmitter waits before retransmitting a message that the receiver did not acknowledge. It is measured in integer seconds, and should be greater than zero. By default it is 3 seconds, and can be set at any time. \\ \hline
-		\texttt{retransmissions} & Number of times a frame will be retransmitted before giving up and terminating the connection. Defaults to 3, and can be set at any time. \\ \hline \hline
+		\texttt{retransmissions} & Number of times a frame will be retransmitted before giving up and terminating the connection. Defaults to 3, and can be set at any time. \\ \hline
+		\texttt{verbosity}       & Verbosity accepted for printing. The program can be compiled in debug or release mode; in debug mode, logs will be printed, if they are less or as verbose as a certain verbosity level, according to the value in this field.\\ \hline \hline
 	\end{tabular}
 	\caption{Fields of \texttt{ll\_config\_t}, and their descriptions}
 \end{table}
