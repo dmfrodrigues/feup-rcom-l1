@@ -17,7 +17,7 @@ ll_config_t ll_config = {
     .retransmissions = 3
 };
 int timeout = 0;
-unsigned int sequence_number = 1;
+unsigned int sequence_number;
 
 void alarmHandler(__attribute__((unused)) int signum){
 	fprintf(stderr, "Emitter | WARNING: timeout\n");
