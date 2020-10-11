@@ -44,9 +44,8 @@ test: FORCE
 doc: FORCE
 	cd doc && doxygen doxyfile
 
-report.pdf: FORCE
-	cd doc/report && latexmk --shell-escape report.tex -pdf
-	cp doc/report/report.pdf .
+doc/report/report.pdf: FORCE
+	make -C $(@D) $(@F)
 
 clean: FORCE
 	git clean -dfX
