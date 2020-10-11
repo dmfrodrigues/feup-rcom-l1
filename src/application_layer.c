@@ -6,11 +6,18 @@ int application(int com, ll_status_t status, char *file_path){
 
     app.status = status;
     app.fileDescriptor = llopen(com, app.status);
+    if(app.fileDescriptor == -1) return -1;
 
     if(app.status == TRANSMITTER){
-        app_send_file(file_path);
+        if(app_send_file(file_path) < 0){
+            fprintf(stderr, "ERROR: unable to send file\n");
+            return -1;
+        }
     }else{
-        app_receive_file();
+        if(app_receive_file() < 0){
+            fprintf(stderr, "ERROR: unexpected error receiving file\n");
+            return -1;
+        }
     }
 
     if(llclose(app.fileDescriptor) < 0)
@@ -91,7 +98,7 @@ int app_send_file(char *file_path){
     stat(file_path, &st);
     uint32_t file_size = st.st_size;
 
-    char *file_name = basename(file_path);
+    char *file_name = basename(file_path) + '\0';
 
     if(app_send_ctrl_packet(CTRL_START, file_size, file_name) < 0)
         return -1;
@@ -135,14 +142,17 @@ int app_rcv_ctrl_packet(int ctrl, unsigned int * file_size, char * file_name){
     memcpy(file_size, ctrl_packet + 3, file_size_octets);
 
     if(ctrl_packet[7] != T_FILE_NAME){
-        fprintf(stderr, "ERROR: unable to read ctrl packet\n");
+        fprintf(stderr, "ERROR: unexpected byte in control packet\n");
         return -1;
     }
 
     int file_name_length = ctrl_packet[8];
 
-
-    memcpy(file_name, ctrl_packet + 9, file_name_length);
+    int i=0;
+    for(; i<file_name_length; i++)   {
+        file_name[i] = (char)ctrl_packet[9+i];
+    }
+    file_name[i] = '\0';
 
     free(ctrl_packet);
 
@@ -222,7 +232,8 @@ int app_receive_file(){
         return -1;
     }
 
-    if(file_size != file_size_ || file_name != file_name_){
+    if(file_size != file_size_ || strcmp(file_name, file_name_) != 0){
+        fprintf(stderr, "ERROR: Start control packet filename: %s differs from End control packet filename: %s\n", file_name, file_name_);
         return -1;
     }
 

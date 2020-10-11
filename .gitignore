@@ -27,4 +27,4 @@ lib*.a
 emitter
 transmitter
 receiver
-.vscode
+COMMIT.tex
