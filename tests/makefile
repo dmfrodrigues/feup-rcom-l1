@@ -6,8 +6,10 @@ RECEIVER   =../receiver
 
 TRANSMITTER_PORT=11
 RECEIVER_PORT   =12
+TRANSMITTER_FILE=../testfiles/pinguim.gif
+RECEIVER_FILE   =pinguim.gif
 
-CALL_TRANSMITTER=$(TRANSMITTER) $(TRANSMITTER_PORT)
+CALL_TRANSMITTER=$(TRANSMITTER) $(TRANSMITTER_PORT) $(TRANSMITTER_FILE)
 CALL_RECEIVER   =$(RECEIVER) $(RECEIVER_PORT)
 
 all:
@@ -21,30 +23,39 @@ test1: $(TRANSMITTER)
 
 test2: $(TRANSMITTER) $(RECEIVER)
 	@echo ==================== $@ ====================
+	@rm -f $(RECEIVER_FILE)
 	$(CALL_RECEIVER) &
 	sleep 1
 	$(CALL_TRANSMITTER)
-	sleep 4
+	sleep 2
+	cmp $(TRANSMITTER_FILE) $(RECEIVER_FILE)
+	@rm -f $(RECEIVER_FILE)
 
 test3: $(TRANSMITTER) $(RECEIVER)
 	@echo ==================== $@ ====================
+	@rm -f $(RECEIVER_FILE)
 	$(CALL_TRANSMITTER) &
 	sleep 0.5
 	$(CALL_RECEIVER)
-	sleep 4
+	sleep 2
+	cmp $(TRANSMITTER_FILE) $(RECEIVER_FILE)
+	@rm -f $(RECEIVER_FILE)
 	
 test4: $(TRANSMITTER) $(RECEIVER)
 	@echo ==================== $@ ====================
+	@rm -f $(RECEIVER_FILE)
 	$(CALL_TRANSMITTER) &
 	sleep 1.5
 	$(CALL_RECEIVER)
-	sleep 4
+	sleep 2
+	cmp $(TRANSMITTER_FILE) $(RECEIVER_FILE)
+	@rm -f $(RECEIVER_FILE)
 
 clean:
 	make -C .. clean
 
-$(TRANSMITTER):
+$(TRANSMITTER): FORCE
 	make -C ..
 
-$(RECEIVER):
+$(RECEIVER): FORCE
 	make -C ..
