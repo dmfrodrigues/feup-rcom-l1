@@ -6,6 +6,7 @@ int application(int com, ll_status_t status, char *file_path){
 
     app.status = status;
     app.fileDescriptor = llopen(com, app.status);
+    if(app.fileDescriptor == -1) return -1;
 
     if(app.status == TRANSMITTER){
         app_send_file(file_path);
