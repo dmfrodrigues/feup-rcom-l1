@@ -16,7 +16,7 @@ int application(int com, ll_status_t status, char *file_path){
     if(llclose(app.fileDescriptor) < 0)
         return -1;
 
-    return 1;
+    return 0;
 }
 
 int app_send_ctrl_packet(int ctrl, uint32_t file_size, const char *file_name){
@@ -27,7 +27,7 @@ int app_send_ctrl_packet(int ctrl, uint32_t file_size, const char *file_name){
     ctrl_packet[0] = ctrl;
 
     ctrl_packet[1] = T_FILE_SIZE;    // T1
-    ctrl_packet[2] = sizeof(uint32_t); // L1 -> 4 octets
+    ctrl_packet[2] = sizeof(uint32_t); // L1
     // V1
     ctrl_packet[3] = (file_size & 0xFF);
     ctrl_packet[4] = (file_size & 0xFF00) >> 8;  
@@ -40,10 +40,6 @@ int app_send_ctrl_packet(int ctrl, uint32_t file_size, const char *file_name){
     
     // V2
     memcpy(ctrl_packet + 9, file_name, strlen(file_name));
-
-    //fprintf(stderr, "ERROR:file_name=%s (expected size=%d) file_size=0x%02X, %02X, 0x%02X, %02X\n", file_name, file_size, ctrl_packet[3], ctrl_packet[4], ctrl_packet[5], ctrl_packet[6]);
-    //exit(EXIT_FAILURE);
-    
     
     if(llwrite(app.fileDescriptor, ctrl_packet, packet_size) < 0){
         fprintf(stderr, "ERROR: unable to write control packet\n");
@@ -53,7 +49,7 @@ int app_send_ctrl_packet(int ctrl, uint32_t file_size, const char *file_name){
 
     free(ctrl_packet);
 
-    return 1;
+    return 0;
 }
 
 
@@ -79,7 +75,7 @@ int app_send_data_packet(char *data, unsigned int data_size, unsigned int seq_nu
 
     free(data_packet);
     
-    return 1;
+    return 0;
 }
 
 int app_send_file(char *file_path){
@@ -117,7 +113,7 @@ int app_send_file(char *file_path){
     fclose(file);
     free(buf);
 
-    return 1;
+    return 0;
 }
 
 int app_rcv_ctrl_packet(int ctrl, unsigned int * file_size, char * file_name){
@@ -150,7 +146,7 @@ int app_rcv_ctrl_packet(int ctrl, unsigned int * file_size, char * file_name){
 
     free(ctrl_packet);
 
-    return 1;
+    return 0;
 }
 
 int app_rcv_data_packet(char * data, int seq_number){
@@ -201,11 +197,9 @@ int app_receive_file(){
     unsigned int data_bytes_read = 0;
     unsigned int seq_number = 0;
     char *buf =(char*)malloc(LL_MAX_SIZE);
-
-    fprintf(stderr, "app_receive_file: file_size=%08X\n", file_size);
     
     while(file_size > data_bytes_read){
-        fprintf(stderr, "app_receive_file: file_size=%08X, data_bytes_read=%08X\n", file_size, data_bytes_read);
+
         data_length = app_rcv_data_packet(buf, seq_number);
         
         if(data_length < 0){
@@ -232,5 +226,5 @@ int app_receive_file(){
         return -1;
     }
 
-    return 1;
+    return 0;
 }
