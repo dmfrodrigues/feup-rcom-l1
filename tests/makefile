@@ -59,3 +59,5 @@ $(TRANSMITTER): FORCE
 
 $(RECEIVER): FORCE
 	make -C ..
+
+FORCE:
