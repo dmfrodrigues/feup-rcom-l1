@@ -8,22 +8,17 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#include "ll_flags.h"
-#include "ll_u_statemachine.h"
-#include "ll_s_statemachine.h"
-#include "ll_i_statemachine.h"
-#include "ll_utils.h"
-
 ll_config_t ll_config = {
     .baud_rate       = 38400,
     .timeout         = 3,
-    .retransmissions = 3
+    .retransmissions = 3,
+    .verbosity       = 3
 };
 int timeout = 0;
 unsigned int sequence_number;
 
 void alarmHandler(__attribute__((unused)) int signum){
-	fprintf(stderr, "Emitter | WARNING: timeout\n");
+	ll_log(1, "WARNING: timeout\n");
 	timeout = 1;
 }
 
@@ -87,7 +82,7 @@ int ll_send_SET(int port_fd){
     frame[4] = LL_FLAG;
 
     int res = write(port_fd, frame, sizeof(frame));
-    if(res == sizeof(frame)) fprintf(stderr, "    Sent SET\n");
+    if(res == sizeof(frame)) ll_log(2, "    Sent SET\n");
     return res;
 }
 
@@ -100,7 +95,7 @@ int ll_send_DISC(int port_fd){
     frame[4] = LL_FLAG;
 
     int res = write(port_fd, frame, sizeof(frame));
-    if(res == sizeof(frame))  fprintf(stderr, "    Sent DISC\n");
+    if(res == sizeof(frame))  ll_log(2, "    Sent DISC\n");
     return res;
 }
 
@@ -113,20 +108,21 @@ int ll_send_UA(int port_fd){
     frame[4] = LL_FLAG;
 
     int res = write(port_fd, frame, sizeof(frame));
-    if(res == sizeof(frame))  fprintf(stderr, "    Sent UA\n");
+    if(res == sizeof(frame))  ll_log(2, "    Sent UA\n");
     return res;
 }
 
 ssize_t ll_send_I(int port_fd, const uint8_t *buffer, size_t length){
-    fprintf(stderr, "Sending");
+    ll_log(2, "    Sending");
     /*
-    fprintf(stderr, " '");
-    for(size_t i = 0; i < length; ++i) fprintf(stderr, "%c", buffer[i]);
-    fprintf(stderr, "'");
+    ll_log(3, " '");
+    for(size_t i = 0; i < length; ++i) ll_log(3, "%c", buffer[i]);
+    ll_log(3, "'");
     */
-    fprintf(stderr, " (");
-    for(size_t i = 0; i < length; ++i) fprintf(stderr, "%02X ", buffer[i]);
-    fprintf(stderr, ")\n");
+    ll_log(2, " (");
+    for(size_t i = 0; i < length; ++i) ll_log(2, "%02X ", buffer[i]);
+    ll_log(2, ")");
+    ll_log(2, "\n");
 
     uint8_t frame_header[4];
     frame_header[0] = LL_FLAG;
@@ -139,11 +135,11 @@ ssize_t ll_send_I(int port_fd, const uint8_t *buffer, size_t length){
     uint8_t buffer_escaped[2*LL_MAX_SIZE];
     ssize_t written_chars = ll_stuffing(buffer_escaped, buffer, length);
     if(written_chars < (ssize_t)length) return -1;
-    fprintf(stderr, "Stuffed bits, preparing to send %ld bytes:", written_chars);
+    ll_log(2, "Stuffed bits, preparing to send %ld bytes:", written_chars);
     for(ssize_t i = 0; i < written_chars; ++i){
-        fprintf(stderr, " %02X", buffer_escaped[i]);
+        ll_log(2, " %02X", buffer_escaped[i]);
     }
-    fprintf(stderr, "\n");
+    ll_log(2, "\n");
     if(write(port_fd, buffer_escaped, written_chars) != written_chars)
         { perror("write"); return -1; }
 
@@ -163,7 +159,7 @@ ssize_t ll_send_I(int port_fd, const uint8_t *buffer, size_t length){
             { perror("write"); return -1; }
     }
 
-    fprintf(stderr, "    Sent I\n");
+    ll_log(2, "    Sent I\n");
     
     return length;
 }
@@ -178,7 +174,7 @@ int ll_send_RR(int port_fd){
 
     int res = write(port_fd, frame, sizeof(frame));
     if(res == sizeof(frame)){
-        fprintf(stderr, "    Sent RR\n");
+        ll_log(2, "    Sent RR\n");
         return EXIT_SUCCESS;
     } else return EXIT_FAILURE;
 }
@@ -193,7 +189,7 @@ int ll_send_RR_resend(int port_fd){
 
     int res = write(port_fd, frame, sizeof(frame));
     if(res == sizeof(frame)){
-        fprintf(stderr, "    Sent RR resend\n");
+        ll_log(2, "    Sent RR resend\n");
         return EXIT_SUCCESS;
     } else return EXIT_FAILURE;
 }
@@ -208,13 +204,13 @@ int ll_send_REJ(int port_fd){
 
     int res = write(port_fd, frame, sizeof(frame));
     if(res == sizeof(frame)){
-        fprintf(stderr, "    Sent REJ\n");
+        ll_log(2, "    Sent REJ\n");
         return EXIT_SUCCESS;
     } else return EXIT_FAILURE;
 }
 
 int ll_expect_Sframe(int port_fd, uint8_t *a_rcv, uint8_t *c_rcv){
-    fprintf(stderr, "    Expecting S-frame\n");
+    ll_log(2, "    Expecting S-frame\n");
     ll_s_statemachine_t machine;
     do {
         machine.state = LL_S_START;
@@ -224,20 +220,20 @@ int ll_expect_Sframe(int port_fd, uint8_t *a_rcv, uint8_t *c_rcv){
             uint8_t byte;
             int res = read(port_fd, &byte, 1);
             if(res == 1){
-                fprintf(stderr, "        Read byte 0x%02X | ", byte);
-                fprintf(stderr, "Transitioned from state %d", machine.state);
+                ll_log(3, "        Read byte 0x%02X | ", byte);
+                ll_log(3, "Transitioned from state %d", machine.state);
                 res = ll_s_state_update(&machine, byte);
-                fprintf(stderr, " to %d\n", machine.state);
-                if(res) fprintf(stderr, "ERROR: failed to update state\n");
+                ll_log(3, " to %d\n", machine.state);
+                if(res) ll_err("ERROR: failed to update state\n");
             } else {
                 perror("read");
                 return EXIT_FAILURE;
             }
         } while(machine.state != LL_S_STOP && machine.state != LL_S_STOP_RR);
         if(machine.state == LL_S_STOP_RR){
-            fprintf(stderr, "    Got unexpected I-frame (sending RR)\n");
+            ll_log(2, "    Got unexpected I-frame (sending RR)\n");
             if(ll_send_RR_resend(port_fd)){
-                fprintf(stderr, "    ERROR: Failed to send RR\n");
+                ll_err("ERROR: Failed to send RR\n");
                 return -1;
             }
         }
@@ -248,7 +244,7 @@ int ll_expect_Sframe(int port_fd, uint8_t *a_rcv, uint8_t *c_rcv){
 }
 
 int ll_expect_Uframe(int port_fd, uint8_t *a_rcv, uint8_t *c_rcv){
-    fprintf(stderr, "    Expecting U-frame\n");
+    ll_log(2, "    Expecting U-frame\n");
     ll_u_statemachine_t machine;
     do {
         machine.state = LL_U_START;
@@ -258,20 +254,20 @@ int ll_expect_Uframe(int port_fd, uint8_t *a_rcv, uint8_t *c_rcv){
             uint8_t byte;
             int res = read(port_fd, &byte, 1);
             if(res == 1){
-                fprintf(stderr, "        Read byte 0x%02X | ", byte);
-                fprintf(stderr, "Transitioned from state %d", machine.state);
+                ll_log(3, "        Read byte 0x%02X | ", byte);
+                ll_log(3, "Transitioned from state %d", machine.state);
                 res = ll_u_state_update(&machine, byte);
-                fprintf(stderr, " to %d\n", machine.state);
-                if(res) fprintf(stderr, "ERROR: failed to update state\n");
+                ll_log(3, " to %d\n", machine.state);
+                if(res) ll_err("ERROR: failed to update state\n");
             } else {
                 perror("read");
                 return EXIT_FAILURE;
             }
         } while(machine.state != LL_U_STOP && machine.state != LL_U_STOP_DISC);
         if(machine.state == LL_U_STOP_DISC){
-            fprintf(stderr, "    Got unexpected DISC (sending DISC as well)\n");
+            ll_log(2, "    Got unexpected DISC (sending DISC as well)\n");
             if(ll_send_DISC(port_fd)){
-                fprintf(stderr, "    ERROR: Failed to send DISC\n");
+                ll_err("ERROR: Failed to send DISC\n");
                 return -1;
             }
         }
@@ -282,7 +278,7 @@ int ll_expect_Uframe(int port_fd, uint8_t *a_rcv, uint8_t *c_rcv){
 }
 
 ssize_t ll_expect_Iframe(int port_fd, uint8_t *buffer){
-    fprintf(stderr, "    Expecting I-frame\n");
+    ll_log(2, "    Expecting I-frame\n");
     ll_i_statemachine_t machine;
     do{
         machine.state = LL_I_START;
@@ -291,12 +287,12 @@ ssize_t ll_expect_Iframe(int port_fd, uint8_t *buffer){
             uint8_t byte;
             int res = read(port_fd, &byte, 1);
             if(res == 1){
-                fprintf(stderr, "        Read byte 0x%02X | ", byte);
-                fprintf(stderr, "Transitioned from state %d", machine.state);
+                ll_log(3, "        Read byte 0x%02X | ", byte);
+                ll_log(3, "Transitioned from state %d", machine.state);
                 res = ll_i_state_update(&machine, byte);
-                fprintf(stderr, " to %d\n", machine.state);
+                ll_log(3, " to %d\n", machine.state);
                 if(res){
-                    fprintf(stderr, "ERROR: failed to update state\n");
+                    ll_err("ERROR: failed to update state\n");
                     return -1;
                 }
             } else {
@@ -305,9 +301,9 @@ ssize_t ll_expect_Iframe(int port_fd, uint8_t *buffer){
             }
         } while(machine.state != LL_I_STOP && machine.state != LL_I_STOP_RR);
         if(machine.state == LL_I_STOP_RR){
-            fprintf(stderr, "    Got unexpected data (sending RR and ignoring data)\n");
+            ll_log(2, "    Got unexpected data (sending RR and ignoring data)\n");
             if(ll_send_RR_resend(port_fd)){
-                fprintf(stderr, "    ERROR: Failed to send RR\n");
+                ll_err("ERROR: Failed to send RR\n");
                 return -1;
             }
         }
@@ -319,8 +315,7 @@ ssize_t ll_expect_Iframe(int port_fd, uint8_t *buffer){
     uint8_t bcc2  = buffer[written_chars-1];
     uint8_t bcc2_ = ll_bcc(buffer, buffer+written_chars-1);
     if(bcc2 != bcc2_){
-        fprintf(stderr, "        ERROR: bcc2 incorrect");
-        fprintf(stderr, " (is 0x%02X, should be 0x%02X)\n", bcc2, bcc2_);
+        ll_err("ERROR: bcc2 incorrect (is 0x%02X, should be 0x%02X)\n", bcc2, bcc2_);
         return -1;
     }
 

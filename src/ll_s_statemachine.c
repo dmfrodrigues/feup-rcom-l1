@@ -47,7 +47,7 @@ int ll_s_state_update(ll_s_statemachine_t *m, uint8_t b){
             default       : m->state = LL_S_START; break;
         } break;
     case LL_S_STOP:
-        fprintf(stderr, "        ERROR: can't transition LL_S_STOP\n");
+        ll_err("ERROR: can't transition LL_S_STOP\n");
         return EXIT_FAILURE;
     case LL_S_C_I_RCV:
         switch(b){
@@ -55,10 +55,10 @@ int ll_s_state_update(ll_s_statemachine_t *m, uint8_t b){
             default       : m->state = LL_S_C_I_RCV; break;
         } break;
     case LL_S_STOP_RR:
-        fprintf(stderr, "        ERROR: can't transition LL_S_STOP_RR\n");
+        ll_err("ERROR: can't transition LL_S_STOP_RR\n");
         return EXIT_FAILURE;
     default:
-        fprintf(stderr, "        ERROR: No such state %d\n", m->state);
+        ll_err("ERROR: No such state %d\n", m->state);
         return EXIT_FAILURE;
     }
     return EXIT_SUCCESS;

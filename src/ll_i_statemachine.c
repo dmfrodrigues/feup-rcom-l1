@@ -50,7 +50,7 @@ int ll_i_state_update(ll_i_statemachine_t *m, uint8_t b){
             default       : m->data[m->length++] = b; break;
         } break;
     case LL_I_STOP:
-        fprintf(stderr, "can't transition from LL_I_STOP\n");
+        ll_err("ERROR: can't transition from LL_I_STOP\n");
         return EXIT_FAILURE;
     case LL_I_C_UNXP_RCV:
         switch(b){
@@ -59,7 +59,7 @@ int ll_i_state_update(ll_i_statemachine_t *m, uint8_t b){
         }
         break;
     case LL_I_STOP_RR:
-        fprintf(stderr, "can't transition from LL_I_STOP_RR\n");
+        ll_err("ERROR: can't transition from LL_I_STOP_RR\n");
         return EXIT_FAILURE;
     case LL_I_C_SET_RCV:
         switch(b){
@@ -68,10 +68,10 @@ int ll_i_state_update(ll_i_statemachine_t *m, uint8_t b){
         }
         break;
     case LL_I_STOP_UA:
-        fprintf(stderr, "can't transition from LL_I_STOP_UA\n");
+        ll_err("ERROR: can't transition from LL_I_STOP_UA\n");
         return EXIT_FAILURE;
     default:
-        fprintf(stderr, "No such state %d\n", m->state);
+        ll_err("ERROR: No such state %d\n", m->state);
         return EXIT_FAILURE;
     }
     return EXIT_SUCCESS;

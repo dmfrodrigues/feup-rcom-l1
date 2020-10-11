@@ -17,6 +17,7 @@ typedef struct {
     int baud_rate;
     unsigned int timeout;
     unsigned int retransmissions;
+    int verbosity;
 } ll_config_t;
 
 typedef enum {
