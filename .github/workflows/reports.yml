@@ -24,9 +24,8 @@ jobs:
         sudo apt install -y texlive-latex-extra texlive-science latexmk curl
 
     - name: Checkout submodules
-      uses: srt32/git-actions@v0.0.3
-      with:
-        args: git submodule update --init --recursive
+      run: |
+        git submodule update --init --recursive
 
     - name: report
       run: |
