@@ -9,7 +9,8 @@
 #include "ll.h"
 #include "ll_flags.h"
 
-int ll_log(__attribute__ ((unused)) int verbosity, __attribute__ ((unused)) const char *format, ...){
+int ll_log(__attribute__ ((unused)) int verbosity,
+           __attribute__ ((unused)) const char *format, ...){
     #ifdef DEBUG
     if(verbosity <= ll_config.verbosity){
         va_list args;

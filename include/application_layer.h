@@ -1,3 +1,12 @@
+// Copyright (C) 2020 Diogo Rodrigues, Breno Pimentel
+// Distributed under the terms of the GNU General Public License, version 3
+
+/**
+ * @defgroup app Application layer
+ * @ingroup ll 
+ * @brief Application layer
+ */
+
 #ifndef _APPLICATION_LAYER_H_
 #define _APPLICATION_LAYER_H_
 
@@ -17,8 +26,8 @@
 #define FILE_NAME_MAX_SIZE 255
 
 typedef struct {
-    int fileDescriptor; /*Descritor correspondente à porta série*/
-    ll_status_t status; /*TRANSMITTER | RECEIVER*/
+    int fileDescriptor; ///< Descriptor corresponding to the serial port
+    ll_status_t status; ///< TRANSMITTER | RECEIVER
 } application_layer;
 
 int application(int com, ll_status_t status, const char *file_name);
