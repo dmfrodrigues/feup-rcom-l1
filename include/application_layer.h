@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
+#include <libgen.h>
 #include "ll.h"
 
 #define CTRL_DATA   1
@@ -21,17 +22,17 @@ typedef struct {
     ll_status_t status; /*TRANSMITTER | RECEIVER*/
 } application_layer;
 
-int application(int com, ll_status_t status, const char *file_name);
+int application(int com, ll_status_t status, char *file_path);
 
 int app_send_ctrl_packet(int ctrl, uint32_t file_size, const char *file_name);
 
-int app_send_data_packet(uint8_t *data, size_t data_size, unsigned int seq_number);
+int app_send_data_packet(char*data, unsigned int data_size, unsigned int seq_number);
 
-int app_send_file(const char *file_name);
+int app_send_file(char *file_path);
 
-int app_rcv_ctrl_packet(int ctrl, int * file_size, char * file_name);
+int app_rcv_ctrl_packet(int ctrl, unsigned int * file_size, char * file_name);
 
-int app_rcv_data_packet(uint8_t * data, int seq_number);
+int app_rcv_data_packet(char * data, int seq_number);
 
 int app_receive_file(void);
 
