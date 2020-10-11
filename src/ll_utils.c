@@ -9,16 +9,17 @@
 #include "ll.h"
 #include "ll_flags.h"
 
-int ll_log(int verbosity, const char *format, ...) {
-
+int ll_log(__attribute__ ((unused)) int verbosity, __attribute__ ((unused)) const char *format, ...){
+    #ifdef DEBUG
     if(verbosity <= ll_config.verbosity){
         va_list args;
         va_start(args, format);
         int res = vfprintf(stderr, format, args);
         va_end(args);
         return res;
-    } else return 0;
-
+    }
+    #endif
+    return 0;
 }
 
 int ll_err(const char *format, ...) {

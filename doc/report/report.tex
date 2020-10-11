@@ -206,10 +206,10 @@ We implemented two layers to satisfy the previously presented architecture: two 
 The \texttt{app} module makes available two executable files, where \texttt{<COM>} is the communication port to be used (\texttt{COM1} corresponds to \texttt{ttyS0}, \texttt{COM2} to \texttt{ttyS1}, ...), and \texttt{<file>} is a file path:
 \begin{itemize}
 	\item \texttt{./transmitter <COM> <file>}, to send \texttt{<file>} to port \texttt{<COM>}.
-	\item \texttt{./receiver <COM> <file>}, to receive \texttt{<file>} from port \texttt{<COM>}.
+	\item \texttt{./receiver <COM>}, to receive a file from port \texttt{<COM>}.
 \end{itemize}
 
-This module takes advantage of the link layer interface to transfer a file in chunks that should be: not too large, since the probability of having an error is increased, and as such implies large frames will often have to be retransmitted; and not too small, as the total amount of non-data bytes is proportional to the number of frames.
+This module takes advantage of the link layer interface to transfer a file in chunks, that should be not too large to reduce the probability of having an error and requiring retransmission, and not too small as the total amount of non-data bytes is proportional to the number of frames.
 
 % TODO: How can I configure transmission from the command line?
 
@@ -230,10 +230,10 @@ To use these functions, one just needs to allocate the buffers with proper sizes
 	\begin{tabular}{l | p{12cm}}
 		\hline \hline
 		\textbf{Field}           & \textbf{Description} \\ \hline
-		\texttt{baud\_rate}      & Baud rate, the number of bits transmitted per second; defaults to 38400. Any number may be specified, but only a few specific baud rates can be used (see \texttt{termios(3)}); as such, the baud rate is rounded up to the next allowed baud rate, unless it is above the maximum baud rate, 230400. Is loaded on call to \texttt{llopen}. \\ \hline
-		\texttt{timeout}         & Time the transmitter waits before retransmitting a message that the receiver did not acknowledge. It is measured in integer seconds, and should be greater than zero. By default it is 3 seconds, and can be set at any time. \\ \hline
+		\texttt{baud\_rate}      & Number of bits transmitted per second; defaults to 38400. Any number may be specified, but only a few specific baud rates can be used; as such, the baud rate is rounded up to the next allowed baud rate, unless it is above the maximum baud rate, 230400. Is loaded on call to \texttt{llopen}. \\ \hline
+		\texttt{timeout}         & Time the transmitter waits before retransmitting a message that the receiver did not acknowledge. It is measured in integer seconds, and is than zero. By default it is 3 seconds, and can be set at any time. \\ \hline
 		\texttt{retransmissions} & Number of times a frame will be retransmitted before giving up and terminating the connection. Defaults to 3, and can be set at any time. \\ \hline
-		\texttt{verbosity}       & Verbosity accepted for printing. The program can be compiled in debug or release mode; in debug mode, logs will be printed, if they are less or as verbose as a certain verbosity level, according to the value in this field.\\ \hline \hline
+		\texttt{verbosity}       & If the program is compiled in debug mode, logs will be printed if they are less or as verbose as the value of this field.\\ \hline \hline
 	\end{tabular}
 	\caption{Fields of \texttt{ll\_config\_t}, and their descriptions}
 \end{table}
@@ -246,13 +246,12 @@ Assuming \texttt{COM11} of the transmitter computer and \texttt{COM12} of the re
 
 First, start the receiver and connect it to \texttt{COM12} to read the file by calling
 
-\begin{lstlisting}
+\begin{lstlisting}[frame=none, numbers=none]
 ./receiver 12
 \end{lstlisting}
-
 Then, start the transmitter and connect it to \texttt{COM11} to write file \texttt{pinguim.gif} by calling
 
-\begin{lstlisting}
+\begin{lstlisting}[frame=none, numbers=none]
 ./transmitter 11 pinguim.gif
 \end{lstlisting}
 	
