@@ -31,18 +31,25 @@ typedef struct {
     ll_status_t status; ///< TRANSMITTER | RECEIVER
 } application_layer;
 
-int application(int com, ll_status_t status, char *file_path);
+int application(int com, ll_status_t status, char *file_path)
+    __attribute__((warn_unused_result));
 
-int app_send_ctrl_packet(int ctrl, uint32_t file_size, const char *file_name);
+int app_send_ctrl_packet(int ctrl, uint32_t file_size, const char *file_name)
+    __attribute__((warn_unused_result));
 
-int app_send_data_packet(char*data, unsigned int data_size, unsigned int seq_number);
+int app_send_data_packet(char*data, unsigned int data_size, unsigned int seq_number)
+    __attribute__((warn_unused_result));
 
-int app_send_file(char *file_path);
+int app_send_file(char *file_path)
+    __attribute__((warn_unused_result));
 
-int app_rcv_ctrl_packet(int ctrl, unsigned int * file_size, char * file_name);
+int app_rcv_ctrl_packet(int ctrl, unsigned int * file_size, char * file_name)
+    __attribute__((warn_unused_result));
 
-int app_rcv_data_packet(char * data, int seq_number);
+int app_rcv_data_packet(char * data, int seq_number)
+    __attribute__((warn_unused_result));
 
-int app_receive_file(void);
+int app_receive_file(void)
+    __attribute__((warn_unused_result));
 
 #endif // _APPLICATION_LAYER_H_
