@@ -6,7 +6,8 @@
 #include <string.h>
 
 #include "ll.h"
-#include "application_layer.h"
+#include "app.h"
+#include "app_args.h"
 
 #define BAUDRATE B38400
 #define _POSIX_SOURCE 1 /* POSIX compliant source */

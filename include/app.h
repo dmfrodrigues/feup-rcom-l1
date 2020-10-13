@@ -3,12 +3,11 @@
 
 /**
  * @defgroup app Application layer
- * @ingroup ll 
  * @brief Application layer
  */
 
-#ifndef _APPLICATION_LAYER_H_
-#define _APPLICATION_LAYER_H_
+#ifndef _APP_H_
+#define _APP_H_
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -32,8 +31,7 @@ typedef struct {
     size_t packet_size;
 } app_config_t;
 
-int app_parse_args(int argc, char *argv[], int *com, ll_status_t status, char **file_path)
-    __attribute__((warn_unused_result));
+app_config_t app_config;
 
 /**
  * @brief Initializes the application.
@@ -105,4 +103,4 @@ int app_rcv_data_packet(char * data, int seq_number)
 int app_receive_file(void)
     __attribute__((warn_unused_result));
 
-#endif // _APPLICATION_LAYER_H_
+#endif // _APP_H_
