@@ -449,6 +449,57 @@ There is an additional issue, which was not mentioned in the guidelines: BCC2 ca
 
 \section{Efficiency of the data link protocol} \label{sec:Efficiency}
 
+\subsection{Definitions}
+
+\begin{center}
+	\small
+	\begin{tabular}{c | l | p{84mm} | c}
+		\hline \hline
+		\textbf{Acronym} & \textbf{Name}                & \textbf{Definition}                              & I/O \\ \hline
+		$a$              & Norm. prop. time             & $a = T_{prop}/T_f$                               &     \\
+		$T_{prop}$       & Propagation time             & Time for a signal to propagate through the cable &     \\
+		$T_f$            & Frame time                   & Time to transfer a frame                         &     \\
+		$T$              & Total execution time         & Total execution time of the transmitter          & O   \\
+		$L$              & Total messages length        & Total message length, including retransmissions  & I   \\
+		$L_f$            & File length                  & Message length excluding retransmissions         & I   \\
+		$N$				 & \# of frames                 & Number of actually transferred frames            & I   \\
+		$N_e$            & \# of frames with errors     & Frames with errors, inc. during establishment    & I   \\
+		$R_e$            & Frame error rate             & Frames with errors per total frame number        &     \\
+		$p_e$            & Frame error probability      & Estimated from $R_e$                             &     \\
+		$C$              & Capacity                     & Capacity of the system (baud rate)               & I   \\
+		$R$              & Data rate                    & Global data transfer rate                        &     \\
+		\hline \hline
+	\end{tabular}
+\end{center}
+
+\begin{equation*}
+	a = \frac{TC}{2L} - \frac{1}{2}
+\end{equation*}
+
+\begin{equation*}
+	R_e = \frac{N}{N_e}
+\end{equation*}
+
+\begin{equation*}
+	S = \frac{L_f}{T C}
+\end{equation*}
+
+\section{Efficiency}
+
+We can determine the efficiency $S$ by using 
+\begin{equation} \label{eq:S}
+	S = \frac{R}{C}
+\end{equation}
+where $R$ is the data transfer rate,
+\begin{equation} \label{eq:R}
+	R = \frac{L_f}{T}
+\end{equation}
+and as such equation \ref{eq:S} becomes
+\begin{equation} \label{eq:S2}
+	S = \frac{L_f}{T C}
+\end{equation}
+and as such we can determine $S$ by varying $L$ and $C$ and measure $T$.
+
 \section{Conclusion} \label{sec:Conclusion}
 
 \pagebreak
@@ -631,5 +682,48 @@ An I-frame state machine must be ready to handle to following scenarios:
 		
 	\end{tikzpicture}
 \end{center}
+
+\chapter{Efficiency statistics}
+
+\section{Normalized propagation time}
+
+\begin{equation} \label{eq:T}
+	T = \sum_{i=1}^{N}{(2T_{prop} + T_f^i)} = 2 N \overline{T_{prop}} + \sum_{i=1}^{N}{T_f^i}
+\end{equation}
+
+Because $T_f = L/R$,
+\begin{equation} \label{eq:Tfsum}
+	\sum_{i=1}^{N}{T_f^i} = \sum_{i=1}^{N}{\frac{L_i}{C}} = \frac{1}{C} \sum_{i=1}^{N}{L_i} = \frac{L}{C}
+\end{equation}
+equation \ref{eq:T} becomes
+\begin{equation} \label{eq:T2}
+	T = 2 N \overline{T_{prop}} + \frac{L}{C} \iff \overline{T_{prop}} = \frac{T - L/C}{2 N}
+\end{equation}
+We can thus determine $\overline{T_{prop}}$, because we can vary $L$, $C$ and $N$, and measure $T$.
+
+As per equation \ref{eq:Tfsum}, the average frame time $\overline{T_f}$ is 
+\begin{equation} \label{eq:Tfmean}
+	\overline{T_f} = \frac{1}{N}\sum_{i=1}^{N}{T_f^i} = \frac{L}{N C}
+\end{equation}
+We can thus determine $a$ from
+\begin{equation}
+	a = \frac{\overline{T_{prop}}}{\overline{T_f}} = \frac{\frac{T - L/C}{2 N}}{\frac{L}{N C}} = \frac{TC}{2L} - \frac{1}{2}
+\end{equation}
+
+\section{Efficiency}
+
+We can determine the efficiency $S$ by using 
+\begin{equation} \label{eq:S}
+	S = \frac{R}{C}
+\end{equation}
+where $R$ is the data transfer rate,
+\begin{equation} \label{eq:R}
+	R = \frac{L_f}{T}
+\end{equation}
+and as such equation \ref{eq:S} becomes
+\begin{equation} \label{eq:S2}
+	S = \frac{L_f}{T C}
+\end{equation}
+and as such we can determine $S$ by varying $L$ and $C$ and measure $T$.
 
 \end{document}
