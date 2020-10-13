@@ -23,24 +23,24 @@ void alarmHandler(__attribute__((unused)) int signum){
 }
 
 tcflag_t ll_get_baud_rate(void){
-    if(ll_config.baud_rate < 0     ){ ll_config.baud_rate = 0     ; return B0     ; }
-    if(ll_config.baud_rate < 50    ){ ll_config.baud_rate = 50    ; return B50    ; }
-    if(ll_config.baud_rate < 75    ){ ll_config.baud_rate = 75    ; return B75    ; }
-    if(ll_config.baud_rate < 110   ){ ll_config.baud_rate = 110   ; return B110   ; }
-    if(ll_config.baud_rate < 134   ){ ll_config.baud_rate = 134   ; return B134   ; }
-    if(ll_config.baud_rate < 150   ){ ll_config.baud_rate = 150   ; return B150   ; }
-    if(ll_config.baud_rate < 200   ){ ll_config.baud_rate = 200   ; return B200   ; }
-    if(ll_config.baud_rate < 300   ){ ll_config.baud_rate = 300   ; return B300   ; }
-    if(ll_config.baud_rate < 600   ){ ll_config.baud_rate = 600   ; return B600   ; }
-    if(ll_config.baud_rate < 1200  ){ ll_config.baud_rate = 1200  ; return B1200  ; }
-    if(ll_config.baud_rate < 1800  ){ ll_config.baud_rate = 1800  ; return B1800  ; }
-    if(ll_config.baud_rate < 2400  ){ ll_config.baud_rate = 2400  ; return B2400  ; }
-    if(ll_config.baud_rate < 4800  ){ ll_config.baud_rate = 4800  ; return B4800  ; }
-    if(ll_config.baud_rate < 9600  ){ ll_config.baud_rate = 9600  ; return B9600  ; }
-    if(ll_config.baud_rate < 19200 ){ ll_config.baud_rate = 19200 ; return B19200 ; }
-    if(ll_config.baud_rate < 38400 ){ ll_config.baud_rate = 38400 ; return B38400 ; }
-    if(ll_config.baud_rate < 57600 ){ ll_config.baud_rate = 57600 ; return B57600 ; }
-    if(ll_config.baud_rate < 115200){ ll_config.baud_rate = 115200; return B115200; }
+    if(ll_config.baud_rate <= 0     ){ ll_config.baud_rate = 0     ; return B0     ; }
+    if(ll_config.baud_rate <= 50    ){ ll_config.baud_rate = 50    ; return B50    ; }
+    if(ll_config.baud_rate <= 75    ){ ll_config.baud_rate = 75    ; return B75    ; }
+    if(ll_config.baud_rate <= 110   ){ ll_config.baud_rate = 110   ; return B110   ; }
+    if(ll_config.baud_rate <= 134   ){ ll_config.baud_rate = 134   ; return B134   ; }
+    if(ll_config.baud_rate <= 150   ){ ll_config.baud_rate = 150   ; return B150   ; }
+    if(ll_config.baud_rate <= 200   ){ ll_config.baud_rate = 200   ; return B200   ; }
+    if(ll_config.baud_rate <= 300   ){ ll_config.baud_rate = 300   ; return B300   ; }
+    if(ll_config.baud_rate <= 600   ){ ll_config.baud_rate = 600   ; return B600   ; }
+    if(ll_config.baud_rate <= 1200  ){ ll_config.baud_rate = 1200  ; return B1200  ; }
+    if(ll_config.baud_rate <= 1800  ){ ll_config.baud_rate = 1800  ; return B1800  ; }
+    if(ll_config.baud_rate <= 2400  ){ ll_config.baud_rate = 2400  ; return B2400  ; }
+    if(ll_config.baud_rate <= 4800  ){ ll_config.baud_rate = 4800  ; return B4800  ; }
+    if(ll_config.baud_rate <= 9600  ){ ll_config.baud_rate = 9600  ; return B9600  ; }
+    if(ll_config.baud_rate <= 19200 ){ ll_config.baud_rate = 19200 ; return B19200 ; }
+    if(ll_config.baud_rate <= 38400 ){ ll_config.baud_rate = 38400 ; return B38400 ; }
+    if(ll_config.baud_rate <= 57600 ){ ll_config.baud_rate = 57600 ; return B57600 ; }
+    if(ll_config.baud_rate <= 115200){ ll_config.baud_rate = 115200; return B115200; }
     ll_config.baud_rate = 230400; return B230400;
 }
 
@@ -131,9 +131,9 @@ ssize_t ll_send_I(int port_fd, const uint8_t *buffer, size_t length){
     uint8_t buffer_escaped[2*LL_MAX_SIZE];
     ssize_t written_chars = ll_stuffing(buffer_escaped, buffer, length);
     if(written_chars < (ssize_t)length) return -1;
-    ll_log(2, "Stuffed bits, preparing to send %ld bytes:", written_chars);
+    ll_log(2, "    Stuffed bits, preparing to send %ld bytes", written_chars);
     for(ssize_t i = 0; i < written_chars; ++i){
-        ll_log(2, " %02X", buffer_escaped[i]);
+        ll_log(3, " %02X", buffer_escaped[i]);
     }
     ll_log(2, "\n");
 

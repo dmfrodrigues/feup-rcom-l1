@@ -9,12 +9,14 @@
 #ifndef _LL_H_
 #define _LL_H_
 
+#include <stdlib.h>
+
 #include "ll_flags.h"
 
 #define LL_MAX_SIZE 4096    ///< @ingroup ll Maximum message size
 
 typedef struct {
-    int baud_rate;
+    size_t baud_rate;
     unsigned int timeout;
     unsigned int retransmissions;
     int verbosity;

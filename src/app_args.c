@@ -27,7 +27,7 @@ int app_parse_args(int argc, char *argv[], int *com, ll_status_t status, char **
     int opt = 0; int longindex;
     while((opt = getopt_long(argc, argv, optstring, longopts, &longindex)) != -1){
         switch(opt){
-            case 'b': if(sscanf(optarg, "%d" , &ll_config.baud_rate      ) != 1) res = EXIT_FAILURE; break;
+            case 'b': if(sscanf(optarg, "%lu", &ll_config.baud_rate      ) != 1) res = EXIT_FAILURE; break;
             case 'r': if(sscanf(optarg, "%u" , &ll_config.retransmissions) != 1) res = EXIT_FAILURE; break;
             case 's': if(sscanf(optarg, "%lu", &app_config.packet_size   ) != 1) res = EXIT_FAILURE; break;
             case 't': if(sscanf(optarg, "%u" , &ll_config.timeout        ) != 1) res = EXIT_FAILURE; break;
