@@ -122,6 +122,9 @@ ssize_t ll_send_I(int port_fd, const uint8_t *buffer, size_t length){
     frame_header[1] = (ll_status == TRANSMITTER ? LL_A_SEND : LL_A_RECV);
     frame_header[2] = ll_get_Iframe_C();
     frame_header[3] = ll_bcc(frame_header+1, frame_header+3);
+
+    ll_gen_frame_error(-0.5, frame_header);
+
     if(write(port_fd, frame_header, sizeof(frame_header)) != sizeof(frame_header))
         { perror("write"); return -1; }
     
@@ -133,6 +136,9 @@ ssize_t ll_send_I(int port_fd, const uint8_t *buffer, size_t length){
         ll_log(2, " %02X", buffer_escaped[i]);
     }
     ll_log(2, "\n");
+
+    ll_gen_frame_error(-0.1, buffer_escaped);
+
     if(write(port_fd, buffer_escaped, written_chars) != written_chars)
         { perror("write"); return -1; }
 
@@ -142,12 +148,18 @@ ssize_t ll_send_I(int port_fd, const uint8_t *buffer, size_t length){
         frame_tail[0] = LL_ESC;
         frame_tail[1] = LL_STUFF(bcc2);
         frame_tail[2] = LL_FLAG;
+
+        ll_gen_frame_error(-0.1, frame_tail);
+
         if(write(port_fd, frame_tail, sizeof(frame_tail)) != sizeof(frame_tail))
             { perror("write"); return -1; }
     } else {
         uint8_t frame_tail[2];
         frame_tail[0] = bcc2;
         frame_tail[1] = LL_FLAG;
+
+        ll_gen_frame_error(-0.1, frame_tail);
+
         if(write(port_fd, frame_tail, sizeof(frame_tail)) != sizeof(frame_tail))
             { perror("write"); return -1; }
     }

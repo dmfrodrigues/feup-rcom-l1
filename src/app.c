@@ -2,6 +2,7 @@
 // Distributed under the terms of the GNU General Public License, version 3
 
 #include "app.h"
+#include <time.h>
 
 app_config_t app_config = {
     fileDescriptor: -1,
@@ -9,6 +10,8 @@ app_config_t app_config = {
 };
 
 int application(int com, ll_status_t status, char *file_path){
+
+    srand(time(0));
 
     app_config.fileDescriptor = llopen(com, status);
     if(app_config.fileDescriptor == -1) return -1;

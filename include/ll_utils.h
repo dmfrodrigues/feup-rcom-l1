@@ -10,8 +10,22 @@
 #ifndef _LL_UTILS_H_
 #define _LL_UTILS_H_
 
+#include <stdlib.h>
 #include <stdint.h>
 #include <sys/types.h>
+
+
+/**
+ * @ingroup ll_utils
+ * @brief Generates random frame errors.
+ * 
+ * If the probability is negative, no errors will be generated
+ * 
+ * @param probability   Value from 0 to 1, meaning the probability of a error
+ * @param frame         Frame where the error will be generated
+ * @return void
+ */
+void ll_gen_frame_error(float probability, uint8_t *frame);
 
 /**
  * @ingroup ll_utils

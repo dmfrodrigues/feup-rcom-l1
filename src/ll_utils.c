@@ -9,6 +9,17 @@
 #include "ll.h"
 #include "ll_flags.h"
 
+void ll_gen_frame_error(float probability, uint8_t *frame){
+    float rand_value = rand() / (float) RAND_MAX;
+    if (rand_value <= probability)
+    {   
+        fprintf(stderr, "Generating a random frame error\n");
+        size_t size = sizeof(frame)/sizeof(uint8_t);
+        int rand_idx = rand()%(size-1);
+        frame[rand_idx] = 0x0;
+    }
+}
+
 int ll_log(__attribute__ ((unused)) int verbosity,
            __attribute__ ((unused)) const char *format, ...){
     #ifdef DEBUG
