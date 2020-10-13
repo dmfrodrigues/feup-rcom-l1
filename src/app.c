@@ -5,17 +5,15 @@
 
 app_config_t app_config = {
     fileDescriptor: -1,
-    status        : -1,
     packet_size   : LL_MAX_SIZE
 };
 
 int application(int com, ll_status_t status, char *file_path){
 
-    app_config.status = status;
-    app_config.fileDescriptor = llopen(com, app_config.status);
+    app_config.fileDescriptor = llopen(com, status);
     if(app_config.fileDescriptor == -1) return -1;
 
-    if(app_config.status == TRANSMITTER){
+    if(status == TRANSMITTER){
         if(app_send_file(file_path) < 0){
             fprintf(stderr, "ERROR: unable to send file\n");
             return -1;
