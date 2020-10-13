@@ -19,7 +19,6 @@ int main(int argc, char** argv){
     }
 
     ll_config.verbosity = 1;
-    ll_config.timeout = 1;
 
     if(application(atoi(argv[1]), TRANSMITTER, argv[2]) < 0)
         return 1;
