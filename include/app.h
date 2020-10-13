@@ -25,11 +25,19 @@
 
 #define FILE_NAME_MAX_SIZE 255
 
+/**
+ * @ingroup app
+ * @brief App configuration structure
+ */
 typedef struct {
     int fileDescriptor;
     size_t packet_size;
 } app_config_t;
 
+/**
+ * @ingroup app
+ * @brief App configuration
+ */
 app_config_t app_config;
 
 /**
