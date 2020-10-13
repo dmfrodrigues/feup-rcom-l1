@@ -18,7 +18,6 @@ int main(int argc, char** argv){
         exit(1);
     }
 
-
     if(application(atoi(argv[1]), TRANSMITTER, argv[2]) < 0)
         return 1;
 

@@ -20,6 +20,8 @@ int main(int argc, char** argv){
         exit(1);
     }
 
+    ll_config.verbosity = 1;
+
     if(application(atoi(argv[1]), RECEIVER, NULL) < 0)
         return 1;
 

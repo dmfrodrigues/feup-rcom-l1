@@ -412,7 +412,7 @@ This protocol is suited with a mechanism that allows the receiver to identify if
 			\node[align=center, draw, minimum width=1.2cm, minimum height=1.2cm] at (1.2, 0) (a) {A};
 			\node[align=center, draw, minimum width=1.2cm, minimum height=1.2cm] at (2.4, 0) (c) {C};
 			\node[align=center, draw, minimum width=1.2cm, minimum height=1.2cm] at (3.6, 0) (bcc) {BCC1};
-			\node[align=center, draw, minimum width=1.2cm, minimum height=1.2cm] at (4.8, 0) (d1) {D1};
+			\node[align=center, draw, minimum width=1.2cm, minimum height=1.2cm] at (4.8, 0) (d1) {D$_1$};
 			\node[align=center, dashed, draw, minimum width=2.4cm, minimum height=1.2cm] at (6.6, 0) (data) {Data};
 			\node[align=center, draw, minimum width=1.2cm, minimum height=1.2cm] at (8.4, 0) (bcc2) {BCC2};
 			\node[align=center, draw, minimum width=1.2cm, minimum height=1.2cm] at (9.6, 0) (f-end) {F};
@@ -428,7 +428,7 @@ The meaning of the constituents of frames are as follows:
 	\item Flag (F, FLAG, \texttt{0x7E}): marks the beginning and end of a frame.
 	\item Address (A): identifier of the sender, or of the destination if it is an answer. Takes values \texttt{0x03} for the transmitter and \texttt{0x01} for the receiver.
 	\item Control (C): identifies the command; \texttt{0x03} for SET, \texttt{0x0B} for DISC, \texttt{0x07} for UA, \texttt{0b0S000000} for I, \texttt{0bR0000101} for RR and \texttt{0bR0000001} for REJ, where $\texttt{S} = N_s$ and $\texttt{R} = N_r$.
-	\item Block check character (BCC): exclusive-or of a certain range of bytes (BCC and BCC1 are the exclusive-or of A and C, and BCC2 is the exclusive-or of all data D1, D2, ..., DN). Is used to check for bit swaps.
+	\item Block check character (BCC): exclusive-or ($\xor$) of a certain range of bytes; BCC and BCC1 are $\text{A}\xor\text{C}$, and BCC2 is $\text{D}_1 \xor \text{D}_2 \xor ... \xor \text{D}_\text{N}$. Is used to check for bit swaps.
 	\item Data (D): data bytes, encoded using byte stuffing.
 \end{itemize}
 
