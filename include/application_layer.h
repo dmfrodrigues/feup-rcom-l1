@@ -29,7 +29,8 @@
 typedef struct {
     int fileDescriptor;
     ll_status_t status;
-} application_layer;
+    size_t packet_size;
+} app_config_t;
 
 
 /**

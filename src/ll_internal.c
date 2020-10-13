@@ -114,14 +114,9 @@ int ll_send_UA(int port_fd){
 
 ssize_t ll_send_I(int port_fd, const uint8_t *buffer, size_t length){
     ll_log(2, "    Sending");
-    /*
-    ll_log(3, " '");
-    for(size_t i = 0; i < length; ++i) ll_log(3, "%c", buffer[i]);
-    ll_log(3, "'");
-    */
-    ll_log(2, " (");
-    for(size_t i = 0; i < length; ++i) ll_log(2, "%02X ", buffer[i]);
-    ll_log(2, ")");
+    ll_log(3, " (");
+    for(size_t i = 0; i < length; ++i) ll_log(3, "%02X ", buffer[i]);
+    ll_log(3, ")");
     ll_log(2, "\n");
 
     uint8_t frame_header[4];

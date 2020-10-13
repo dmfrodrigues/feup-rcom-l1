@@ -3,7 +3,10 @@
         "array": "c",
         "string_view": "c",
         "initializer_list": "c",
-        "utility": "c"
+        "utility": "c",
+        "*.tcc": "c",
+        "fstream": "c",
+        "sstream": "c"
     },
     "latex-workshop.latex.recipes": [
         {

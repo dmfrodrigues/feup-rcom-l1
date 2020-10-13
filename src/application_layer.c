@@ -1,14 +1,18 @@
 #include "application_layer.h"
 
-application_layer app;
+app_config_t app_config = {
+    fileDescriptor: -1,
+    status        : -1,
+    packet_size   : LL_MAX_SIZE
+};
 
 int application(int com, ll_status_t status, char *file_path){
 
-    app.status = status;
-    app.fileDescriptor = llopen(com, app.status);
-    if(app.fileDescriptor == -1) return -1;
+    app_config.status = status;
+    app_config.fileDescriptor = llopen(com, app_config.status);
+    if(app_config.fileDescriptor == -1) return -1;
 
-    if(app.status == TRANSMITTER){
+    if(app_config.status == TRANSMITTER){
         if(app_send_file(file_path) < 0){
             fprintf(stderr, "ERROR: unable to send file\n");
             return -1;
@@ -20,7 +24,7 @@ int application(int com, ll_status_t status, char *file_path){
         }
     }
 
-    if(llclose(app.fileDescriptor) < 0)
+    if(llclose(app_config.fileDescriptor) < 0)
         return -1;
 
     return 0;
@@ -48,7 +52,7 @@ int app_send_ctrl_packet(int ctrl, uint32_t file_size, const char *file_name){
     // V2
     memcpy(ctrl_packet + 9, file_name, strlen(file_name));
     
-    if(llwrite(app.fileDescriptor, ctrl_packet, packet_size) < 0){
+    if(llwrite(app_config.fileDescriptor, ctrl_packet, packet_size) < 0){
         fprintf(stderr, "ERROR: unable to write control packet\n");
         free(ctrl_packet);
         return -1;
@@ -74,7 +78,7 @@ int app_send_data_packet(char *data, unsigned int data_size, unsigned int seq_nu
 
     memcpy(data_packet + 4, data, data_size);
 
-    if(llwrite(app.fileDescriptor, data_packet, packet_size) < 0){
+    if(llwrite(app_config.fileDescriptor, data_packet, packet_size) < 0){
         fprintf(stderr, "ERROR: unable to write data packet\n");
         free(data_packet);
         return -1;
@@ -103,12 +107,12 @@ int app_send_file(char *file_path){
     if(app_send_ctrl_packet(CTRL_START, file_size, file_name) < 0)
         return -1;
 
-    char *buf =(char*)malloc(LL_MAX_SIZE);
+    char *buf =(char*)malloc(app_config.packet_size);
 
     unsigned int res = 0;
     unsigned int seq_number = 0;
 
-    while((res = fread(buf, sizeof(char), LL_MAX_SIZE, file)) > 0){
+    while((res = fread(buf, sizeof(char), app_config.packet_size, file)) > 0){
         if(app_send_data_packet(buf, res, seq_number) < 0)
             return -1;
         seq_number = (seq_number+1)%255;
@@ -127,7 +131,7 @@ int app_rcv_ctrl_packet(int ctrl, unsigned int * file_size, char * file_name){
 
     uint8_t * ctrl_packet = (uint8_t*)malloc(5 + sizeof(unsigned int) + FILE_NAME_MAX_SIZE);
 
-    if(llread(app.fileDescriptor, ctrl_packet) < 0){
+    if(llread(app_config.fileDescriptor, ctrl_packet) < 0){
         fprintf(stderr, "ERROR: unable to read ctrl packet\n");
         return -1;
     }
@@ -161,9 +165,9 @@ int app_rcv_ctrl_packet(int ctrl, unsigned int * file_size, char * file_name){
 
 int app_rcv_data_packet(char * data, int seq_number){
 
-    uint8_t * data_packet = (uint8_t*) malloc(LL_MAX_SIZE);
+    uint8_t * data_packet = (uint8_t*) malloc(app_config.packet_size);
     
-    if(llread(app.fileDescriptor, data_packet) < 0){
+    if(llread(app_config.fileDescriptor, data_packet) < 0){
         fprintf(stderr, "ERROR: unable to read data packet\n");
         return -1;
     }
@@ -206,7 +210,7 @@ int app_receive_file(){
     int data_length;
     unsigned int data_bytes_read = 0;
     unsigned int seq_number = 0;
-    char *buf =(char*)malloc(LL_MAX_SIZE);
+    char *buf =(char*)malloc(app_config.packet_size);
     
     while(file_size > data_bytes_read){
 

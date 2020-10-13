@@ -11,7 +11,7 @@
 
 #include "ll_flags.h"
 
-#define LL_MAX_SIZE 1024    ///< @ingroup ll Maximum message size
+#define LL_MAX_SIZE 4096    ///< @ingroup ll Maximum message size
 
 typedef struct {
     int baud_rate;
