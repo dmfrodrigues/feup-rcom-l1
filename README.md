@@ -23,6 +23,16 @@ Distributed under the terms of the GNU General Public License, version 3
     - [Breno Accioly de Barros Pimentel](https://github.com/BrenoAccioly) (<up201800170@fe.up.pt>)
     - [Diogo Miguel Ferreira Rodrigues](https://github.com/dmfrodrigues) (<dmfrodrigues2000@gmail.com> / <diogo.rodrigues@fe.up.pt>)
 
+# How to use
+
+```txt
+-b, --baudrate          Baud rate (default is 38400)
+-r, --retransmissions   Retransmissions (default is 3)
+-s, --size              Block size (default is LL_MAX_SIZE, which is 4096)
+-t, --timeout           Timeout (default is 3 seconds)
+-v, --verbosity         Verbosity (0 to 4)
+```
+
 # License
 
 © 2020 Diogo Rodrigues, Breno Pimentel
