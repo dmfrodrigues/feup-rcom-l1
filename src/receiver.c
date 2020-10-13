@@ -14,15 +14,15 @@
 #define TRUE 1
 
 int main(int argc, char** argv){
-    // CHECK ARGUMENTS
-    if(argc < 2){
+
+    int com = 0;
+
+    if(app_parse_args(argc, argv, &com, RECEIVER, NULL)){
         printf("Usage:\tnserial SerialPort\n\tex: nserial 2\n");
         exit(1);
     }
 
-    ll_config.verbosity = 1;
-
-    if(application(atoi(argv[1]), RECEIVER, NULL) < 0)
+    if(application(com, RECEIVER, NULL) < 0)
         return 1;
 
     return 0;

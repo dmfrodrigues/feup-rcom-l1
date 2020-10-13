@@ -12,13 +12,15 @@
 
 int main(int argc, char** argv){
 
-    // CHECK ARGUMENTS
-    if(argc < 2){
-        printf("Usage:\tnserial SerialPort FileName\n\tex: nserial 2 pinguim.gif\n");
+    int com = 0;
+    char *file_path = NULL;
+
+    if(app_parse_args(argc, argv, &com, TRANSMITTER, &file_path)){
+        printf("Usage:\tnserial SerialPort FileName\n\tex: ./transmitter 2 pinguim.gif\n");
         exit(1);
     }
-
-    if(application(atoi(argv[1]), TRANSMITTER, argv[2]) < 0)
+    
+    if(application(com, TRANSMITTER, file_path) < 0)
         return 1;
 
     return 0;

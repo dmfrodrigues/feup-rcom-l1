@@ -32,6 +32,8 @@ typedef struct {
     size_t packet_size;
 } app_config_t;
 
+int app_parse_args(int argc, char *argv[], int *com, ll_status_t status, char **file_path)
+    __attribute__((warn_unused_result));
 
 /**
  * @brief Initializes the application.
