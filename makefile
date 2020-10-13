@@ -16,13 +16,13 @@ CFLAGS_PARANOID =-pedantic -Wall -Wbad-function-cast -Wcast-align -Wcast-qual -W
 
 #CFLAGS=-Wall -g #-O3
 CFLAGS=$(CFLAGS_PARANOID)
-DFLAGS=-D DEBUG
+DFLAGS=-D DEBUG -D STATISTICS
 #DFLAGS=
 
 TRANSMITTER_O_FILES=$(ODIR)/transmitter.o
 RECEIVER_O_FILES   =$(ODIR)/receiver.o
 
-O_FILES=$(ODIR)/ll.o $(ODIR)/ll_internal.o $(ODIR)/ll_s_statemachine.o $(ODIR)/ll_u_statemachine.o $(ODIR)/ll_i_statemachine.o $(ODIR)/ll_utils.o $(ODIR)/app.o $(ODIR)/app_args.o
+O_FILES=$(ODIR)/ll.o $(ODIR)/ll_internal.o $(ODIR)/ll_s_statemachine.o $(ODIR)/ll_u_statemachine.o $(ODIR)/ll_i_statemachine.o $(ODIR)/ll_utils.o $(ODIR)/app.o $(ODIR)/app_args.o $(ODIR)/stats.o
 
 all: $(TRANSMITTER) $(RECEIVER)
 

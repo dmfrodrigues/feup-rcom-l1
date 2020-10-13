@@ -4,6 +4,8 @@
 #include "app.h"
 #include <time.h>
 
+#include "stats.h"
+
 app_config_t app_config = {
     fileDescriptor: -1,
     packet_size   : LL_MAX_SIZE
@@ -35,6 +37,7 @@ int application(int com, ll_status_t status, char *file_path){
 }
 
 int app_send_ctrl_packet(int ctrl, uint32_t file_size, const char *file_name){
+    if(ctrl == CTRL_START) ADD_FILE_LENGTH(file_size);
     
     uint32_t packet_size = 5 + sizeof(uint32_t) + strlen(file_name);
     uint8_t *ctrl_packet = (uint8_t *) malloc(packet_size);

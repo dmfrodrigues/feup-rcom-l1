@@ -8,6 +8,8 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+#include "stats.h"
+
 ll_config_t ll_config = {
     .baud_rate       = 38400,
     .timeout         = 3,
@@ -81,7 +83,7 @@ int ll_send_SET(int port_fd){
     frame[3] = ll_bcc(frame+1, frame+3);
     frame[4] = LL_FLAG;
 
-    int res = write(port_fd, frame, sizeof(frame));
+    int res = write(port_fd, frame, sizeof(frame)); ADD_MESSAGE_LENGTH(sizeof(frame)); ADD_FRAME();
     if(res == sizeof(frame)) ll_log(2, "    Sent SET\n");
     return res;
 }
@@ -94,7 +96,7 @@ int ll_send_DISC(int port_fd){
     frame[3] = ll_bcc(frame+1, frame+3);
     frame[4] = LL_FLAG;
 
-    int res = write(port_fd, frame, sizeof(frame));
+    int res = write(port_fd, frame, sizeof(frame)); ADD_MESSAGE_LENGTH(sizeof(frame)); ADD_FRAME();
     if(res == sizeof(frame))  ll_log(2, "    Sent DISC\n");
     return res;
 }
@@ -107,7 +109,7 @@ int ll_send_UA(int port_fd){
     frame[3] = ll_bcc(frame+1, frame+3);
     frame[4] = LL_FLAG;
 
-    int res = write(port_fd, frame, sizeof(frame));
+    int res = write(port_fd, frame, sizeof(frame)); ADD_MESSAGE_LENGTH(sizeof(frame)); ADD_FRAME();
     if(res == sizeof(frame))  ll_log(2, "    Sent UA\n");
     return res;
 }
@@ -126,7 +128,7 @@ ssize_t ll_send_I(int port_fd, const uint8_t *buffer, size_t length){
     ll_gen_frame_error(-0.5, frame_header);
 
     if(write(port_fd, frame_header, sizeof(frame_header)) != sizeof(frame_header))
-        { perror("write"); return -1; }
+        { perror("write"); return -1; } ADD_MESSAGE_LENGTH(sizeof(frame_header));
     
     uint8_t buffer_escaped[2*LL_MAX_SIZE];
     ssize_t written_chars = ll_stuffing(buffer_escaped, buffer, length);
@@ -140,7 +142,7 @@ ssize_t ll_send_I(int port_fd, const uint8_t *buffer, size_t length){
     ll_gen_frame_error(-0.1, buffer_escaped);
 
     if(write(port_fd, buffer_escaped, written_chars) != written_chars)
-        { perror("write"); return -1; }
+        { perror("write"); return -1; } ADD_MESSAGE_LENGTH(written_chars);
 
     uint8_t bcc2 = ll_bcc(buffer, buffer+length);
     if(bcc2 == LL_FLAG || bcc2 == LL_ESC){
@@ -152,7 +154,7 @@ ssize_t ll_send_I(int port_fd, const uint8_t *buffer, size_t length){
         ll_gen_frame_error(-0.1, frame_tail);
 
         if(write(port_fd, frame_tail, sizeof(frame_tail)) != sizeof(frame_tail))
-            { perror("write"); return -1; }
+            { perror("write"); return -1; } ADD_MESSAGE_LENGTH(sizeof(frame_tail));
     } else {
         uint8_t frame_tail[2];
         frame_tail[0] = bcc2;
@@ -161,8 +163,10 @@ ssize_t ll_send_I(int port_fd, const uint8_t *buffer, size_t length){
         ll_gen_frame_error(-0.1, frame_tail);
 
         if(write(port_fd, frame_tail, sizeof(frame_tail)) != sizeof(frame_tail))
-            { perror("write"); return -1; }
+            { perror("write"); return -1; } ADD_MESSAGE_LENGTH(sizeof(frame_tail));
     }
+
+    ADD_FRAME();
 
     ll_log(2, "    Sent I\n");
     
@@ -177,7 +181,7 @@ int ll_send_RR(int port_fd){
     frame[3] = ll_bcc(frame+1, frame+3);
     frame[4] = LL_FLAG;
 
-    int res = write(port_fd, frame, sizeof(frame));
+    int res = write(port_fd, frame, sizeof(frame)); ADD_MESSAGE_LENGTH(sizeof(frame)); ADD_FRAME();
     if(res == sizeof(frame)){
         ll_log(2, "    Sent RR\n");
         return EXIT_SUCCESS;
@@ -192,7 +196,7 @@ int ll_send_RR_resend(int port_fd){
     frame[3] = ll_bcc(frame+1, frame+3);
     frame[4] = LL_FLAG;
 
-    int res = write(port_fd, frame, sizeof(frame));
+    int res = write(port_fd, frame, sizeof(frame)); ADD_MESSAGE_LENGTH(sizeof(frame)); ADD_FRAME();
     if(res == sizeof(frame)){
         ll_log(2, "    Sent RR resend\n");
         return EXIT_SUCCESS;
@@ -207,7 +211,7 @@ int ll_send_REJ(int port_fd){
     frame[3] = ll_bcc(frame+1, frame+3);
     frame[4] = LL_FLAG;
 
-    int res = write(port_fd, frame, sizeof(frame));
+    int res = write(port_fd, frame, sizeof(frame)); ADD_MESSAGE_LENGTH(sizeof(frame)); ADD_FRAME();
     if(res == sizeof(frame)){
         ll_log(2, "    Sent REJ\n");
         return EXIT_SUCCESS;
@@ -236,6 +240,7 @@ int ll_expect_Sframe(int port_fd, uint8_t *a_rcv, uint8_t *c_rcv){
             }
         } while(machine.state != LL_S_STOP && machine.state != LL_S_STOP_RR);
         if(machine.state == LL_S_STOP_RR){
+            ADD_FRAME_ERROR();
             ll_log(2, "    Got unexpected I-frame (sending RR)\n");
             if(ll_send_RR_resend(port_fd)){
                 ll_err("ERROR: Failed to send RR\n");
@@ -270,6 +275,7 @@ int ll_expect_Uframe(int port_fd, uint8_t *a_rcv, uint8_t *c_rcv){
             }
         } while(machine.state != LL_U_STOP && machine.state != LL_U_STOP_DISC);
         if(machine.state == LL_U_STOP_DISC){
+            ADD_FRAME_ERROR();
             ll_log(2, "    Got unexpected DISC (sending DISC as well)\n");
             if(ll_send_DISC(port_fd)){
                 ll_err("ERROR: Failed to send DISC\n");
@@ -306,6 +312,7 @@ ssize_t ll_expect_Iframe(int port_fd, uint8_t *buffer){
             }
         } while(machine.state != LL_I_STOP && machine.state != LL_I_STOP_RR);
         if(machine.state == LL_I_STOP_RR){
+            ADD_FRAME_ERROR();
             ll_log(2, "    Got unexpected data (sending RR and ignoring data)\n");
             if(ll_send_RR_resend(port_fd)){
                 ll_err("ERROR: Failed to send RR\n");

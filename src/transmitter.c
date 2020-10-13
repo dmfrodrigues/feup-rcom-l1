@@ -9,9 +9,12 @@
 #include "app.h"
 #include "app_args.h"
 
+#include "stats.h"
+
 #define _POSIX_SOURCE 1 /* POSIX compliant source */
 
 int main(int argc, char** argv){
+    TIC();
 
     int com = 0;
     char *file_path = NULL;
@@ -23,6 +26,10 @@ int main(int argc, char** argv){
     
     if(application(com, TRANSMITTER, file_path) < 0)
         return 1;
+
+    TOC();
+
+    PRINT_STATS();
 
     return 0;
 }
