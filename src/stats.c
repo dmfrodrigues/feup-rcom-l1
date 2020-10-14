@@ -38,3 +38,13 @@ void print_stats(void){
     fprintf(stderr, "    C : %lu\n",*stats.C );
     fprintf(stderr, "    T : %lu\n", stats.T );
 }
+
+void ll_gen_frame_error(float prob, uint8_t *frame, size_t frame_size){
+    float rand_value = rand() / (float) RAND_MAX;
+    if (rand_value <= prob)
+    {   
+        fprintf(stderr, "Generating a random frame error\n");
+        int rand_idx = rand()%(frame_size-1);
+        frame[rand_idx] = 0x0;
+    }
+}
