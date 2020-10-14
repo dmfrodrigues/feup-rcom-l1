@@ -19,6 +19,8 @@
 #include "ll_internal.h"
 #include "ll_utils.h"
 
+#include "stats.h"
+
 struct termios oldtio;
 
 int llopen(int com, ll_status_t status){
