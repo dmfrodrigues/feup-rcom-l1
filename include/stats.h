@@ -42,7 +42,7 @@ void print_stats(void);
  * @param frame         Frame where the error will be generated
  * @param frame_size    Size of frame
  */
-void ll_gen_frame_error(float prob, uint8_t *frame, size_t frame_size);
+void gen_frame_error(float prob, uint8_t *frame, size_t frame_size);
 
 #ifdef STATISTICS
     #define ADD_MESSAGE_LENGTH(length)                  {stats.L  += (length); }
@@ -54,7 +54,7 @@ void ll_gen_frame_error(float prob, uint8_t *frame, size_t frame_size);
     #define TOC()                                       toc()
     #define PRINT_STATS()                               print_stats()
     #ifdef STATISTICS_ERRORS
-        #define GEN_FRAME_ERROR(prob, frame, frame_size)    ll_gen_frame_error(prob, frame, frame_size)
+        #define GEN_FRAME_ERROR(prob, frame, frame_size)    gen_frame_error(prob, frame, frame_size)
     #else
         #define GEN_FRAME_ERROR(prob, frame, frame_size)    {}
     #endif
