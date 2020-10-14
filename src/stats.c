@@ -5,6 +5,7 @@
 #include <sys/time.h>
 
 #include "ll.h"
+#include "ll_utils.h"
 
 #define SECONDS_TO_MICROS 1000000
 
@@ -16,6 +17,11 @@ stats_t stats = {
     Nt: 0,
     C : &ll_config.baud_rate,
     T : 0
+};
+
+stats_config_t stats_config = {
+    prob_error_head: 0.0,
+    prob_error_data: 0.0
 };
 
 struct timeval time_start, time_end;
