@@ -42,11 +42,12 @@ void print_stats(void){
 }
 
 void ll_gen_frame_error(float prob, uint8_t *frame, size_t frame_size){
-    float rand_value = rand() / (float) RAND_MAX;
-    if (rand_value <= prob)
-    {   
-        fprintf(stderr, "Generating a random frame error\n");
-        int rand_idx = rand()%(frame_size-1);
-        frame[rand_idx] = 0x0;
+    for(size_t i = 0; i < 8*frame_size; ++i){
+        size_t idx = i/8, bit = i%8;
+        float rand_value = rand() / (float) RAND_MAX;
+        if(rand_value < prob) {
+            ll_log(3, "        Generating a random bit swap\n");
+            frame[idx] ^= (1 << bit);
+        }
     }
 }

@@ -27,14 +27,13 @@ void print_stats(void);
 
 /**
  * @ingroup stats
- * @brief Generates random frame errors.
+ * @brief Generates random bit swaps.
  * 
- * If the probability is negative, no errors will be generated
+ * If the probability is negative or zero, no errors will be generated
  * 
- * @param prob          Value from 0 to 1, meaning the probability of a error
+ * @param prob          Value from 0 to 1, meaning the probability of a bit swap happening to a bit
  * @param frame         Frame where the error will be generated
- * @param frame_size
- * @return void
+ * @param frame_size    Size of frame
  */
 void ll_gen_frame_error(float prob, uint8_t *frame, size_t frame_size);
 
@@ -47,7 +46,11 @@ void ll_gen_frame_error(float prob, uint8_t *frame, size_t frame_size);
     #define GEN_FRAME_ERROR(prob, frame, frame_size)    ll_gen_frame_error(prob, frame, frame_size)
     #define TIC()                                       tic()
     #define TOC()                                       toc()
-    #define PRINT_STATS()                               print_stats()
+    #ifdef STATISTICS_ERRORS
+        #define PRINT_STATS()                               print_stats()
+    #else
+        #define PRINT_STATS()
+    #endif
 #else
     #define ADD_MESSAGE_LENGTH(length)
     #define ADD_FILE_LENGTH(length)
