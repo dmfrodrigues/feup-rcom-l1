@@ -43,13 +43,13 @@ void ll_gen_frame_error(float prob, uint8_t *frame, size_t frame_size);
     #define ADD_FRAME()                                 {++stats.N           ; }
     #define ADD_FRAME_ERROR()                           {++stats.Ne          ; }
     #define ADD_FRAME_TIMEOUT()                         {++stats.Nt          ; }
-    #define GEN_FRAME_ERROR(prob, frame, frame_size)    ll_gen_frame_error(prob, frame, frame_size)
     #define TIC()                                       tic()
     #define TOC()                                       toc()
+    #define PRINT_STATS()                               print_stats()
     #ifdef STATISTICS_ERRORS
-        #define PRINT_STATS()                               print_stats()
+        #define GEN_FRAME_ERROR(prob, frame, frame_size)    ll_gen_frame_error(prob, frame, frame_size)
     #else
-        #define PRINT_STATS()
+        #define GEN_FRAME_ERROR(prob, frame, frame_size)
     #endif
 #else
     #define ADD_MESSAGE_LENGTH(length)
@@ -57,10 +57,10 @@ void ll_gen_frame_error(float prob, uint8_t *frame, size_t frame_size);
     #define ADD_FRAME()
     #define ADD_FRAME_ERROR()
     #define ADD_FRAME_TIMEOUT()
-    #define GEN_FRAME_ERROR(prob, frame, frame_size)
     #define TIC()
     #define TOC()
     #define PRINT_STATS()
+    #define GEN_FRAME_ERROR(prob, frame, frame_size)
 #endif
 
 #endif // _STATS_H_
