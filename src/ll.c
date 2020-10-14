@@ -87,8 +87,10 @@ int llopen(int com, ll_status_t status){
             // Validate UA
             if(res){
                 if(errno == EINTR){
-                    if(timeout) ll_err("WARNING: gave up due to timeout\n");
-                    else        ll_err("ERROR: emitter was interrupted\n");
+                    if(timeout){
+                        ll_err("WARNING: timeout waiting for UA\n");
+                        ADD_FRAME_TIMEOUT();
+                    } else        ll_err("ERROR: emitter was interrupted\n");
                 } else perror("read");
             } else if(a_rcv == LL_A_SEND && c_rcv == LL_C_UA){
                 ll_log(2, "    Got UA\n");
@@ -99,7 +101,10 @@ int llopen(int com, ll_status_t status){
                 ll_err("c_rcv=0x%02X (should be 0x%02X)\n", c_rcv, LL_C_UA);
             }
         }
-        if(attempts == ll_config.retransmissions) return -1;
+        if(attempts == ll_config.retransmissions){
+            if(timeout) ll_err("WARNING: gave up due to timeout\n");
+            return -1;
+        }
         alarm(0);
     } else if(status == RECEIVER){
         // Get SET
@@ -152,8 +157,10 @@ int llwrite(int port_fd, const uint8_t *buffer, int length){
         // Validate RR or REJ
         if(res){
             if(errno == EINTR){
-                if(timeout) ll_err("WARNING: gave up due to timeout\n");
-                else        ll_err("ERROR: emitter was interrupted\n");
+                if(timeout){
+                    ll_err("WARNING: timeout waiting for RR/REJ\n");
+                    ADD_FRAME_TIMEOUT();
+                } else        ll_err("ERROR: emitter was interrupted\n");
             } else perror("read");
         } else if(a_rcv == LL_A_SEND){
             if(c_rcv == ll_get_expected_RR()){
@@ -169,7 +176,10 @@ int llwrite(int port_fd, const uint8_t *buffer, int length){
                 c_rcv, ll_get_expected_RR(), ll_get_expected_REJ());
         }
     }
-    if(attempts == ll_config.retransmissions) return -1;
+    if(attempts == ll_config.retransmissions){
+        ll_err("WARNING: gave up due to timeout\n");
+        return -1;
+    }
     alarm(0);
 
     ll_log(1, "Successfully wrote\n");
@@ -229,8 +239,10 @@ int llclose(int port_fd){
             // Validate DISC
             if(res){
                 if(errno == EINTR){
-                    if(timeout) ll_err("WARNING: gave up due to timeout\n");
-                    else        ll_err("ERROR: interrupted\n");
+                    if(timeout){
+                        ll_err("WARNING: timeout waiting for DISC\n");
+                        ADD_FRAME_TIMEOUT();
+                    } else        ll_err("ERROR: interrupted\n");
                 } else perror("read");
             } 
             else if(a_rcv == LL_A_RECV && c_rcv == LL_C_DISC) {
@@ -239,7 +251,10 @@ int llclose(int port_fd){
             } else ll_err("ERROR: c_rcv or a_rcv are not correct\n");
         }
     
-        if(attempts == ll_config.retransmissions) return -1;
+        if(attempts == ll_config.retransmissions){
+            ll_err("ERROR: gave up due to timeout\n");
+            return -1;
+        }
 
         // Send UA
         res = ll_send_UA(port_fd);
@@ -276,7 +291,7 @@ int llclose(int port_fd){
     }
 
     // Restore initial port settings
-    sleep(1);
+    // sleep(1);
     if(tcsetattr(port_fd, TCSANOW, &oldtio) == -1) { perror("tcsetattr"); return -1; }
     // Close port
     if(close(port_fd) == -1) { perror("close"); return -1; };

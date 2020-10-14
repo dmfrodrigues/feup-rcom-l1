@@ -13,6 +13,7 @@ stats_t stats = {
     Lf: 0,
     N : 0,
     Ne: 0,
+    Nt: 0,
     C : &ll_config.baud_rate,
     T : 0
 };
@@ -35,6 +36,7 @@ void print_stats(void){
     fprintf(stderr, "    Lf: %lu\n", stats.Lf);
     fprintf(stderr, "    N : %lu\n", stats.N );
     fprintf(stderr, "    Ne: %lu\n", stats.Ne);
+    fprintf(stderr, "    Nt: %lu\n", stats.Nt);
     fprintf(stderr, "    C : %lu\n",*stats.C );
     fprintf(stderr, "    T : %lu\n", stats.T );
 }

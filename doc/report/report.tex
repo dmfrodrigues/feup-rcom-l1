@@ -455,27 +455,29 @@ There is an additional issue, which was not mentioned in the guidelines: BCC2 ca
 	\small
 	\begin{tabular}{c | l | p{83mm} | c}
 		\hline \hline
-		\textbf{Acronym} & \textbf{Name}            & \textbf{Definition}                                                                & I/O \\ \hline
-		$S$              & Efficiency               & Ratio of actual transfer rate to capacity                                          & D   \\
-		$a$              & Norm. prop. time         & $a = T_{prop}/T_f$                                                                 & D   \\
-		$T_{prop}$       & Propagation time         & Time for a signal to propagate through the cable; $T_{prop} = \tau_0 + \Delta\tau$ & D   \\
-		$T_f$            & Frame time               & Time to transfer a frame                                                           & D   \\
-		$T$              & Total execution time     & Total execution time of the transmitter                                            & O   \\
-		$\Delta\tau$     & Added propagation time   & Additional propagation time                                                        & I   \\
-		$L$              & Total messages length    & Total message length, including retransmissions                                    & O   \\
-		$L_f$            & File length              & Message length excluding retransmissions                                           & I   \\
-		$N$				 & \# of frames             & Number of actually transferred frames                                              & O   \\
-		$N_e$            & \# of frames with errors & Frames with errors, inc. during establishment                                      & O   \\
-		$R_e$            & Frame error rate         & Frames with errors per total frame number                                          & D   \\
-		$p_e$            & Frame error probability  & Estimated from $R_e$                                                               & I   \\
-		$C$              & Capacity                 & Capacity of the system (baud rate)                                                 & I   \\
-		$R$              & Data rate                & Global data transfer rate                                                          & D   \\
+		\textbf{Acronym} & \textbf{Name}             & \textbf{Definition}                                                                & I/O \\ \hline
+		$S$              & Efficiency                & Ratio of actual transfer rate to capacity                                          & D   \\
+		$a$              & Norm. prop. time          & $a = T_{prop}/T_f$                                                                 & D   \\
+		$T_{prop}$       & Propagation time          & Time for a signal to propagate through the cable; $T_{prop} = \tau_0 + \Delta\tau$ & D   \\
+		$T_f$            & Frame time                & Time to transfer a frame                                                           & D   \\
+		$T_t$            & Timeout time              & Time to wait for answer                                                            & D   \\
+		$T$              & Total execution time      & Total execution time of the transmitter                                            & O   \\
+		$\Delta\tau$     & Added propagation time    & Additional propagation time                                                        & I   \\
+		$L$              & Total messages length     & Total message length, including retransmissions                                    & O   \\
+		$L_f$            & File length               & Message length excluding retransmissions                                           & I   \\
+		$N$				 & \# of frames              & Number of actually transferred frames                                              & O   \\
+		$N_e$            & \# of frames with errors  & Frames with errors, inc. during establishment                                      & O   \\
+		$N_t$            & \# of frames with timeout & Frames with timeout, inc. during establishment                                     & O   \\
+		$R_e$            & Frame error rate          & Frames with errors per total frame number                                          & D   \\
+		$p_e$            & Frame error probability   & Estimated from $R_e$                                                               & I   \\
+		$C$              & Capacity                  & Capacity of the system (baud rate)                                                 & I   \\
+		$R$              & Data rate                 & Global data transfer rate                                                          & D   \\
 		\hline \hline
 	\end{tabular}
 \end{center}
 
 \begin{equation*}
-	a = \frac{TC}{2L} - \frac{1}{2}
+	a = \frac{C(T - N_t T_t)}{2 L} - \frac{1}{2}
 \end{equation*}
 
 \begin{equation*}
@@ -673,28 +675,33 @@ An I-frame state machine must be ready to handle to following scenarios:
 
 \section{Normalized propagation time}
 
-\begin{equation} \label{eq:T}
-	T = \sum_{i=1}^{N}{(2T_{prop} + T_f^i)} = 2 N \overline{T_{prop}} + \sum_{i=1}^{N}{T_f^i}
-\end{equation}
+\begin{alignat}{2} \label{eq:T}
+	T & = \sum_{i=1}^{N-N_t}{(2T_{prop}^i + T_f^i)} && + \sum_{i=1}^{N_t}{T_t} \\
+	  & = 2 (N-N_t) \overline{T_{prop}} + \sum_{i=1}^{N}{T_f^i} && + N_t T_t
+\end{alignat}
 
 Because $T_f = L/R$,
 \begin{equation} \label{eq:Tfsum}
-	\sum_{i=1}^{N}{T_f^i} = \sum_{i=1}^{N}{\frac{L_i}{C}} = \frac{1}{C} \sum_{i=1}^{N}{L_i} = \frac{L}{C}
+	\sum_{i=1}^{N-N_t}{T_f^i} = \sum_{i=1}^{N-N_t}{\frac{L_i}{C}} = \frac{1}{C} \sum_{i=1}^{N-N_t}{L_i} = \frac{L}{C}
 \end{equation}
 equation \ref{eq:T} becomes
-\begin{equation} \label{eq:T2}
-	T = 2 N \overline{T_{prop}} + \frac{L}{C} \iff \overline{T_{prop}} = \frac{T - L/C}{2 N}
-\end{equation}
+\begin{alignat}{2} \label{eq:T2}
+	T & = 2 (N-N_t) \overline{T_{prop}} + \frac{L}{C} + N_t T_t \\
+	\iff \overline{T_{prop}} & = \frac{T - L/C - N_t T_t}{2 (N-N_t)}
+\end{alignat}
 We can thus determine $\overline{T_{prop}}$, because we can vary $L$, $C$ and $N$, and measure $T$.
 
 As per equation \ref{eq:Tfsum}, the average frame time $\overline{T_f}$ is 
 \begin{equation} \label{eq:Tfmean}
-	\overline{T_f} = \frac{1}{N}\sum_{i=1}^{N}{T_f^i} = \frac{L}{N C}
+	\overline{T_f} = \frac{1}{N-N_t}\sum_{i=1}^{N-N_t}{T_f^i} = \frac{L}{(N-N_t) C}
 \end{equation}
 We can thus determine $a$ from
-\begin{equation}
-	a = \frac{\overline{T_{prop}}}{\overline{T_f}} = \frac{\frac{T - L/C}{2 N}}{\frac{L}{N C}} = \frac{TC}{2L} - \frac{1}{2}
-\end{equation}
+\begin{alignat}{2}
+	a
+	& = \frac{\overline{T_{prop}}}{\overline{T_f}} \\
+	& = \frac{\frac{T - L/C - N_t T_t}{2 (N-N_t)}}{\frac{L}{(N-N_t) C}} \\
+	& = \frac{C(T - N_t T_t)}{2 L} - \frac{1}{2}
+\end{alignat}
 
 \section{Efficiency}
 
@@ -706,7 +713,7 @@ where $R$ is the data transfer rate,
 \begin{equation} \label{eq:R}
 	R = \frac{L_f}{T}
 \end{equation}
-and as such equation \ref{eq:S} becomes
+thus equation \ref{eq:S} becomes
 \begin{equation} \label{eq:S2}
 	S = \frac{L_f}{T C}
 \end{equation}

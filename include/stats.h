@@ -13,6 +13,7 @@ typedef struct {
     size_t Lf;
     size_t N;
     size_t Ne;
+    size_t Nt;
     size_t *C;
     suseconds_t T;    
 } stats_t;
@@ -42,6 +43,7 @@ void ll_gen_frame_error(float prob, uint8_t *frame, size_t frame_size);
     #define ADD_FILE_LENGTH(length)                     {stats.Lf += (length); }
     #define ADD_FRAME()                                 {++stats.N           ; }
     #define ADD_FRAME_ERROR()                           {++stats.Ne          ; }
+    #define ADD_FRAME_TIMEOUT()                         {++stats.Nt          ; }
     #define GEN_FRAME_ERROR(prob, frame, frame_size)    ll_gen_frame_error(prob, frame, frame_size)
     #define TIC()                                       tic()
     #define TOC()                                       toc()
@@ -51,6 +53,7 @@ void ll_gen_frame_error(float prob, uint8_t *frame, size_t frame_size);
     #define ADD_FILE_LENGTH(length)
     #define ADD_FRAME()
     #define ADD_FRAME_ERROR()
+    #define ADD_FRAME_TIMEOUT()
     #define GEN_FRAME_ERROR(prob, frame, frame_size)
     #define TIC()
     #define TOC()
