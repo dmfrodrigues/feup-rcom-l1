@@ -2,7 +2,6 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <sys/time.h>
 
 #include "ll.h"
 #include "ll_utils.h"
@@ -51,4 +50,9 @@ void gen_frame_error(float prob, uint8_t *frame, size_t frame_size){
             frame[idx] ^= (1 << bit);
         }
     }
+}
+
+void add_delay(useconds_t usec){
+    ll_log(3, "        Adding delay of %d microseconds\n", usec);
+    usleep(usec);
 }
