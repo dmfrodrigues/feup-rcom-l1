@@ -18,6 +18,11 @@ stats_t stats = {
     T : 0
 };
 
+stats_config_t stats_config = {
+    prob_error_head: 0.0,
+    prob_error_data: 0.0
+};
+
 struct timeval time_start, time_end;
 
 void tic(void){

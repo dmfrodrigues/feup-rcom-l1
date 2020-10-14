@@ -21,6 +21,13 @@ typedef struct {
 
 stats_t stats;
 
+typedef struct {
+    float prob_error_head;
+    float prob_error_data;
+} stats_config_t;
+
+stats_config_t stats_config;
+
 void tic(void);
 void toc(void);
 
@@ -53,19 +60,19 @@ void add_delay(useconds_t usec);
     #ifdef STATISTICS_ERRORS
         #define GEN_FRAME_ERROR(prob, frame, frame_size)    gen_frame_error(prob, frame, frame_size)
     #else
-        #define GEN_FRAME_ERROR(prob, frame, frame_size)
+        #define GEN_FRAME_ERROR(prob, frame, frame_size)    {}
     #endif
 #else
-    #define ADD_MESSAGE_LENGTH(length)
-    #define ADD_FILE_LENGTH(length)
-    #define ADD_FRAME()
-    #define ADD_FRAME_ERROR()
-    #define ADD_FRAME_TIMEOUT()
-    #define TIC()
-    #define TOC()
-    #define PRINT_STATS()
-    #define GEN_FRAME_ERROR(prob, frame, frame_size)
-    #define ADD_DELAY(usec)
+    #define ADD_MESSAGE_LENGTH(length)                  {}
+    #define ADD_FILE_LENGTH(length)                     {}
+    #define ADD_FRAME()                                 {}
+    #define ADD_FRAME_ERROR()                           {}
+    #define ADD_FRAME_TIMEOUT()                         {}
+    #define TIC()                                       {}
+    #define TOC()                                       {}
+    #define PRINT_STATS()                               {}
+    #define GEN_FRAME_ERROR(prob, frame, frame_size)    {}
+    #define ADD_DELAY(usec)                             {}
 #endif
 
 #endif // _STATS_H_
