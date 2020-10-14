@@ -83,6 +83,8 @@ int ll_send_SET(int port_fd){
     frame[3] = ll_bcc(frame+1, frame+3);
     frame[4] = LL_FLAG;
 
+    GEN_FRAME_ERROR(stats_config.prob_error_head, frame, sizeof(frame));
+
     int res = write(port_fd, frame, sizeof(frame)); ADD_MESSAGE_LENGTH(sizeof(frame)); ADD_FRAME();
     if(res == sizeof(frame)) ll_log(2, "    Sent SET\n");
     return res;
@@ -96,6 +98,8 @@ int ll_send_DISC(int port_fd){
     frame[3] = ll_bcc(frame+1, frame+3);
     frame[4] = LL_FLAG;
 
+    GEN_FRAME_ERROR(stats_config.prob_error_head, frame, sizeof(frame));
+
     int res = write(port_fd, frame, sizeof(frame)); ADD_MESSAGE_LENGTH(sizeof(frame)); ADD_FRAME();
     if(res == sizeof(frame))  ll_log(2, "    Sent DISC\n");
     return res;
@@ -108,6 +112,8 @@ int ll_send_UA(int port_fd){
     frame[2] = LL_C_UA;
     frame[3] = ll_bcc(frame+1, frame+3);
     frame[4] = LL_FLAG;
+
+    GEN_FRAME_ERROR(stats_config.prob_error_head, frame, sizeof(frame));
 
     int res = write(port_fd, frame, sizeof(frame)); ADD_MESSAGE_LENGTH(sizeof(frame)); ADD_FRAME();
     if(res == sizeof(frame))  ll_log(2, "    Sent UA\n");
@@ -181,6 +187,8 @@ int ll_send_RR(int port_fd){
     frame[3] = ll_bcc(frame+1, frame+3);
     frame[4] = LL_FLAG;
 
+    GEN_FRAME_ERROR(stats_config.prob_error_head, frame, sizeof(frame));
+
     int res = write(port_fd, frame, sizeof(frame)); ADD_MESSAGE_LENGTH(sizeof(frame)); ADD_FRAME();
     if(res == sizeof(frame)){
         ll_log(2, "    Sent RR\n");
@@ -196,6 +204,8 @@ int ll_send_RR_resend(int port_fd){
     frame[3] = ll_bcc(frame+1, frame+3);
     frame[4] = LL_FLAG;
 
+    GEN_FRAME_ERROR(stats_config.prob_error_head, frame, sizeof(frame));
+
     int res = write(port_fd, frame, sizeof(frame)); ADD_MESSAGE_LENGTH(sizeof(frame)); ADD_FRAME();
     if(res == sizeof(frame)){
         ll_log(2, "    Sent RR resend\n");
@@ -210,6 +220,8 @@ int ll_send_REJ(int port_fd){
     frame[2] = LL_REJ(sequence_number);
     frame[3] = ll_bcc(frame+1, frame+3);
     frame[4] = LL_FLAG;
+
+    GEN_FRAME_ERROR(stats_config.prob_error_head, frame, sizeof(frame));
 
     int res = write(port_fd, frame, sizeof(frame)); ADD_MESSAGE_LENGTH(sizeof(frame)); ADD_FRAME();
     if(res == sizeof(frame)){
