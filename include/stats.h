@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <sys/time.h>
+#include <unistd.h>
 
 typedef struct {
     size_t L;
@@ -44,6 +45,8 @@ void print_stats(void);
  */
 void gen_frame_error(float prob, uint8_t *frame, size_t frame_size);
 
+void add_delay(useconds_t usec);
+
 #ifdef STATISTICS
     #define ADD_MESSAGE_LENGTH(length)                  {stats.L  += (length); }
     #define ADD_FILE_LENGTH(length)                     {stats.Lf += (length); }
@@ -53,6 +56,7 @@ void gen_frame_error(float prob, uint8_t *frame, size_t frame_size);
     #define TIC()                                       tic()
     #define TOC()                                       toc()
     #define PRINT_STATS()                               print_stats()
+    #define ADD_DELAY(usec)                             add_delay(usec)
     #ifdef STATISTICS_ERRORS
         #define GEN_FRAME_ERROR(prob, frame, frame_size)    gen_frame_error(prob, frame, frame_size)
     #else
@@ -68,6 +72,7 @@ void gen_frame_error(float prob, uint8_t *frame, size_t frame_size);
     #define TOC()                                       {}
     #define PRINT_STATS()                               {}
     #define GEN_FRAME_ERROR(prob, frame, frame_size)    {}
+    #define ADD_DELAY(usec)                             {}
 #endif
 
 #endif // _STATS_H_

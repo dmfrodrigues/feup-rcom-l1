@@ -227,6 +227,7 @@ int ll_expect_Sframe(int port_fd, uint8_t *a_rcv, uint8_t *c_rcv){
         machine.c_rcv = 0;
         do {
             uint8_t byte;
+            ADD_DELAY(1000);
             int res = read(port_fd, &byte, 1);
             if(res == 1){
                 ll_log(3, "        Read byte 0x%02X | ", byte);
@@ -262,6 +263,7 @@ int ll_expect_Uframe(int port_fd, uint8_t *a_rcv, uint8_t *c_rcv){
         machine.c_rcv = 0;
         do {
             uint8_t byte;
+            ADD_DELAY(1000);
             int res = read(port_fd, &byte, 1);
             if(res == 1){
                 ll_log(3, "        Read byte 0x%02X | ", byte);
@@ -296,6 +298,7 @@ ssize_t ll_expect_Iframe(int port_fd, uint8_t *buffer){
         machine.length = 0;
         do {
             uint8_t byte;
+            ADD_DELAY(1000);
             int res = read(port_fd, &byte, 1);
             if(res == 1){
                 ll_log(3, "        Read byte 0x%02X | ", byte);
