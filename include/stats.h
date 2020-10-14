@@ -56,7 +56,11 @@ void add_delay(useconds_t usec);
     #define TIC()                                       tic()
     #define TOC()                                       toc()
     #define PRINT_STATS()                               print_stats()
-    #define ADD_DELAY(usec)                             add_delay(usec)
+    #ifdef STATISTICS_DELAY
+        #define ADD_DELAY(usec)                             add_delay(usec)
+    #else
+        #define ADD_DELAY(usec)                             {}
+    #endif
     #ifdef STATISTICS_ERRORS
         #define GEN_FRAME_ERROR(prob, frame, frame_size)    gen_frame_error(prob, frame, frame_size)
     #else
