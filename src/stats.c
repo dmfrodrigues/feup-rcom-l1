@@ -5,6 +5,7 @@
 #include <sys/time.h>
 
 #include "ll.h"
+#include "ll_utils.h"
 
 #define SECONDS_TO_MICROS 1000000
 
@@ -41,7 +42,7 @@ void print_stats(void){
     fprintf(stderr, "    T : %lu\n", stats.T );
 }
 
-void ll_gen_frame_error(float prob, uint8_t *frame, size_t frame_size){
+void gen_frame_error(float prob, uint8_t *frame, size_t frame_size){
     for(size_t i = 0; i < 8*frame_size; ++i){
         size_t idx = i/8, bit = i%8;
         float rand_value = rand() / (float) RAND_MAX;
