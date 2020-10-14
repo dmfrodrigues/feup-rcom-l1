@@ -16,8 +16,17 @@ CFLAGS_PARANOID =-pedantic -Wall -Wbad-function-cast -Wcast-align -Wcast-qual -W
 
 #CFLAGS=-Wall -g #-O3
 CFLAGS=$(CFLAGS_PARANOID)
-DFLAGS=-D DEBUG -D STATISTICS
-#DFLAGS=
+
+# DFLAGS
+DFLAGS=
+ifeq ($(DEBUG),)
+else
+	DFLAGS +=-D DEBUG
+endif
+ifeq ($(STATISTICS),)
+else
+	DFLAGS +=-D STATISTICS
+endif
 
 TRANSMITTER_O_FILES=$(ODIR)/transmitter.o
 RECEIVER_O_FILES   =$(ODIR)/receiver.o
