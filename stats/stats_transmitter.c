@@ -62,7 +62,7 @@ int main(int argc, char *argv[]){
 
     const size_t num_lines = count_lines(stats_file_path);
 
-    fprintf(stdout, "L,Lf,N,Ne,Nt,C,T\n");
+    fprintf(stdout, "file,C,pd,ph,retransmissions,size,timeout,dtau,L,Lf,N,Ne,Nt,C,T\n");
 
     FILE *stats_file = fopen(stats_file_path, "r");
     char filepath[1024];
@@ -132,7 +132,10 @@ int main(int argc, char *argv[]){
         size_t      C ; fscanf(pipe_transmitter_read, "%lu", &C );
         suseconds_t T ; fscanf(pipe_transmitter_read, "%lu", &T );
         fclose(pipe_transmitter_read);
-        fprintf(stdout, "%lu,%lu,%lu,%lu,%lu,%lu,%lu\n", L, Lf, N, Ne, Nt, C, T);
+        fprintf(stdout, "%s,%lu,%.10f,%.10f,%lu,%lu,%lu,%lu,"
+                        "%lu,%lu,%lu,%lu,%lu,%lu,%lu\n",
+            filepath, baud_rate, prob_data, prob_head, retransmissions, size, timeout, tau,
+            L, Lf, N, Ne, Nt, C, T);
         fprintf(stderr, "%8lu %6.2f%% (%6.1fs; %6.1fs left)\n", T, (100.0*idx_line)/num_lines, total_time, left_time);
 
         usleep(100000);
