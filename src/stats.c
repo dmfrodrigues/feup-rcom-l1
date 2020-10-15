@@ -36,14 +36,14 @@ void toc(void){
 }
 
 void print_stats(void){
-    fprintf(stderr, "Statistics:\n");
-    fprintf(stderr, "    L : %lu\n", stats.L );
-    fprintf(stderr, "    Lf: %lu\n", stats.Lf);
-    fprintf(stderr, "    N : %lu\n", stats.N );
-    fprintf(stderr, "    Ne: %lu\n", stats.Ne);
-    fprintf(stderr, "    Nt: %lu\n", stats.Nt);
-    fprintf(stderr, "    C : %lu\n",*stats.C );
-    fprintf(stderr, "    T : %lu\n", stats.T );
+    ll_log(1, "Statistics:\n");
+    ll_log(1, "    L : %lu\n", stats.L ); fprintf(stdout, "%lu\n", stats.L );
+    ll_log(1, "    Lf: %lu\n", stats.Lf); fprintf(stdout, "%lu\n", stats.Lf);
+    ll_log(1, "    N : %lu\n", stats.N ); fprintf(stdout, "%lu\n", stats.N );
+    ll_log(1, "    Ne: %lu\n", stats.Ne); fprintf(stdout, "%lu\n", stats.Ne);
+    ll_log(1, "    Nt: %lu\n", stats.Nt); fprintf(stdout, "%lu\n", stats.Nt);
+    ll_log(1, "    C : %lu\n",*stats.C ); fprintf(stdout, "%lu\n",*stats.C );
+    ll_log(1, "    T : %lu\n", stats.T ); fprintf(stdout, "%lu\n", stats.T );
 }
 
 void gen_frame_error(float prob, uint8_t *frame, size_t frame_size){
