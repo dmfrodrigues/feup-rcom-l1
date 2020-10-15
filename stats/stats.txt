@@ -15,21 +15,15 @@
 
 
 
-../testfiles/pinguim.gif 230400 0.0 0.0 3 2048   200000 0 1
-
-../testfiles/pinguim.gif 230400 0.0 0.0 3 2048   500000 0 1
 ../testfiles/pinguim.gif 115200 0.0 0.0 3 2048   500000 0 1
 
-../testfiles/pinguim.gif 230400 0.0 0.0 3 2048  1000000 0 1
 ../testfiles/pinguim.gif 115200 0.0 0.0 3 2048  1000000 0 1
 ../testfiles/pinguim.gif  57600 0.0 0.0 3 2048  1000000 0 1
 
-../testfiles/pinguim.gif 230400 0.0 0.0 3 2048  2000000 0 1
 ../testfiles/pinguim.gif 115200 0.0 0.0 3 2048  2000000 0 1
 ../testfiles/pinguim.gif  57600 0.0 0.0 3 2048  2000000 0 1
 ../testfiles/pinguim.gif  38400 0.0 0.0 3 2048  2000000 0 1
 
-../testfiles/pinguim.gif 230400 0.0 0.0 3 2048  5000000 0 1
 ../testfiles/pinguim.gif 115200 0.0 0.0 3 2048  5000000 0 1
 ../testfiles/pinguim.gif  57600 0.0 0.0 3 2048  5000000 0 1
 ../testfiles/pinguim.gif  38400 0.0 0.0 3 2048  5000000 0 1
@@ -38,21 +32,15 @@
 
 
 
-../testfiles/pinguim.gif 230400 0.0 0.0 3 1024   200000 0 1
-
-../testfiles/pinguim.gif 230400 0.0 0.0 3 1024   500000 0 1
 ../testfiles/pinguim.gif 115200 0.0 0.0 3 1024   500000 0 1
 
-../testfiles/pinguim.gif 230400 0.0 0.0 3 1024  1000000 0 1
 ../testfiles/pinguim.gif 115200 0.0 0.0 3 1024  1000000 0 1
 ../testfiles/pinguim.gif  57600 0.0 0.0 3 1024  1000000 0 1
 
-../testfiles/pinguim.gif 230400 0.0 0.0 3 1024  2000000 0 1
 ../testfiles/pinguim.gif 115200 0.0 0.0 3 1024  2000000 0 1
 ../testfiles/pinguim.gif  57600 0.0 0.0 3 1024  2000000 0 1
 ../testfiles/pinguim.gif  38400 0.0 0.0 3 1024  2000000 0 1
 
-../testfiles/pinguim.gif 230400 0.0 0.0 3 1024  5000000 0 1
 ../testfiles/pinguim.gif 115200 0.0 0.0 3 1024  5000000 0 1
 ../testfiles/pinguim.gif  57600 0.0 0.0 3 1024  5000000 0 1
 ../testfiles/pinguim.gif  38400 0.0 0.0 3 1024  5000000 0 1
@@ -61,21 +49,15 @@
 
 
 
-../testfiles/pinguim.gif 230400 0.0 0.0 3  512   200000 0 1
-
-../testfiles/pinguim.gif 230400 0.0 0.0 3  512   500000 0 1
 ../testfiles/pinguim.gif 115200 0.0 0.0 3  512   500000 0 1
 
-../testfiles/pinguim.gif 230400 0.0 0.0 3  512  1000000 0 1
 ../testfiles/pinguim.gif 115200 0.0 0.0 3  512  1000000 0 1
 ../testfiles/pinguim.gif  57600 0.0 0.0 3  512  1000000 0 1
 
-../testfiles/pinguim.gif 230400 0.0 0.0 3  512  2000000 0 1
 ../testfiles/pinguim.gif 115200 0.0 0.0 3  512  2000000 0 1
 ../testfiles/pinguim.gif  57600 0.0 0.0 3  512  2000000 0 1
 ../testfiles/pinguim.gif  38400 0.0 0.0 3  512  2000000 0 1
 
-../testfiles/pinguim.gif 230400 0.0 0.0 3  512  5000000 0 1
 ../testfiles/pinguim.gif 115200 0.0 0.0 3  512  5000000 0 1
 ../testfiles/pinguim.gif  57600 0.0 0.0 3  512  5000000 0 1
 ../testfiles/pinguim.gif  38400 0.0 0.0 3  512  5000000 0 1
@@ -84,21 +66,15 @@
 
 
 
-../testfiles/pinguim.gif 230400 0.0 0.0 3  256   200000 0 1
-
-../testfiles/pinguim.gif 230400 0.0 0.0 3  256   500000 0 1
 ../testfiles/pinguim.gif 115200 0.0 0.0 3  256   500000 0 1
 
-../testfiles/pinguim.gif 230400 0.0 0.0 3  256  1000000 0 1
 ../testfiles/pinguim.gif 115200 0.0 0.0 3  256  1000000 0 1
 ../testfiles/pinguim.gif  57600 0.0 0.0 3  256  1000000 0 1
 
-../testfiles/pinguim.gif 230400 0.0 0.0 3  256  2000000 0 1
 ../testfiles/pinguim.gif 115200 0.0 0.0 3  256  2000000 0 1
 ../testfiles/pinguim.gif  57600 0.0 0.0 3  256  2000000 0 1
 ../testfiles/pinguim.gif  38400 0.0 0.0 3  256  2000000 0 1
 
-../testfiles/pinguim.gif 230400 0.0 0.0 3  256  5000000 0 1
 ../testfiles/pinguim.gif 115200 0.0 0.0 3  256  5000000 0 1
 ../testfiles/pinguim.gif  57600 0.0 0.0 3  256  5000000 0 1
 ../testfiles/pinguim.gif  38400 0.0 0.0 3  256  5000000 0 1
@@ -107,21 +83,16 @@
 
 
 
-../testfiles/pinguim.gif 230400 0.0 0.0 3  128   200000 0 1
 
-../testfiles/pinguim.gif 230400 0.0 0.0 3  128   500000 0 1
 ../testfiles/pinguim.gif 115200 0.0 0.0 3  128   500000 0 1
 
-../testfiles/pinguim.gif 230400 0.0 0.0 3  128  1000000 0 1
 ../testfiles/pinguim.gif 115200 0.0 0.0 3  128  1000000 0 1
 ../testfiles/pinguim.gif  57600 0.0 0.0 3  128  1000000 0 1
 
-../testfiles/pinguim.gif 230400 0.0 0.0 3  128  2000000 0 1
 ../testfiles/pinguim.gif 115200 0.0 0.0 3  128  2000000 0 1
 ../testfiles/pinguim.gif  57600 0.0 0.0 3  128  2000000 0 1
 ../testfiles/pinguim.gif  38400 0.0 0.0 3  128  2000000 0 1
 
-../testfiles/pinguim.gif 230400 0.0 0.0 3  128  5000000 0 1
 ../testfiles/pinguim.gif 115200 0.0 0.0 3  128  5000000 0 1
 ../testfiles/pinguim.gif  57600 0.0 0.0 3  128  5000000 0 1
 ../testfiles/pinguim.gif  38400 0.0 0.0 3  128  5000000 0 1
@@ -130,21 +101,15 @@
 
 
 
-../testfiles/pinguim.gif 230400 0.0 0.0 3   64   200000 0 1
-
-../testfiles/pinguim.gif 230400 0.0 0.0 3   64   500000 0 1
 ../testfiles/pinguim.gif 115200 0.0 0.0 3   64   500000 0 1
 
-../testfiles/pinguim.gif 230400 0.0 0.0 3   64  1000000 0 1
 ../testfiles/pinguim.gif 115200 0.0 0.0 3   64  1000000 0 1
 ../testfiles/pinguim.gif  57600 0.0 0.0 3   64  1000000 0 1
 
-../testfiles/pinguim.gif 230400 0.0 0.0 3   64  2000000 0 1
 ../testfiles/pinguim.gif 115200 0.0 0.0 3   64  2000000 0 1
 ../testfiles/pinguim.gif  57600 0.0 0.0 3   64  2000000 0 1
 ../testfiles/pinguim.gif  38400 0.0 0.0 3   64  2000000 0 1
 
-../testfiles/pinguim.gif 230400 0.0 0.0 3   64  5000000 0 1
 ../testfiles/pinguim.gif 115200 0.0 0.0 3   64  5000000 0 1
 ../testfiles/pinguim.gif  57600 0.0 0.0 3   64  5000000 0 1
 ../testfiles/pinguim.gif  38400 0.0 0.0 3   64  5000000 0 1
