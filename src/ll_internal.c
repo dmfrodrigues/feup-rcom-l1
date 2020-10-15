@@ -12,7 +12,10 @@
 
 ll_config_t ll_config = {
     .baud_rate       = 38400,
-    .timeout         = 3,
+    .timeout         = {
+        {0, 0},
+        {3, 0}
+    },
     .retransmissions = 3,
     .verbosity       = 3
 };

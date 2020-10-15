@@ -10,6 +10,7 @@
 #define _LL_H_
 
 #include <stdlib.h>
+#include <sys/time.h>
 
 #include "ll_flags.h"
 
@@ -17,7 +18,7 @@
 
 typedef struct {
     size_t baud_rate;
-    unsigned int timeout;
+    struct itimerval timeout;
     unsigned int retransmissions;
     int verbosity;
 } ll_config_t;
