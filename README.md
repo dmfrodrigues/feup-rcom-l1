@@ -27,9 +27,12 @@ Distributed under the terms of the GNU General Public License, version 3
 
 ```txt
 -b, --baudrate          Baud rate (default is 38400)
+-d, --prob-error-data   Data error probability
+-h, --prob-error-head   Header error probability
 -r, --retransmissions   Retransmissions (default is 3)
 -s, --size              Block size (default is LL_MAX_SIZE, which is 4096)
 -t, --timeout           Timeout (default is 3 seconds)
+-T, --tau               Tau; extra time before analysing (default is 0)
 -v, --verbosity         Verbosity (0 to 4)
 ```
 
