@@ -12,7 +12,7 @@ size_t prob_size = sizeof(prob_data)/sizeof(float);
 
 size_t capacity[] = {
 //        50,
-        75,
+//        75,
 //       110,
 //       134,
 //       150,
