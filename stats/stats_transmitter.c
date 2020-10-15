@@ -6,7 +6,6 @@
 #include <unistd.h>
 
 pid_t start_transmitter(int fd, const char *com, const char *filepath, size_t baud_rate, float prob_data, float prob_head, size_t retransmissions, size_t size, size_t timeout, size_t tau, size_t verbosity){
-    fprintf(stderr, "    starting transmitter, com=%s\n", com);
     pid_t pid = fork();
     if(pid == 0) /* Child */{
         dup2(fd, STDOUT_FILENO);
@@ -59,6 +58,8 @@ int main(int argc, char *argv[]){
     size_t timeout;
     size_t tau;
     size_t verbosity;
+    fprintf(stderr, "                     File path   Rate  Pr data  Pr head Try Size  Timeout    Tau V Ret        T\n");
+    fprintf(stderr, "-----------------------------------------------------------------------------------------------\n");
     while(fscanf(stats_file, "%s %lu %f %f %lu %lu %lu %lu %lu",
       filepath,
       &baud_rate,
@@ -69,7 +70,7 @@ int main(int argc, char *argv[]){
       &timeout,
       &tau,
       &verbosity) == 9){
-        printf("Sending %s %lu %f %f %lu %lu %lu %lu %lu\n",
+        fprintf(stderr, "%30s %6lu %8f %8f %3lu %4lu %8lu %6lu %1lu ",
             filepath,
             baud_rate,
             prob_data,
@@ -85,16 +86,15 @@ int main(int argc, char *argv[]){
         pid_t transmitter_pid = start_transmitter(pipe_transmitter[1], com, filepath, baud_rate, prob_data, prob_head, retransmissions, size, timeout, tau, verbosity);
 
         int transmitter_status;
-        fprintf(stderr, "    waiting for transmitter\n");
         waitpid(transmitter_pid, &transmitter_status, 0);
         if(WIFEXITED(transmitter_status)){
-            fprintf(stderr, "    transmitter exited with status %d\n", WEXITSTATUS(transmitter_status));
+            fprintf(stderr, "%3d ", WEXITSTATUS(transmitter_status));
             if(WEXITSTATUS(transmitter_status) != 0){
-                fprintf(stderr, "    ERROR: exited with failure\n");
+                fprintf(stderr, "\n    ERROR: exited with failure\n");
                 exit(1);
             }
         } else {
-            fprintf(stderr, "    ERROR: transmitter did not exit\n");
+            fprintf(stderr, "\n    ERROR: transmitter did not exit\n");
             exit(1);
         }
         FILE *pipe_transmitter_read = fdopen(pipe_transmitter[0], "r");
@@ -107,6 +107,7 @@ int main(int argc, char *argv[]){
         suseconds_t T ; fscanf(pipe_transmitter_read, "%lu", &T );
         fclose(pipe_transmitter_read);
         fprintf(stdout, "%lu,%lu,%lu,%lu,%lu,%lu,%lu\n", L, Lf, N, Ne, Nt, C, T);
+        fprintf(stderr, "%8lu\n", T);
 
         sleep(1);
     }
