@@ -10,7 +10,7 @@
 
 #include "stats.h"
 
-static const char optstring[] = "b:d:h:r:s:t:v:";
+static const char optstring[] = "b:d:h:r:s:t:T:v:";
 
 static const struct option longopts[] = {
     {"baudrate"       , 1, NULL, 'b'},
@@ -19,6 +19,7 @@ static const struct option longopts[] = {
     {"retransmissions", 1, NULL, 'r'},
     {"size"           , 1, NULL, 's'},
     {"timeout"        , 1, NULL, 't'},
+    {"tau"            , 1, NULL, 'T'},
     {"verbosity"      , 1, NULL, 'v'},
     {0,0,0,0}
 };
@@ -37,6 +38,7 @@ int app_parse_args(int argc, char *argv[], int *com, ll_status_t status, char **
             case 'r': if(sscanf(optarg, "%u" , &ll_config.retransmissions   ) != 1) res = EXIT_FAILURE; break;
             case 's': if(sscanf(optarg, "%lu", &app_config.packet_size      ) != 1) res = EXIT_FAILURE; break;
             case 't': if(sscanf(optarg, "%u" , &ll_config.timeout           ) != 1) res = EXIT_FAILURE; break;
+            case 'T':                                                                                   break;
             case 'v': if(sscanf(optarg, "%d" , &ll_config.verbosity         ) != 1) res = EXIT_FAILURE; break;
             default : res = 1;
         }
