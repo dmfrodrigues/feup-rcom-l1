@@ -10,6 +10,7 @@ Distributed under the terms of the GNU General Public License, version 3
 
 ![Compile report](https://github.com/dmfrodrigues/feup-rcom-l1/workflows/Compile%20report/badge.svg)
 ![Test](https://github.com/dmfrodrigues/feup-rcom-l1/workflows/Test/badge.svg)
+![Test stats](https://github.com/dmfrodrigues/feup-rcom-l1/workflows/Test%20stats/badge.svg)
 ![Documentation](https://github.com/dmfrodrigues/feup-rcom-l1/workflows/Documentation/badge.svg)
 
 - **Project name:** Serial port data protocol
