@@ -9,18 +9,18 @@
 #define SECONDS_TO_MICROS 1000000
 
 stats_t stats = {
-    L : 0,
-    Lf: 0,
-    N : 0,
-    Ne: 0,
-    Nt: 0,
-    C : &ll_config.baud_rate,
-    T : 0
+    0,
+    0,
+    0,
+    0,
+    0,
+    &ll_config.baud_rate,
+    0
 };
 
 stats_config_t stats_config = {
-    prob_error_head: 0.0,
-    prob_error_data: 0.0
+    0.0,
+    0.0
 };
 
 struct timeval time_start, time_end;
