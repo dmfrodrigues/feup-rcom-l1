@@ -12,7 +12,10 @@
 
 ll_config_t ll_config = {
     .baud_rate       = 38400,
-    .timeout         = 3,
+    .timeout         = {
+        {0, 0},
+        {3, 0}
+    },
     .retransmissions = 3,
     .verbosity       = 3
 };
@@ -227,7 +230,6 @@ int ll_expect_Sframe(int port_fd, uint8_t *a_rcv, uint8_t *c_rcv){
         machine.c_rcv = 0;
         do {
             uint8_t byte;
-            ADD_DELAY(1000);
             int res = read(port_fd, &byte, 1);
             if(res == 1){
                 ll_log(3, "        Read byte 0x%02X | ", byte);
@@ -240,6 +242,7 @@ int ll_expect_Sframe(int port_fd, uint8_t *a_rcv, uint8_t *c_rcv){
                 return EXIT_FAILURE;
             }
         } while(machine.state != LL_S_STOP && machine.state != LL_S_STOP_RR);
+        ADD_DELAY(stats_config.dtau);
         if(machine.state == LL_S_STOP_RR){
             ADD_FRAME_ERROR();
             ll_log(2, "    Got unexpected I-frame (sending RR)\n");
@@ -263,7 +266,6 @@ int ll_expect_Uframe(int port_fd, uint8_t *a_rcv, uint8_t *c_rcv){
         machine.c_rcv = 0;
         do {
             uint8_t byte;
-            ADD_DELAY(1000);
             int res = read(port_fd, &byte, 1);
             if(res == 1){
                 ll_log(3, "        Read byte 0x%02X | ", byte);
@@ -276,6 +278,7 @@ int ll_expect_Uframe(int port_fd, uint8_t *a_rcv, uint8_t *c_rcv){
                 return EXIT_FAILURE;
             }
         } while(machine.state != LL_U_STOP && machine.state != LL_U_STOP_DISC);
+        ADD_DELAY(stats_config.dtau);
         if(machine.state == LL_U_STOP_DISC){
             ADD_FRAME_ERROR();
             ll_log(2, "    Got unexpected DISC (sending DISC as well)\n");
@@ -298,7 +301,6 @@ ssize_t ll_expect_Iframe(int port_fd, uint8_t *buffer){
         machine.length = 0;
         do {
             uint8_t byte;
-            ADD_DELAY(1000);
             int res = read(port_fd, &byte, 1);
             if(res == 1){
                 ll_log(3, "        Read byte 0x%02X | ", byte);
@@ -314,6 +316,7 @@ ssize_t ll_expect_Iframe(int port_fd, uint8_t *buffer){
                 return -1;
             }
         } while(machine.state != LL_I_STOP && machine.state != LL_I_STOP_RR);
+        ADD_DELAY(stats_config.dtau);
         if(machine.state == LL_I_STOP_RR){
             ADD_FRAME_ERROR();
             ll_log(2, "    Got unexpected data (sending RR and ignoring data)\n");

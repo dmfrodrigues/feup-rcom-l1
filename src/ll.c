@@ -23,6 +23,11 @@
 
 struct termios oldtio;
 
+struct itimerval ll_timer_reset = {
+    {0, 0},
+    {0, 0}
+};
+
 int llopen(int com, ll_status_t status){
     ll_log(1, "Preparing to open\n");
 
@@ -77,7 +82,7 @@ int llopen(int com, ll_status_t status){
         unsigned attempts;
         for(attempts = 0; attempts < ll_config.retransmissions; ++attempts){
             timeout = 0;
-            alarm(ll_config.timeout);
+            setitimer(ITIMER_REAL, &ll_config.timeout, NULL);
             
             // Send SET
             res = ll_send_SET(port_fd);
@@ -107,7 +112,7 @@ int llopen(int com, ll_status_t status){
             if(timeout) ll_err("WARNING: gave up due to timeout\n");
             return -1;
         }
-        alarm(0);
+        setitimer(ITIMER_REAL, &ll_timer_reset, NULL);
     } else if(status == RECEIVER){
         // Get SET
         uint8_t a_rcv, c_rcv;
@@ -143,7 +148,7 @@ int llwrite(int port_fd, const uint8_t *buffer, int length){
     unsigned attempts;
     for(attempts = 0; attempts < ll_config.retransmissions; ++attempts){
         timeout = 0;
-        alarm(ll_config.timeout);
+        setitimer(ITIMER_REAL, &ll_config.timeout, NULL);
         
         // Send I
         ret = ll_send_I(port_fd, (const uint8_t *)buffer, length);
@@ -182,7 +187,7 @@ int llwrite(int port_fd, const uint8_t *buffer, int length){
         ll_err("WARNING: gave up due to timeout\n");
         return -1;
     }
-    alarm(0);
+    setitimer(ITIMER_REAL, &ll_timer_reset, NULL);
 
     ll_log(1, "Successfully wrote\n");
 
@@ -229,7 +234,7 @@ int llclose(int port_fd){
         unsigned attempts;
         for(attempts = 0; attempts < ll_config.retransmissions; ++attempts){
             timeout = 0;
-            alarm(ll_config.timeout);
+            setitimer(ITIMER_REAL, &ll_config.timeout, NULL);
             
             // Send DISC
             res = ll_send_DISC(port_fd);
@@ -260,7 +265,7 @@ int llclose(int port_fd){
 
         // Send UA
         res = ll_send_UA(port_fd);
-        alarm(0);
+        setitimer(ITIMER_REAL, &ll_timer_reset, NULL);
     }
     else{
         // Get DISC

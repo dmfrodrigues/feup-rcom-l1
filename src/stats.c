@@ -20,7 +20,8 @@ stats_t stats = {
 
 stats_config_t stats_config = {
     0.0,
-    0.0
+    0.0,
+    0
 };
 
 struct timeval time_start, time_end;
