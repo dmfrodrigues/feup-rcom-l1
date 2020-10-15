@@ -12,7 +12,10 @@
 
 ll_config_t ll_config = {
     .baud_rate       = 38400,
-    .timeout         = 3,
+    .timeout         = {
+        {0, 0},
+        {3, 0}
+    },
     .retransmissions = 3,
     .verbosity       = 3
 };
@@ -125,7 +128,7 @@ ssize_t ll_send_I(int port_fd, const uint8_t *buffer, size_t length){
     frame_header[2] = ll_get_Iframe_C();
     frame_header[3] = ll_bcc(frame_header+1, frame_header+3);
 
-    GEN_FRAME_ERROR(2e-5, frame_header, sizeof(frame_header));
+    GEN_FRAME_ERROR(stats_config.prob_error_head, frame_header, sizeof(frame_header));
 
     if(write(port_fd, frame_header, sizeof(frame_header)) != sizeof(frame_header))
         { perror("write"); return -1; } ADD_MESSAGE_LENGTH(sizeof(frame_header));
@@ -139,7 +142,7 @@ ssize_t ll_send_I(int port_fd, const uint8_t *buffer, size_t length){
     }
     ll_log(2, "\n");
 
-    GEN_FRAME_ERROR(1e-5, buffer_escaped, written_chars);
+    GEN_FRAME_ERROR(stats_config.prob_error_data, buffer_escaped, written_chars);
 
     if(write(port_fd, buffer_escaped, written_chars) != written_chars)
         { perror("write"); return -1; } ADD_MESSAGE_LENGTH(written_chars);
@@ -151,7 +154,7 @@ ssize_t ll_send_I(int port_fd, const uint8_t *buffer, size_t length){
         frame_tail[1] = LL_STUFF(bcc2);
         frame_tail[2] = LL_FLAG;
 
-        GEN_FRAME_ERROR(2e-5, frame_tail, sizeof(frame_tail));
+        GEN_FRAME_ERROR(stats_config.prob_error_head, frame_tail, sizeof(frame_tail));
 
         if(write(port_fd, frame_tail, sizeof(frame_tail)) != sizeof(frame_tail))
             { perror("write"); return -1; } ADD_MESSAGE_LENGTH(sizeof(frame_tail));
@@ -160,7 +163,7 @@ ssize_t ll_send_I(int port_fd, const uint8_t *buffer, size_t length){
         frame_tail[0] = bcc2;
         frame_tail[1] = LL_FLAG;
 
-        GEN_FRAME_ERROR(2e-5, frame_tail, sizeof(frame_tail));
+        GEN_FRAME_ERROR(stats_config.prob_error_head, frame_tail, sizeof(frame_tail));
 
         if(write(port_fd, frame_tail, sizeof(frame_tail)) != sizeof(frame_tail))
             { perror("write"); return -1; } ADD_MESSAGE_LENGTH(sizeof(frame_tail));
@@ -239,6 +242,7 @@ int ll_expect_Sframe(int port_fd, uint8_t *a_rcv, uint8_t *c_rcv){
                 return EXIT_FAILURE;
             }
         } while(machine.state != LL_S_STOP && machine.state != LL_S_STOP_RR);
+        ADD_DELAY(stats_config.dtau);
         if(machine.state == LL_S_STOP_RR){
             ADD_FRAME_ERROR();
             ll_log(2, "    Got unexpected I-frame (sending RR)\n");
@@ -274,6 +278,7 @@ int ll_expect_Uframe(int port_fd, uint8_t *a_rcv, uint8_t *c_rcv){
                 return EXIT_FAILURE;
             }
         } while(machine.state != LL_U_STOP && machine.state != LL_U_STOP_DISC);
+        ADD_DELAY(stats_config.dtau);
         if(machine.state == LL_U_STOP_DISC){
             ADD_FRAME_ERROR();
             ll_log(2, "    Got unexpected DISC (sending DISC as well)\n");
@@ -311,6 +316,7 @@ ssize_t ll_expect_Iframe(int port_fd, uint8_t *buffer){
                 return -1;
             }
         } while(machine.state != LL_I_STOP && machine.state != LL_I_STOP_RR);
+        ADD_DELAY(stats_config.dtau);
         if(machine.state == LL_I_STOP_RR){
             ADD_FRAME_ERROR();
             ll_log(2, "    Got unexpected data (sending RR and ignoring data)\n");

@@ -10,6 +10,7 @@ Distributed under the terms of the GNU General Public License, version 3
 
 ![Compile report](https://github.com/dmfrodrigues/feup-rcom-l1/workflows/Compile%20report/badge.svg)
 ![Test](https://github.com/dmfrodrigues/feup-rcom-l1/workflows/Test/badge.svg)
+![Test stats](https://github.com/dmfrodrigues/feup-rcom-l1/workflows/Test%20stats/badge.svg)
 ![Documentation](https://github.com/dmfrodrigues/feup-rcom-l1/workflows/Documentation/badge.svg)
 
 - **Project name:** Serial port data protocol
@@ -26,10 +27,13 @@ Distributed under the terms of the GNU General Public License, version 3
 # How to use
 
 ```txt
--b, --baudrate          Baud rate (default is 38400)
+-b, --baudrate          Baud rate; bit per second (default is 38400)
+-d, --prob-error-data   Data error probability
+-h, --prob-error-head   Header error probability
 -r, --retransmissions   Retransmissions (default is 3)
--s, --size              Block size (default is LL_MAX_SIZE, which is 4096)
--t, --timeout           Timeout (default is 3 seconds)
+-s, --size              Block size, in bytes (default is LL_MAX_SIZE, which is 4096)
+-t, --timeout           Timeout, in seconds (default is 3)
+-T, --tau               Tau; extra time before analysing, in microseconds (default is 0)
 -v, --verbosity         Verbosity (0 to 4)
 ```
 

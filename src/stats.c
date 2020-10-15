@@ -2,20 +2,26 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <sys/time.h>
 
 #include "ll.h"
+#include "ll_utils.h"
 
 #define SECONDS_TO_MICROS 1000000
 
 stats_t stats = {
-    L : 0,
-    Lf: 0,
-    N : 0,
-    Ne: 0,
-    Nt: 0,
-    C : &ll_config.baud_rate,
-    T : 0
+    0,
+    0,
+    0,
+    0,
+    0,
+    &ll_config.baud_rate,
+    0
+};
+
+stats_config_t stats_config = {
+    0.0,
+    0.0,
+    0
 };
 
 struct timeval time_start, time_end;
@@ -31,17 +37,17 @@ void toc(void){
 }
 
 void print_stats(void){
-    fprintf(stderr, "Statistics:\n");
-    fprintf(stderr, "    L : %lu\n", stats.L );
-    fprintf(stderr, "    Lf: %lu\n", stats.Lf);
-    fprintf(stderr, "    N : %lu\n", stats.N );
-    fprintf(stderr, "    Ne: %lu\n", stats.Ne);
-    fprintf(stderr, "    Nt: %lu\n", stats.Nt);
-    fprintf(stderr, "    C : %lu\n",*stats.C );
-    fprintf(stderr, "    T : %lu\n", stats.T );
+    ll_log(1, "Statistics:\n");
+    ll_log(1, "    L : %lu\n", stats.L ); fprintf(stdout, "%lu\n", stats.L );
+    ll_log(1, "    Lf: %lu\n", stats.Lf); fprintf(stdout, "%lu\n", stats.Lf);
+    ll_log(1, "    N : %lu\n", stats.N ); fprintf(stdout, "%lu\n", stats.N );
+    ll_log(1, "    Ne: %lu\n", stats.Ne); fprintf(stdout, "%lu\n", stats.Ne);
+    ll_log(1, "    Nt: %lu\n", stats.Nt); fprintf(stdout, "%lu\n", stats.Nt);
+    ll_log(1, "    C : %lu\n",*stats.C ); fprintf(stdout, "%lu\n",*stats.C );
+    ll_log(1, "    T : %lu\n", stats.T ); fprintf(stdout, "%lu\n", stats.T );
 }
 
-void ll_gen_frame_error(float prob, uint8_t *frame, size_t frame_size){
+void gen_frame_error(float prob, uint8_t *frame, size_t frame_size){
     for(size_t i = 0; i < 8*frame_size; ++i){
         size_t idx = i/8, bit = i%8;
         float rand_value = rand() / (float) RAND_MAX;
@@ -50,4 +56,9 @@ void ll_gen_frame_error(float prob, uint8_t *frame, size_t frame_size){
             frame[idx] ^= (1 << bit);
         }
     }
+}
+
+void add_delay(useconds_t usec){
+    ll_log(3, "        Adding delay of %d microseconds\n", usec);
+    usleep(usec);
 }

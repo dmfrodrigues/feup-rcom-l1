@@ -24,7 +24,14 @@ doc/latex
 main
 lib*.a
 *.zip
-emitter
 transmitter
 receiver
+/pinguim.gif
 COMMIT.tex
+stats/stats_transmitter
+stats/stats_receiver
+stats/do_stats
+stats/*.csv
+stats/*.gif
+stats/*.png
+stats/*.jpg

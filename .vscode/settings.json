@@ -6,7 +6,8 @@
         "utility": "c",
         "*.tcc": "c",
         "fstream": "c",
-        "sstream": "c"
+        "sstream": "c",
+        "hash_map": "c"
     },
     "latex-workshop.latex.recipes": [
         {
