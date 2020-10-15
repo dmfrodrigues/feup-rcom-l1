@@ -1,3 +1,8 @@
+../testfiles/pinguim.gif 115200 0.0 0.0 3 4096   500000 0 1
+
+../testfiles/pinguim.gif 115200 0.0 0.0 3 4096  1000000 0 1
+../testfiles/pinguim.gif  57600 0.0 0.0 3 4096  1000000 0 1
+
 ../testfiles/pinguim.gif 115200 0.0 0.0 3 4096  2000000 0 1
 ../testfiles/pinguim.gif  57600 0.0 0.0 3 4096  2000000 0 1
 ../testfiles/pinguim.gif  38400 0.0 0.0 3 4096  2000000 0 1
