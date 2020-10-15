@@ -24,6 +24,7 @@ stats_t stats;
 typedef struct {
     float prob_error_head;
     float prob_error_data;
+    useconds_t dtau;
 } stats_config_t;
 
 stats_config_t stats_config;
