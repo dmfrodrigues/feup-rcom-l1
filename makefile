@@ -50,6 +50,9 @@ $(ODIR)/%.o: $(SDIR)/%.c | $(ODIR)
 test: FORCE
 	make -C tests test
 
+stats: FORCE
+	make -C stats stats
+
 doc: FORCE
 	cd doc && doxygen doxyfile
 
