@@ -6,7 +6,7 @@
 #include <unistd.h>
 
 pid_t start_transmitter(int fd, const char *com, const char *filepath, size_t baud_rate, float prob_data, float prob_head, size_t retransmissions, size_t size, size_t timeout, size_t tau, size_t verbosity){
-    fprintf(stderr, "        starting transmitter, com=%s\n", com);
+    fprintf(stderr, "    starting transmitter, com=%s\n", com);
     pid_t pid = fork();
     if(pid == 0) /* Child */{
         dup2(fd, STDOUT_FILENO);
