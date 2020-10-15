@@ -3,7 +3,21 @@
 #include <stdlib.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <time.h>
 #include <unistd.h>
+
+#define SECONDS_TO_NANOS 1000000000
+
+size_t count_lines(const char *filepath){
+    size_t ret = 0;
+
+    FILE *file = fopen(filepath, "r");
+    char buf[1024];
+    while(fscanf(file, "%s", buf) == 1) ++ret;
+    fclose(file);
+
+    return ret/9;
+}
 
 pid_t start_transmitter(int fd, const char *com, const char *filepath, size_t baud_rate, float prob_data, float prob_head, size_t retransmissions, size_t size, size_t timeout, size_t tau, size_t verbosity){
     pid_t pid = fork();
@@ -46,6 +60,8 @@ int main(int argc, char *argv[]){
     const char *stats_file_path = argv[1];
     const char *com             = argv[2];
 
+    const size_t num_lines = count_lines(stats_file_path);
+
     fprintf(stdout, "L,Lf,N,Ne,Nt,C,T\n");
 
     FILE *stats_file = fopen(stats_file_path, "r");
@@ -60,6 +76,9 @@ int main(int argc, char *argv[]){
     size_t verbosity;
     fprintf(stderr, "                     File path   Rate  Pr data  Pr head Try Size  Timeout    Tau V Ret        T\n");
     fprintf(stderr, "-----------------------------------------------------------------------------------------------\n");
+
+    size_t idx_line = 0;
+    struct timespec start; clock_gettime(CLOCK_REALTIME, &start);
     while(fscanf(stats_file, "%s %lu %f %f %lu %lu %lu %lu %lu",
       filepath,
       &baud_rate,
@@ -97,6 +116,13 @@ int main(int argc, char *argv[]){
             fprintf(stderr, "\n    ERROR: transmitter did not exit\n");
             exit(1);
         }
+
+        ++idx_line;
+        struct timespec now; clock_gettime(CLOCK_REALTIME, &now);
+        float time_now = (now.tv_sec - start.tv_sec) + (float)(now.tv_nsec-start.tv_nsec)/(float)SECONDS_TO_NANOS;
+        float total_time = (time_now*num_lines)/idx_line;
+        float left_time  = total_time-time_now;
+
         FILE *pipe_transmitter_read = fdopen(pipe_transmitter[0], "r");
         size_t      L ; fscanf(pipe_transmitter_read, "%lu", &L );
         size_t      Lf; fscanf(pipe_transmitter_read, "%lu", &Lf);
@@ -107,9 +133,9 @@ int main(int argc, char *argv[]){
         suseconds_t T ; fscanf(pipe_transmitter_read, "%lu", &T );
         fclose(pipe_transmitter_read);
         fprintf(stdout, "%lu,%lu,%lu,%lu,%lu,%lu,%lu\n", L, Lf, N, Ne, Nt, C, T);
-        fprintf(stderr, "%8lu\n", T);
+        fprintf(stderr, "%8lu %6.2f%% (%6.1fs; %6.1fs left)\n", T, (100.0*idx_line)/num_lines, total_time, left_time);
 
-        sleep(1);
+        usleep(100000);
     }
 
     return 0;
