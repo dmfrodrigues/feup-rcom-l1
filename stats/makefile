@@ -6,7 +6,7 @@ stats: recompile stats_transmitter stats_receiver
 
 recompile: FORCE
 	make -C .. clean
-	make -C .. STATISTICS=1
+	make -C .. STATISTICS=1 STATISTICS_DELAY=1
 
 stats_transmitter: stats_transmitter.c
 	$(CC) $^ -o $@
