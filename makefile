@@ -65,5 +65,6 @@ doc/report/report.pdf: FORCE
 
 clean: FORCE
 	rm -f $(TRANSMITTER) $(RECEIVER)
+	make -C stats clean
 
 FORCE:
