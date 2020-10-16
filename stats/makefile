@@ -21,6 +21,9 @@ test: recompile stats_transmitter stats_receiver
 	./stats_receiver rate-size.txt 12 &
 	sleep 1
 	./stats_transmitter rate-size.txt 11
+	./stats_receiver vary-tau.txt 12 &
+	sleep 1
+	./stats_transmitter vary-tau.txt 11
 
 clean: FORCE
 	rm -f stats_receiver stats_transmitter

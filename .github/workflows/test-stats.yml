@@ -2,7 +2,7 @@ name: Test stats
 
 on:
   push:
-    branches: [ master , dev ]
+    branches: [ master , dev , stats ]
 
 jobs:
   build:
