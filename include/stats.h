@@ -40,7 +40,8 @@ void print_stats(void);
  * 
  * If the probability is negative or zero, no errors will be generated
  * 
- * @param prob          Value from 0 to 1, meaning the probability of a bit swap happening to a bit
+ * @param prob          Value from 0 to 1, meaning the probability of a bit swap
+ *                      happening to a bit
  * @param frame         Frame where the error will be generated
  * @param frame_size    Size of frame
  */
@@ -63,7 +64,8 @@ void add_delay(useconds_t usec);
         #define ADD_DELAY(usec)                             {}
     #endif
     #ifdef STATISTICS_ERRORS
-        #define GEN_FRAME_ERROR(prob, frame, frame_size)    gen_frame_error(prob, frame, frame_size)
+        #define GEN_FRAME_ERROR(prob, frame, frame_size)    \
+            gen_frame_error(prob, frame, frame_size)
     #else
         #define GEN_FRAME_ERROR(prob, frame, frame_size)    {}
     #endif

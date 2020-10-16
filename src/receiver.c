@@ -22,7 +22,8 @@ int main(int argc, char** argv){
     int com = 0;
 
     if(app_parse_args(argc, argv, &com, RECEIVER, NULL)){
-        printf("Usage:\tnserial SerialPort\n\tex: nserial 2\n");
+        printf("Usage:\tnserial SerialPort\n"
+               "\tex: nserial 2\n");
         exit(1);
     }
 

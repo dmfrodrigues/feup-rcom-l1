@@ -5,7 +5,18 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
-pid_t start_receiver(int fd, const char *com, const char *filepath, size_t baud_rate, float prob_data, float prob_head, size_t retransmissions, size_t size, size_t timeout, size_t tau, size_t verbosity){
+pid_t start_receiver(
+  int fd,
+  const char *com,
+  const char *filepath,
+  size_t baud_rate,
+  float prob_data,
+  float prob_head,
+  size_t retransmissions,
+  size_t size,
+  size_t timeout,
+  size_t tau,
+  size_t verbosity){
     pid_t pid = fork();
     if(pid == 0) /* Child */{
         dup2(fd, STDOUT_FILENO);
@@ -57,8 +68,10 @@ int main(int argc, char *argv[]){
     size_t timeout;
     size_t tau;
     size_t verbosity;
-    fprintf(stderr, "                     File path   Rate  Pr data  Pr head Try Size  Timeout    Tau V Ret\n");
-    fprintf(stderr, "--------------------------------------------------------------------------------------\n");
+    fprintf(stderr, "                     File path   Rate  Pr data  Pr head "
+                    "Try Size  Timeout    Tau V Ret\n");
+    fprintf(stderr, "--------------------------------------------------------"
+                    "------------------------------\n");
     while(fscanf(stats_file, "%s %lu %f %f %lu %lu %lu %lu %lu",
       filepath,
       &baud_rate,
@@ -82,7 +95,19 @@ int main(int argc, char *argv[]){
         );
 
         int pipe_receiver[2]; pipe(pipe_receiver);
-        pid_t receiver_pid = start_receiver(pipe_receiver[1], com, filepath, baud_rate, prob_data, prob_head, retransmissions, size, timeout, tau, verbosity);
+        pid_t receiver_pid = start_receiver(
+            pipe_receiver[1],
+            com,
+            filepath,
+            baud_rate,
+            prob_data,
+            prob_head,
+            retransmissions,
+            size,
+            timeout,
+            tau,
+            verbosity
+        );
 
         int receiver_status;
         waitpid(receiver_pid, &receiver_status, 0);
