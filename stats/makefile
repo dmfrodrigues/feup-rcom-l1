@@ -27,5 +27,6 @@ test: recompile stats_transmitter stats_receiver
 
 clean: FORCE
 	rm -f stats_receiver stats_transmitter
+	rm -f *.gif *.jpg *.png
 
 FORCE:
