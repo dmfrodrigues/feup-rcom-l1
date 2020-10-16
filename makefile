@@ -27,6 +27,10 @@ ifeq ($(STATISTICS),)
 else
 	DFLAGS +=-D STATISTICS
 endif
+ifeq ($(STATISTICS_DELAY),)
+else
+	DFLAGS +=-D STATISTICS_DELAY
+endif
 
 TRANSMITTER_O_FILES=$(ODIR)/transmitter.o
 RECEIVER_O_FILES   =$(ODIR)/receiver.o
@@ -60,6 +64,6 @@ doc/report/report.pdf: FORCE
 	make -C $(@D) $(@F)
 
 clean: FORCE
-	git clean -dfX
+	rm -f $(TRANSMITTER) $(RECEIVER)
 
 FORCE:
