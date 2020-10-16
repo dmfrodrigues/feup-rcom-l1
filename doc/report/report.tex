@@ -49,7 +49,7 @@
 \lstset{
 	basicstyle=\linespread{0.85}\ttfamily,
 	basewidth  = {0.50em,1em},
-    frame=tb, % draw frame at top and bottom of the code
+    frame=tbr, % draw frame at top and bottom of the code
     tabsize=4, % tab space width
     numbers=left, % display line numbers on the left
 	showstringspaces=false, % don't mark spaces in strings    
@@ -538,10 +538,24 @@ During project development and evaluation the repository remained private, altho
 \section{Application}
 \lstinputlisting[caption=\texttt{application\_layer.h}, language=C]{../../include/app.h}
 \lstinputlisting[caption=\texttt{application\_layer.c}, language=C]{../../src/app.c}
+
+\subsection{Argument parsing}
 \lstinputlisting[caption=\texttt{application\_layer.h}, language=C]{../../include/app_args.h}
 \lstinputlisting[caption=\texttt{application\_layer.c}, language=C]{../../src/app_args.c}
+
+\subsection{Executables}
 \lstinputlisting[caption=\texttt{transmitter.c}, language=C]{../../src/transmitter.c}
 \lstinputlisting[caption=\texttt{receiver.c}, language=C]{../../src/receiver.c}
+
+\section{Statistics}
+\subsection{In program}
+\lstinputlisting[caption=\texttt{stats.h}, language=C]{../../include/stats.h}
+\lstinputlisting[caption=\texttt{stats.c}, language=C]{../../src/stats.c}
+
+\subsection{Separate module}
+\lstinputlisting[caption=\texttt{stats\_transmitter.c}, language=C]{../../stats/stats_transmitter.c}
+\lstinputlisting[caption=\texttt{stats\_receiver.c}   , language=C]{../../stats/stats_receiver.c}
+\lstinputlisting[caption=\texttt{vary-tau.txt}]{../../stats/vary-tau.txt}
 
 \restoregeometry
 
