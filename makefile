@@ -64,6 +64,6 @@ doc/report/report.pdf: FORCE
 	make -C $(@D) $(@F)
 
 clean: FORCE
-	git clean -dfX
+	rm -f $(TRANSMITTER) $(RECEIVER)
 
 FORCE:
