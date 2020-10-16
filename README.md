@@ -24,9 +24,29 @@ Distributed under the terms of the GNU General Public License, version 3
     - [Breno Accioly de Barros Pimentel](https://github.com/BrenoAccioly) (<up201800170@fe.up.pt>)
     - [Diogo Miguel Ferreira Rodrigues](https://github.com/dmfrodrigues) (<dmfrodrigues2000@gmail.com> / <diogo.rodrigues@fe.up.pt>)
 
-# How to use
+# The program
+
+## Compile
+
+To compile, run `make`. Here are some other interesting `make` options:
+
+```sh
+make test                       # Run tests
+make stats                      # Run statistics
+make doc                        # Generate documentation
+make doc/report/report.pdf      # Generate report
+make clean                      # Cleanup directory
+```
+
+## Use
 
 ```txt
+transmitter COM FILE <-b baudrate> <-d pd> <-h ph> <-r retransmissions> <-s size> <-t timeout> <-T tau> <-v verbosity>
+receiver    COM      <-b baudrate> <-d pd> <-h ph> <-r retransmissions> <-s size> <-t timeout> <-T tau> <-v verbosity>
+
+COM                     Communications channel to use (COM1 - ttyS0, COM2 - ttyS1, ...)
+FILE                    Path to file to be transferred by the transmitter
+
 -b, --baudrate          Baud rate; bit per second (default is 38400)
 -d, --prob-error-data   Data error probability
 -h, --prob-error-head   Header error probability
