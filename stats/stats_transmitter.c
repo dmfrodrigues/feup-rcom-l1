@@ -1,3 +1,6 @@
+// Copyright (C) 2020 Diogo Rodrigues, Breno Pimentel
+// Distributed under the terms of the GNU General Public License, version 3
+
 #include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -8,6 +11,13 @@
 
 #define SECONDS_TO_NANOS 1000000000
 
+/**
+ * @ingroup stats_separate
+ * @brief Count number of non-empty lines in file.
+ * 
+ * @param filepath      Path to file to analyse
+ * @return size_t       Number of non-empty lines
+ */
 size_t count_lines(const char *filepath){
     size_t ret = 0;
 
@@ -19,12 +29,41 @@ size_t count_lines(const char *filepath){
     return ret/9;
 }
 
-pid_t start_transmitter(int fd, const char *com, const char *filepath, size_t baud_rate, float prob_data, float prob_head, size_t retransmissions, size_t size, size_t timeout, size_t tau, size_t verbosity){
+/**
+ * @ingroup stats_separate
+ * @brief Start transmiter
+ * 
+ * @param fd                File descriptor where output should be written to
+ *                          (typically a pipe)
+ * @param com               COM to be used
+ * @param filepath          Path of file to be transferred
+ * @param baud_rate         Baud rate
+ * @param prob_data         Probability of bit swap in data
+ * @param prob_head         Probability of bit swap in header
+ * @param retransmissions   Number of retransmissions
+ * @param size              Maximum frame size
+ * @param timeout           Timeout
+ * @param tau               Artificial propagation delay
+ * @param verbosity         Verbosity
+ * @return pid_t            ID of child process that was created to run transmitter
+ */
+pid_t start_transmitter(
+  int fd,
+  const char *com,
+  const char *filepath,
+  size_t baudrate,
+  float prob_data,
+  float prob_head,
+  size_t retransmissions,
+  size_t size,
+  size_t timeout,
+  size_t tau,
+  size_t verbosity){
     pid_t pid = fork();
     if(pid == 0) /* Child */{
         dup2(fd, STDOUT_FILENO);
 
-        char baud_rate_s      [64]; sprintf(baud_rate_s      , "%lu", baud_rate      );
+        char baud_rate_s      [64]; sprintf(baud_rate_s      , "%lu", baudrate       );
         char prob_data_s      [64]; sprintf(prob_data_s      , "%f" , prob_data      );
         char prob_head_s      [64]; sprintf(prob_head_s      , "%f" , prob_head      );
         char retransmissions_s[64]; sprintf(retransmissions_s, "%lu", retransmissions);
@@ -66,7 +105,7 @@ int main(int argc, char *argv[]){
 
     FILE *stats_file = fopen(stats_file_path, "r");
     char filepath[1024];
-    size_t baud_rate;
+    size_t baudrate;
     float prob_data;
     float prob_head;
     size_t retransmissions;
@@ -74,14 +113,16 @@ int main(int argc, char *argv[]){
     size_t timeout;
     size_t tau;
     size_t verbosity;
-    fprintf(stderr, "                     File path   Rate  Pr data  Pr head Try Size  Timeout    Tau V Ret        T\n");
-    fprintf(stderr, "-----------------------------------------------------------------------------------------------\n");
+    fprintf(stderr, "                     File path   Rate  Pr data  Pr head "
+                    "Try Size  Timeout    Tau V Ret        T\n");
+    fprintf(stderr, "--------------------------------------------------------"
+                    "---------------------------------------\n");
 
     size_t idx_line = 0;
     struct timespec start; clock_gettime(CLOCK_REALTIME, &start);
     while(fscanf(stats_file, "%s %lu %f %f %lu %lu %lu %lu %lu",
       filepath,
-      &baud_rate,
+      &baudrate,
       &prob_data,
       &prob_head,
       &retransmissions,
@@ -91,7 +132,7 @@ int main(int argc, char *argv[]){
       &verbosity) == 9){
         fprintf(stderr, "%30s %6lu %8f %8f %3lu %4lu %8lu %6lu %1lu ",
             filepath,
-            baud_rate,
+            baudrate,
             prob_data,
             prob_head,
             retransmissions,
@@ -102,7 +143,19 @@ int main(int argc, char *argv[]){
         );
         
         int pipe_transmitter[2]; pipe(pipe_transmitter);
-        pid_t transmitter_pid = start_transmitter(pipe_transmitter[1], com, filepath, baud_rate, prob_data, prob_head, retransmissions, size, timeout, tau, verbosity);
+        pid_t transmitter_pid = start_transmitter(
+            pipe_transmitter[1],
+            com,
+            filepath,
+            baudrate,
+            prob_data,
+            prob_head,
+            retransmissions,
+            size,
+            timeout,
+            tau,
+            verbosity
+        );
 
         int transmitter_status;
         waitpid(transmitter_pid, &transmitter_status, 0);
@@ -119,7 +172,8 @@ int main(int argc, char *argv[]){
 
         ++idx_line;
         struct timespec now; clock_gettime(CLOCK_REALTIME, &now);
-        float time_now = (now.tv_sec - start.tv_sec) + (float)(now.tv_nsec-start.tv_nsec)/(float)SECONDS_TO_NANOS;
+        float time_now =        (now.tv_sec  - start.tv_sec ) +
+                         (float)(now.tv_nsec - start.tv_nsec)/(float)SECONDS_TO_NANOS;
         float total_time = (time_now*num_lines)/idx_line;
         float left_time  = total_time-time_now;
 
@@ -134,9 +188,10 @@ int main(int argc, char *argv[]){
         fclose(pipe_transmitter_read);
         fprintf(stdout, "%s,%lu,%.10f,%.10f,%lu,%lu,%lu,%lu,"
                         "%lu,%lu,%lu,%lu,%lu,%lu,%lu\n",
-            filepath, baud_rate, prob_data, prob_head, retransmissions, size, timeout, tau,
+            filepath, baudrate, prob_data, prob_head, retransmissions, size, timeout, tau,
             L, Lf, N, Ne, Nt, C, T);
-        fprintf(stderr, "%8lu %6.2f%% (%6.1fs; %6.1fs left)\n", T, (100.0*idx_line)/num_lines, total_time, left_time);
+        fprintf(stderr, "%8lu %6.2f%% (%6.1fs; %6.1fs left)\n",
+            T, (100.0*idx_line)/num_lines, total_time, left_time);
 
         usleep(100000);
     }

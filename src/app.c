@@ -114,7 +114,7 @@ int app_send_file(char *file_path){
     if(app_send_ctrl_packet(CTRL_START, file_size, file_name) < 0)
         return -1;
 
-    char *buf =(char*)malloc(app_config.packet_size);
+    char *buf = (char*)malloc(app_config.packet_size);
 
     unsigned int res = 0;
     unsigned int seq_number = 0;
@@ -136,7 +136,7 @@ int app_send_file(char *file_path){
 
 int app_rcv_ctrl_packet(int ctrl, unsigned int * file_size, char * file_name){
 
-    uint8_t * ctrl_packet = (uint8_t*)malloc(5 + sizeof(unsigned int) + FILE_NAME_MAX_SIZE);
+    uint8_t *ctrl_packet = (uint8_t*)malloc(5+sizeof(unsigned int)+FILE_NAME_MAX_SIZE);
 
     if(llread(app_config.fileDescriptor, ctrl_packet) < 0){
         fprintf(stderr, "ERROR: unable to read ctrl packet\n");
@@ -180,7 +180,9 @@ int app_rcv_data_packet(char * data, int seq_number){
     }
 
     if(data_packet[0] != CTRL_DATA){
-        fprintf(stderr, "ERROR: data control is not correct\n data control=0x%02X (should be 0x%02X)\n", data_packet[0], CTRL_DATA);
+        fprintf(stderr, "ERROR: data control is not correct\n"
+                        "data control=0x%02X (should be 0x%02X)\n",
+                        data_packet[0], CTRL_DATA);
         return -1;
     }
 
@@ -244,7 +246,9 @@ int app_receive_file(){
     }
 
     if(file_size != file_size_ || strcmp(file_name, file_name_) != 0){
-        fprintf(stderr, "ERROR: Start control packet filename: %s differs from End control packet filename: %s\n", file_name, file_name_);
+        fprintf(stderr, "ERROR: Start control packet filename: "
+                        "%s differs from End control packet filename: %s\n",
+                        file_name, file_name_);
         return -1;
     }
 

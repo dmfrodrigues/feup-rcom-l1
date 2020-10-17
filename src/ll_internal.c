@@ -86,7 +86,8 @@ int ll_send_SET(int port_fd){
     frame[3] = ll_bcc(frame+1, frame+3);
     frame[4] = LL_FLAG;
 
-    int res = write(port_fd, frame, sizeof(frame)); ADD_MESSAGE_LENGTH(sizeof(frame)); ADD_FRAME();
+    int res = write(port_fd, frame, sizeof(frame));
+    ADD_MESSAGE_LENGTH(sizeof(frame)); ADD_FRAME();
     if(res == sizeof(frame)) ll_log(2, "    Sent SET\n");
     return res;
 }
@@ -99,7 +100,8 @@ int ll_send_DISC(int port_fd){
     frame[3] = ll_bcc(frame+1, frame+3);
     frame[4] = LL_FLAG;
 
-    int res = write(port_fd, frame, sizeof(frame)); ADD_MESSAGE_LENGTH(sizeof(frame)); ADD_FRAME();
+    int res = write(port_fd, frame, sizeof(frame));
+    ADD_MESSAGE_LENGTH(sizeof(frame)); ADD_FRAME();
     if(res == sizeof(frame))  ll_log(2, "    Sent DISC\n");
     return res;
 }
@@ -112,7 +114,8 @@ int ll_send_UA(int port_fd){
     frame[3] = ll_bcc(frame+1, frame+3);
     frame[4] = LL_FLAG;
 
-    int res = write(port_fd, frame, sizeof(frame)); ADD_MESSAGE_LENGTH(sizeof(frame)); ADD_FRAME();
+    int res = write(port_fd, frame, sizeof(frame));
+    ADD_MESSAGE_LENGTH(sizeof(frame)); ADD_FRAME();
     if(res == sizeof(frame))  ll_log(2, "    Sent UA\n");
     return res;
 }
@@ -120,7 +123,7 @@ int ll_send_UA(int port_fd){
 ssize_t ll_send_I(int port_fd, const uint8_t *buffer, size_t length){
     ll_log(2, "    Sending I-frame\n");
     
-    for(size_t i = 0; i < length; ++i) ll_log(3, "        Sending byte %02X\n", buffer[i]);
+    for(size_t i=0; i < length; ++i) ll_log(3, "        Sending byte %02X\n", buffer[i]);
 
     uint8_t frame_header[4];
     frame_header[0] = LL_FLAG;
@@ -184,7 +187,8 @@ int ll_send_RR(int port_fd){
     frame[3] = ll_bcc(frame+1, frame+3);
     frame[4] = LL_FLAG;
 
-    int res = write(port_fd, frame, sizeof(frame)); ADD_MESSAGE_LENGTH(sizeof(frame)); ADD_FRAME();
+    int res = write(port_fd, frame, sizeof(frame));
+    ADD_MESSAGE_LENGTH(sizeof(frame)); ADD_FRAME();
     if(res == sizeof(frame)){
         ll_log(2, "    Sent RR\n");
         return EXIT_SUCCESS;
@@ -199,7 +203,8 @@ int ll_send_RR_resend(int port_fd){
     frame[3] = ll_bcc(frame+1, frame+3);
     frame[4] = LL_FLAG;
 
-    int res = write(port_fd, frame, sizeof(frame)); ADD_MESSAGE_LENGTH(sizeof(frame)); ADD_FRAME();
+    int res = write(port_fd, frame, sizeof(frame));
+    ADD_MESSAGE_LENGTH(sizeof(frame)); ADD_FRAME();
     if(res == sizeof(frame)){
         ll_log(2, "    Sent RR resend\n");
         return EXIT_SUCCESS;
@@ -214,7 +219,8 @@ int ll_send_REJ(int port_fd){
     frame[3] = ll_bcc(frame+1, frame+3);
     frame[4] = LL_FLAG;
 
-    int res = write(port_fd, frame, sizeof(frame)); ADD_MESSAGE_LENGTH(sizeof(frame)); ADD_FRAME();
+    int res = write(port_fd, frame, sizeof(frame));
+    ADD_MESSAGE_LENGTH(sizeof(frame)); ADD_FRAME();
     if(res == sizeof(frame)){
         ll_log(2, "    Sent REJ\n");
         return EXIT_SUCCESS;
