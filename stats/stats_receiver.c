@@ -8,11 +8,29 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
+/**
+ * @ingroup stats_separate
+ * @brief Start receiver
+ * 
+ * @param fd                File descriptor where output should be written to
+ *                          (typically a pipe)
+ * @param com               COM to be used
+ * @param filepath          Path of file to be transferred (not used in this case)
+ * @param baudrate         Baud rate
+ * @param prob_data         Probability of bit swap in data
+ * @param prob_head         Probability of bit swap in header
+ * @param retransmissions   Number of retransmissions
+ * @param size              Maximum frame size
+ * @param timeout           Timeout
+ * @param tau               Artificial propagation delay
+ * @param verbosity         Verbosity
+ * @return pid_t            ID of child process that was created to run receiver
+ */
 pid_t start_receiver(
   int fd,
   const char *com,
   const char *filepath,
-  size_t baud_rate,
+  size_t baudrate,
   float prob_data,
   float prob_head,
   size_t retransmissions,
@@ -24,7 +42,7 @@ pid_t start_receiver(
     if(pid == 0) /* Child */{
         dup2(fd, STDOUT_FILENO);
 
-        char baud_rate_s      [64]; sprintf(baud_rate_s      , "%lu", baud_rate      );
+        char baud_rate_s      [64]; sprintf(baud_rate_s      , "%lu", baudrate       );
         char prob_data_s      [64]; sprintf(prob_data_s      , "%f" , prob_data      );
         char prob_head_s      [64]; sprintf(prob_head_s      , "%f" , prob_head      );
         char retransmissions_s[64]; sprintf(retransmissions_s, "%lu", retransmissions);
@@ -63,7 +81,7 @@ int main(int argc, char *argv[]){
 
     FILE *stats_file = fopen(stats_file_path, "r");
     char filepath[1024];
-    size_t baud_rate;
+    size_t baudrate;
     float prob_data;
     float prob_head;
     size_t retransmissions;
@@ -77,7 +95,7 @@ int main(int argc, char *argv[]){
                     "------------------------------\n");
     while(fscanf(stats_file, "%s %lu %f %f %lu %lu %lu %lu %lu",
       filepath,
-      &baud_rate,
+      &baudrate,
       &prob_data,
       &prob_head,
       &retransmissions,
@@ -87,7 +105,7 @@ int main(int argc, char *argv[]){
       &verbosity) == 9){
         fprintf(stderr, "%30s %6lu %8f %8f %3lu %4lu %8lu %6lu %1lu ",
             filepath,
-            baud_rate,
+            baudrate,
             prob_data,
             prob_head,
             retransmissions,
@@ -102,7 +120,7 @@ int main(int argc, char *argv[]){
             pipe_receiver[1],
             com,
             filepath,
-            baud_rate,
+            baudrate,
             prob_data,
             prob_head,
             retransmissions,

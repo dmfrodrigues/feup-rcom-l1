@@ -2,8 +2,27 @@
 // Distributed under the terms of the GNU General Public License, version 3
 
 /**
- * @defgroup stats Statistics
+ * @defgroup    stats Statistics
+ * @brief       Statistics module
  */
+
+/**
+ * @defgroup    stats_integrated Statistics, integrated part
+ * @ingroup     stats
+ * @brief       Statistics module, integrated part
+ * 
+ * The macros documented under this submodule are only defined if the
+ * compilation flag STATISTICS is defined. Additionally, ADD_DELAY requires
+ * flag STATISTICS_DELAY to be defined, and GEN_FRAME_ERROR requires
+ * flag STATISTICS_ERRORS to be defined.
+ */
+
+/**
+ * @defgroup    stats_separate Statistics, separate part
+ * @ingroup     stats
+ * @brief       Statistics module, separate part
+ */
+
 #ifndef _STATS_H_
 #define _STATS_H_
 
@@ -12,27 +31,58 @@
 #include <sys/time.h>
 #include <unistd.h>
 
+/**
+ * @ingroup stats_integrated
+ * @brief Statistics data structure.
+ */
 typedef struct {
-    size_t L;
-    size_t Lf;
-    size_t N;
-    size_t Ne;
-    size_t Nt;
-    size_t *C;
-    suseconds_t T;    
+    size_t L;       ///< Total message length, including frames with errors (in bytes)
+    size_t Lf;      ///< File length (in bytes)
+    size_t N;       ///< Total number of frames
+    size_t Ne;      ///< Number of frames with errors
+    size_t Nt;      ///< Number of frames that resulted in timeout
+    size_t *C;      ///< Capacity (in bits/second)
+    suseconds_t T;  ///< Execution time (in microseconds)
 } stats_t;
 
+/**
+ * @ingroup stats_integrated
+ * @brief Statistics data object.
+ */
 stats_t stats;
 
+/**
+ * @ingroup stats_integrated
+ * @brief Statistics configuration structure.
+ */
 typedef struct {
     float prob_error_head;
     float prob_error_data;
     useconds_t dtau;
 } stats_config_t;
 
+/**
+ * @ingroup stats_integrated
+ * @brief Statistics configuration object.
+ */
 stats_config_t stats_config;
 
+/**
+ * @ingroup stats_integrated
+ * @brief Start timer.
+ * 
+ * @see toc()
+ */
 void tic(void);
+
+/**
+ * @ingroup stats_integrated
+ * @brief Register current time.
+ * 
+ * The time registered by this function can be consulted at stats.T (in microseconds)
+ * 
+ * @see tic()
+ */
 void toc(void);
 
 void print_stats(void);
@@ -50,6 +100,12 @@ void print_stats(void);
  */
 void gen_frame_error(float prob, uint8_t *frame, size_t frame_size);
 
+/**
+ * @ingroup stats_integrated
+ * @brief Generate artificial delay (sleep).
+ * 
+ * @param usec Time to delay (in microseconds)
+ */
 void add_delay(useconds_t usec);
 
 #ifdef STATISTICS
@@ -73,15 +129,25 @@ void add_delay(useconds_t usec);
         #define GEN_FRAME_ERROR(prob, frame, frame_size)    {}
     #endif
 #else
+    ///< @ingroup stats_integrated Add to total message length
     #define ADD_MESSAGE_LENGTH(length)                  {}
+    ///< @ingroup stats_integrated Add to file length
     #define ADD_FILE_LENGTH(length)                     {}
+    ///< @ingroup stats_integrated Increment number of frames
     #define ADD_FRAME()                                 {}
+    ///< @ingroup stats_integrated Increment number of frame errors
     #define ADD_FRAME_ERROR()                           {}
+    ///< @ingroup stats_integrated Increment number of frame timeouts
     #define ADD_FRAME_TIMEOUT()                         {}
+    ///< @ingroup stats_integrated Wrapper of tic()
     #define TIC()                                       {}
+    ///< @ingroup stats_integrated Wrapper of toc()
     #define TOC()                                       {}
+    ///< @ingroup stats_integrated Wrapper of print_stats()
     #define PRINT_STATS()                               {}
+    ///< @ingroup stats_integrated Wrapper of gen_frame_error(float, uint8_t*, size_t)
     #define GEN_FRAME_ERROR(prob, frame, frame_size)    {}
+    ///< @ingroup stats_integrated Wrapper of add_delay(useconds_t)
     #define ADD_DELAY(usec)                             {}
 #endif
 

@@ -11,6 +11,13 @@
 
 #define SECONDS_TO_NANOS 1000000000
 
+/**
+ * @ingroup stats_separate
+ * @brief Count number of non-empty lines in file.
+ * 
+ * @param filepath      Path to file to analyse
+ * @return size_t       Number of non-empty lines
+ */
 size_t count_lines(const char *filepath){
     size_t ret = 0;
 
@@ -22,6 +29,24 @@ size_t count_lines(const char *filepath){
     return ret/9;
 }
 
+/**
+ * @ingroup stats_separate
+ * @brief Start transmiter
+ * 
+ * @param fd                File descriptor where output should be written to
+ *                          (typically a pipe)
+ * @param com               COM to be used
+ * @param filepath          Path of file to be transferred
+ * @param baud_rate         Baud rate
+ * @param prob_data         Probability of bit swap in data
+ * @param prob_head         Probability of bit swap in header
+ * @param retransmissions   Number of retransmissions
+ * @param size              Maximum frame size
+ * @param timeout           Timeout
+ * @param tau               Artificial propagation delay
+ * @param verbosity         Verbosity
+ * @return pid_t            ID of child process that was created to run transmitter
+ */
 pid_t start_transmitter(
   int fd,
   const char *com,
@@ -38,7 +63,7 @@ pid_t start_transmitter(
     if(pid == 0) /* Child */{
         dup2(fd, STDOUT_FILENO);
 
-        char baud_rate_s      [64]; sprintf(baud_rate_s      , "%lu", baudrate      );
+        char baud_rate_s      [64]; sprintf(baud_rate_s      , "%lu", baudrate       );
         char prob_data_s      [64]; sprintf(prob_data_s      , "%f" , prob_data      );
         char prob_head_s      [64]; sprintf(prob_head_s      , "%f" , prob_head      );
         char retransmissions_s[64]; sprintf(retransmissions_s, "%lu", retransmissions);

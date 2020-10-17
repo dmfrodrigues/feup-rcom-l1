@@ -1,6 +1,12 @@
 // Copyright (C) 2020 Diogo Rodrigues, Breno Pimentel
 // Distributed under the terms of the GNU General Public License, version 3
 
+/**
+ * @defgroup    ll_internal LL internal routines
+ * @ingroup     ll
+ * @brief       Logical link (LL) internal routines; for internal use.
+ */
+
 #ifndef _LL_INTERNAL_H_
 #define _LL_INTERNAL_H_
 
@@ -20,6 +26,7 @@ int timeout;
 unsigned int sequence_number;
 
 /**
+ * @ingroup ll_internal
  * @brief Handle alarm signal.
  * 
  * @param signum    Signal number (unused)
@@ -27,6 +34,7 @@ unsigned int sequence_number;
 void alarmHandler(__attribute__((unused)) int signum);
 
 /**
+ * @ingroup ll_internal
  * @brief Get baud rate.
  * 
  * The baud rate can be specified as any integer in ll_config.baud_rate.
@@ -41,6 +49,7 @@ tcflag_t ll_get_baud_rate(void)
     __attribute__((warn_unused_result));
 
 /**
+ * @ingroup ll_internal
  * @brief Get I-frame C byte expected from the other end of the communication.
  * 
  * @return uint8_t  Expected I-frame C byte
@@ -49,6 +58,7 @@ uint8_t ll_get_expected_Iframe_C(void)
     __attribute__((warn_unused_result));
 
 /**
+ * @ingroup ll_internal
  * @brief Get I-frame C byte unexpected from the other end of the communication.
  * 
  * @return uint8_t  Unexpected I-frame C byte
@@ -57,6 +67,7 @@ uint8_t ll_get_unexpected_Iframe_C(void)
     __attribute__((warn_unused_result));
 
 /**
+ * @ingroup ll_internal
  * @brief Get RR byte expected from the other end of the communication.
  * 
  * @return uint8_t  Expected RR byte
@@ -65,6 +76,7 @@ uint8_t ll_get_expected_RR(void)
     __attribute__((warn_unused_result));
 
 /**
+ * @ingroup ll_internal
  * @brief Get REJ byte expected from the other end of the communication.
  * 
  * @return uint8_t  Expected REJ byte
@@ -73,6 +85,7 @@ uint8_t ll_get_expected_REJ(void)
     __attribute__((warn_unused_result));
 
 /**
+ * @ingroup ll_internal
  * @brief Get I-frame C byte (according to the value of sequence_number, aka Ns).
  * 
  * @return uint8_t  I-frame C byte
@@ -81,6 +94,7 @@ uint8_t ll_get_Iframe_C(void)
     __attribute__((warn_unused_result));
 
 /**
+ * @ingroup ll_internal
  * @brief Send SET message (a S-frame) to serial port.
  * 
  * @param port_fd   Port to send SET message to
@@ -90,6 +104,7 @@ int ll_send_SET(int port_fd)
     __attribute__((warn_unused_result));
 
 /**
+ * @ingroup ll_internal
  * @brief Send DISC message (a S-frame) to serial port.
  * 
  * @param port_fd   Port to send DISC message to
@@ -99,6 +114,7 @@ int ll_send_DISC(int port_fd)
     __attribute__((warn_unused_result));
 
 /**
+ * @ingroup ll_internal
  * @brief Send UA message (a U-frame) to serial port.
  * 
  * @param port_fd   Port to send UA message to
@@ -108,6 +124,7 @@ int ll_send_UA(int port_fd)
     __attribute__((warn_unused_result));
 
 /**
+ * @ingroup ll_internal
  * @brief Send data message (I-frame) to serial port.
  * 
  * @param port_fd   Port to send data message to
@@ -119,6 +136,7 @@ ssize_t ll_send_I(int port_fd, const uint8_t *buffer, size_t length)
     __attribute__((warn_unused_result));
 
 /**
+ * @ingroup ll_internal
  * @brief Send Receiver Ready (RR) to port.
  * 
  * @param port_fd   Port to send RR to
@@ -128,6 +146,7 @@ int ll_send_RR(int port_fd)
     __attribute__((warn_unused_result));
 
 /**
+ * @ingroup ll_internal
  * @brief Send Receiver Ready (RR) to port after receiving unexpected I-frame.
  * 
  * @param port_fd   Port to send RR to
@@ -137,6 +156,7 @@ int ll_send_RR_resend(int port_fd)
     __attribute__((warn_unused_result));
 
 /**
+ * @ingroup ll_internal
  * @brief Send Rejected (REJ) to port.
  * 
  * @param port_fd   Port to send REJ to
@@ -146,6 +166,7 @@ int ll_send_REJ(int port_fd)
     __attribute__((warn_unused_result));
 
 /**
+ * @ingroup ll_internal
  * @brief Expect for S-frame to arrive from port.
  * 
  * @param port_fd   Port to expect the frame comes from
@@ -157,6 +178,7 @@ int ll_expect_Sframe(int port_fd, uint8_t *a_rcv, uint8_t *c_rcv)
     __attribute__((warn_unused_result));
 
 /**
+ * @ingroup ll_internal
  * @brief Expect for U-frame to arrive from port.
  * 
  * @param port_fd   Port to expect the frame comes from
@@ -168,6 +190,7 @@ int ll_expect_Uframe(int port_fd, uint8_t *a_rcv, uint8_t *c_rcv)
     __attribute__((warn_unused_result));
 
 /**
+ * @ingroup ll_internal
  * @brief Expect for I-frame to arrive from port.
  * 
  * @param port_fd   Port to expect the frame comes from
