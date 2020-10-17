@@ -447,9 +447,7 @@ Frame reception was implemented using state machines. S-frame, U-frame and I-fra
 
 \subsection{Byte stuffing}
 
-We applied the byte stuffing encoding method suggested in the project guidelines, which consists of defining an escape byte ESC (\texttt{0x7E}), and if character $c$ is equal to FLAG or ESC it is replaced by ESC followed by $c' = c \xor \texttt{0x20}$; the result can be easily decoded, since all we have to do is, on finding ESC, decode $c'$ by applying $c' \xor \texttt{0x20} = c \xor \texttt{0x20} \xor \texttt{0x20} = c \xor \texttt{0x00} = c$. This allows to disambiguate the possible situation where a data byte could be confused with FLAG/end of frame.
-
-There is an additional issue, which was not mentioned in the guidelines: BCC2 can also take the same value as FLAG, if the data is for instance \texttt{0x70 0x0E}, in which case there is no way to distinguish BCC2 from FLAG. We have thus decided to extend byte stuffing encoding to BCC2.
+We applied the byte stuffing encoding method suggested in the project guidelines, which consists of defining an escape byte ESC (\texttt{0x7E}), and if character $c$ is equal to FLAG or ESC it is replaced by ESC followed by $c' = c \xor \texttt{0x20}$; a byte $c'$ after ESC can be easily decoded by applying $c' \xor \texttt{0x20} = c \xor \texttt{0x20} \xor \texttt{0x20} = c$. This disambiguates the situation where a data byte (or BCC2) $c$ could be confused with FLAG.
 
 \section{Application protocol} \label{sec:AppProtocol}
 
