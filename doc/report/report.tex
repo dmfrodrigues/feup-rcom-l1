@@ -498,21 +498,12 @@ The meaning of each field is as follows:
 	\item $\text{P}_1$ to $\text{P}_K$: $K$ bytes of the file to be transmitted.
 \end{itemize}
 
+The transmitter sends one first control packet, with the name and size of the file.
+Then it sends the data packets with the sequential number and ends with another control packet,
+this having the same data as the first one.
 
-\begin{figure}[H]
-	\centering
-	\begin{tikzpicture}[->,>=stealth',node distance=1.4cm,initial text=$ $,]
-		\node[align=center, draw, minimum width=7cm, minimum height=1.4cm] (app) {Start control packet};
-		\node[align=center, draw, minimum width=7cm, minimum height=1.4cm, fill=black!10, below of=app] (link) {Data packets};
-		\node[align=center, draw, minimum width=7cm, minimum height=1.4cm, fill=black!20, below of=link] (driver) {End control packet};
-	
-		\draw   (app) 		edge[align=center, left , bend right=88.5		] node{} (link)
-				(link) 		edge[align=center, left , bend right=88.5		] node{} (driver)
-			;
-	\end{tikzpicture}
-	\caption{Receiver read order. The receiver gathers information about the file with the support of the control packets and reconstructs the original file with the data packets. 
-	It is also possible to detect corrupted data and flaws in the transmission making use of the sequence number and the file size. }
-\end{figure}
+Meanwhile, the receiver gathers information about the file with the support of the control packets and reconstructs the original file with data packets. 
+It is also possible to detect corrupted data and flaws in the transmission making use of the sequence number and the file size.
 
 \section{Validation} \label{sec:Validation}
 
