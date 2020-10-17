@@ -416,10 +416,13 @@ This protocol is suited with a mechanism that allows the receiver to identify if
 			\node[align=center, draw, minimum width=1.2cm, minimum height=1.2cm] at (1.2, 0) (a) {A};
 			\node[align=center, draw, minimum width=1.2cm, minimum height=1.2cm] at (2.4, 0) (c) {C};
 			\node[align=center, draw, minimum width=1.2cm, minimum height=1.2cm] at (3.6, 0) (bcc) {BCC1};
-			\node[align=center, draw, minimum width=1.2cm, minimum height=1.2cm] at (4.8, 0) (d1) {$\text{D}_1$};
-			\node[align=center, dashed, draw, minimum width=2.4cm, minimum height=1.2cm] at (6.6, 0) (data) {Data};
-			\node[align=center, draw, minimum width=1.2cm, minimum height=1.2cm] at (8.4, 0) (bcc2) {BCC2};
-			\node[align=center, draw, minimum width=1.2cm, minimum height=1.2cm] at (9.6, 0) (f-end) {F};
+			\node[align=center,       minimum width=1.2cm, minimum height=1.2cm] at (4.8, 0) (d1) {$\text{D}_1$};
+			\node[align=center, dashed, draw, minimum width=2.4cm, minimum height=1.2cm] at (6.6, 0) (data) {...};
+			\node[align=center,       minimum width=1.2cm, minimum height=1.2cm] at (8.4, 0) (dk) {$\text{D}_K$};
+			\node[align=center, draw, minimum width=1.2cm, minimum height=1.2cm] at (9.6, 0) (bcc2) {BCC2};
+			\node[align=center, draw, minimum width=1.2cm, minimum height=1.2cm] at (10.8, 0) (f-end) {F};
+
+			\draw[line width=2pt]	(4.2, -0.6) rectangle ++(4.8, 1.2);
 		\end{tikzpicture}
 	\end{tabular}
 	\caption{Structure of the S/U-frames (\textit{a}) and I-frames (\textit{b}). Each square represents a byte}
@@ -476,9 +479,9 @@ The application protocol is used for file transfer using the methods offered by 
 			\node[align=center, draw, minimum width=1.2cm, minimum height=1.2cm] at (0, 0) (c) {C};
 			\node[align=center, draw, minimum width=1.2cm, minimum height=1.2cm] at (1.2, 0) (n) {N};
 			\node[align=center, draw, minimum width=2.4cm, minimum height=1.2cm] at (3.0, 0) (l) {$\text{L}$};
-			\node[align=center, draw, minimum width=1.2cm, minimum height=1.2cm] at (4.8, 0) (p1) {$\text{P}_1$};
+			\node[align=center, minimum width=1.2cm, minimum height=1.2cm] at (4.8, 0) (p1) {$\text{P}_1$};
 			\node[align=center, dashed, draw, minimum width=2.4cm, minimum height=1.2cm] at (6.6, 0) (packets) {...};
-			\node[align=center, draw, minimum width=1.2cm, minimum height=1.2cm] at (8.4, 0) (pk) {$\text{P}_\text{k}$};
+			\node[align=center, minimum width=1.2cm, minimum height=1.2cm] at (8.4, 0) (pk) {$\text{P}_\text{k}$};
 
 			\draw[line width=2pt]	(4.2, -0.6) rectangle ++(4.8, 1.2);
 		\end{tikzpicture}
