@@ -1,0 +1,11 @@
+../testfiles/pinguim.gif 115200  0e-4 0.0 10 128 1000000 0 1
+../testfiles/pinguim.gif 115200  1e-4 0.0 10 128 1000000 0 1
+../testfiles/pinguim.gif 115200  2e-4 0.0 10 128 1000000 0 1
+../testfiles/pinguim.gif 115200  3e-4 0.0 10 128 1000000 0 1
+../testfiles/pinguim.gif 115200  4e-4 0.0 10 128 1000000 0 1
+../testfiles/pinguim.gif 115200  5e-4 0.0 10 128 1000000 0 1
+../testfiles/pinguim.gif 115200  6e-4 0.0 10 128 1000000 0 1
+../testfiles/pinguim.gif 115200  7e-4 0.0 10 128 1000000 0 1
+../testfiles/pinguim.gif 115200  8e-4 0.0 10 128 1000000 0 1
+../testfiles/pinguim.gif 115200  9e-4 0.0 10 128 1000000 0 1
+../testfiles/pinguim.gif 115200 10e-4 0.0 10 128 1000000 0 1
