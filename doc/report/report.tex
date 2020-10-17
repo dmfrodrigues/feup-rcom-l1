@@ -220,6 +220,7 @@ We implemented two layers to satisfy the previously presented architecture: two 
 
 The \texttt{app} module makes available two executable files, where \texttt{<COM>} is the communication port to be used (\texttt{COM1} corresponds to \texttt{ttyS0}, \texttt{COM2} to \texttt{ttyS1}, ...), and \texttt{<file>} is a file path:
 \begin{itemize}
+	\itemsep0em
 	\item \texttt{./transmitter <COM> <file>}, to send \texttt{<file>} to port \texttt{<COM>}.
 	\item \texttt{./receiver <COM>}, to receive a file from port \texttt{<COM>}.
 \end{itemize}
@@ -232,6 +233,7 @@ This module takes advantage of the link layer interface to transfer a file in ch
 
 The \texttt{ll} module makes available the following C functions through file \texttt{ll.h}, which are meant to be used by the \texttt{app} module executable files:
 \begin{itemize}
+	\itemsep0em
 	\item \texttt{int llopen(int com, ll\_status\_t status)}, to open serial port \texttt{com} (1 for \texttt{COM1}, 2 for \texttt{COM2}, ...) with a certain \texttt{status} (\texttt{TRANSMITTER} or \texttt{RECEIVER}). Returns the connection ID (which is the file descriptor of the open port) if successful, or -1 if an error occured.
 	\item \texttt{int llwrite(int id, const char *buffer, int length)} writes the first \texttt{length} bytes of \texttt{buffer} (up to \texttt{LL\_MAX\_SIZE} bytes) to connection with ID \texttt{id}; returns the number of written bytes, or -1 if an error occured.
 	\item \texttt{int llread(int id, char *buffer)} reads from the connection with ID \texttt{id} to \texttt{buffer}; \texttt{buffer} must have a size of at least \texttt{LL\_MAX\_SIZE} bytes.
@@ -274,12 +276,14 @@ Then, start the transmitter and connect it to \texttt{COM11} to write file \text
 
 To read from serial port \texttt{COM12}/\texttt{ttyS11}:
 \begin{enumerate}
+	\itemsep0em
 	\item Open the serial port with \texttt{id = llopen("/dev/ttyS11", RECEIVER)}.
 	\item Allocate \texttt{buffer} with at least \texttt{LL\_MAX\_SIZE} bytes, and read data with \texttt{llread(id, buffer)}.
 	\item Close the serial port with \texttt{llclose(id)}.
 \end{enumerate}
 To write to serial port \texttt{COM11}/\texttt{ttyS10}:
 \begin{enumerate}
+	\itemsep0em
 	\item Open the serial port with \texttt{id = llopen("/dev/ttyS10", TRANSMITTER)}.
 	\item Write data with \texttt{llwrite(id, buffer, length)}.
 	\item Close the serial port with \texttt{llclose(id)}.
@@ -412,27 +416,28 @@ This protocol is suited with a mechanism that allows the receiver to identify if
 			\node[align=center, draw, minimum width=1.2cm, minimum height=1.2cm] at (1.2, 0) (a) {A};
 			\node[align=center, draw, minimum width=1.2cm, minimum height=1.2cm] at (2.4, 0) (c) {C};
 			\node[align=center, draw, minimum width=1.2cm, minimum height=1.2cm] at (3.6, 0) (bcc) {BCC1};
-			\node[align=center, draw, minimum width=1.2cm, minimum height=1.2cm] at (4.8, 0) (d1) {D$_1$};
+			\node[align=center, draw, minimum width=1.2cm, minimum height=1.2cm] at (4.8, 0) (d1) {$\text{D}_1$};
 			\node[align=center, dashed, draw, minimum width=2.4cm, minimum height=1.2cm] at (6.6, 0) (data) {Data};
 			\node[align=center, draw, minimum width=1.2cm, minimum height=1.2cm] at (8.4, 0) (bcc2) {BCC2};
 			\node[align=center, draw, minimum width=1.2cm, minimum height=1.2cm] at (9.6, 0) (f-end) {F};
 		\end{tikzpicture}
 	\end{tabular}
-	\caption{Structure of the S/U-frames (\textit{a}) and I-frames (\textit{b}). Each square represents a byte, which can be F (flag), A (address), C (control), BCC (block check character) or D (data).}
+	\caption{Structure of the S/U-frames (\textit{a}) and I-frames (\textit{b}). Each square represents a byte}
 	\label{fig:frames}
 \end{figure}
 
-The meaning of the constituents of frames are as follows:
+The meaning of the bytes that constitute the frames are as follows:
 
 \begin{itemize}
+	\itemsep0em
 	\item Flag (F, FLAG, \texttt{0x7E}): marks the beginning and end of a frame.
 	\item Address (A): identifier of the sender, or of the destination if it is an answer. Takes values \texttt{0x03} for the transmitter and \texttt{0x01} for the receiver.
 	\item Control (C): identifies the command; \texttt{0x03} for SET, \texttt{0x0B} for DISC, \texttt{0x07} for UA, \texttt{0b0S000000} for I, \texttt{0bR0000101} for RR and \texttt{0bR0000001} for REJ, where $\texttt{S} = N_s$ and $\texttt{R} = N_r$.
-	\item Block check character (BCC): exclusive-or ($\xor$) of a certain range of bytes; BCC and BCC1 are $\text{A}\xor\text{C}$, and BCC2 is $\text{D}_1 \xor \text{D}_2 \xor ... \xor \text{D}_\text{N}$. Is used to check for bit swaps.
+	\item Block check character (BCC): exclusive-or ($\xor$) of a certain range of bytes; BCC and BCC1 are $\text{A}\xor\text{C}$, and BCC2 is $\text{D}_1 \xor \text{D}_2 \xor ... \xor \text{D}_N$. Is used to check for bit swaps.
 	\item Data (D): data bytes, encoded using byte stuffing.
 \end{itemize}
 
-Frame reception was implemented using state machines. S-frame and U-frame reception was implemented using the same automaton, as they contain the same number and type of fields; it saves the state, as well as the most recently read values of A and C. I-frames were implemented using a different automaton, as there was no need for storing the values of A and C (which could be directly checked by the automaton), and it additionally required a buffer to store read data, so that data could be provided to the caller once the automaton arrived at the Stop state.
+Frame reception was implemented using state machines. S-frame, U-frame and I-frame reception was implemented using different automatons (in appendix \ref{ch:automatons}), to save up space and allow for the right transitions in each situation.
 
 % TODO automata figures?
 % In appendices
@@ -447,66 +452,49 @@ There is an additional issue, which was not mentioned in the guidelines: BCC2 ca
 
 The application protocol is used for file transfer using the methods offered by the link layer interface. It consists in reading the original file and sending it in smaller pieces to the receiver. This protocol utilizes the control packet, which is used to signal the start and end of the file transmission, and the data packet, which carries chunks of the file.
 
-\vspace{2.5mm}
-
-Control packet:
-
 \begin{figure}[H]
 	\centering
 	\begin{tabular}{m{6mm} m{108mm}}
-		\centering &
+		(\textit{a}) &
 		\begin{tikzpicture}[->,>=stealth',node distance=2cm,initial text=$ $,]
 			\small
 			\node[align=center, draw, minimum width=1.2cm, minimum height=1.2cm] at (0, 0) (c) {C};
-			\node[align=center, draw, minimum width=1.2cm, minimum height=1.2cm] at (1.2, 0) (t1) {T1};
-			\node[align=center, draw, minimum width=1.2cm, minimum height=1.2cm] at (2.4, 0) (l1) {L1};
-			\node[align=center, draw, minimum width=1.2cm, minimum height=1.2cm] at (3.6, 0) (v1) {V1};
-			\node[align=center, draw, minimum width=1.2cm, minimum height=1.2cm] at (4.8, 0) (t2) {T2};
-			\node[align=center, draw, minimum width=1.2cm, minimum height=1.2cm] at (6.0, 0) (l2) {L2};
-			\node[align=center, draw, minimum width=1.2cm, minimum height=1.2cm] at (7.2, 0) (v2) {V2};
-			\node[align=center, dashed, draw, minimum width=2.4cm, minimum height=1.2cm] at (9.0, 0) (packets) {};
+			\node[align=center, draw, minimum width=1.2cm, minimum height=1.2cm] at (1.2, 0) (t1) {$\text{T}_1$};
+			\node[align=center, draw, minimum width=1.2cm, minimum height=1.2cm] at (2.4, 0) (l1) {$\text{L}_1$};
+			\node[align=center, draw, minimum width=2.4cm, minimum height=1.2cm] at (4.2, 0) (v1) {$\text{V}_1$};
+			\node[align=center, draw, minimum width=1.2cm, minimum height=1.2cm] at (6.0, 0) (t2) {$\text{T}_2$};
+			\node[align=center, draw, minimum width=1.2cm, minimum height=1.2cm] at (7.2, 0) (l2) {$\text{L}_2$};
+			\node[align=center, draw, minimum width=2.4cm, minimum height=1.2cm] at (9.0, 0) (v2) {$\text{V}_2$};
+			\node[align=center, dashed, draw, minimum width=2.4cm, minimum height=1.2cm] at (11.4, 0) (packets) {...};
+
+			\draw[line width=2pt]	(0.6, -0.6) rectangle ++(4.8, 1.2)
+									(5.4, -0.6) rectangle ++(4.8, 1.2);
 		\end{tikzpicture}\\[10pt]
-	\end{tabular}
-	\caption{Structure of the control packet. Each parameter is represented by T (type), L (lenght in bytes) and V (value).}
-	\label{fig:control_packet}
-\end{figure}
-
-The meaning of each field are as follows:
-\begin{itemize}
-	\item Control field (C): Determine whether its a start or end control packet. Assumes the value \texttt{0x02} when its a start packet, and \texttt{0x03} when its an end packet.
-	\item Type ($T_x$): Indicates if the parameter is a file size, \texttt{0x0}, or a file name, \texttt{0x01}.
-	\item Lenght ($L_x$): Indicates the size in bytes of the parameter value.
-	\item Value ($V_x$): The parameter value indicated by T and with the size indicated by L.
-\end{itemize} 
-
-Data packet:
-
-\begin{figure}[H]
-	\centering
-	\begin{tabular}{m{6mm} m{108mm}}
-		\centering & 
+		(\textit{b}) &
 		\begin{tikzpicture}[->,>=stealth',node distance=2cm,initial text=$ $,]
 			\small
 			\node[align=center, draw, minimum width=1.2cm, minimum height=1.2cm] at (0, 0) (c) {C};
 			\node[align=center, draw, minimum width=1.2cm, minimum height=1.2cm] at (1.2, 0) (n) {N};
-			\node[align=center, draw, minimum width=1.2cm, minimum height=1.2cm] at (2.4, 0) (l2) {L2};
-			\node[align=center, draw, minimum width=1.2cm, minimum height=1.2cm] at (3.6, 0) (l1) {L1};
-			\node[align=center, draw, minimum width=1.2cm, minimum height=1.2cm] at (4.8, 0) (p1) {P1};
-			\node[align=center, dashed, draw, minimum width=2.4cm, minimum height=1.2cm] at (6.6, 0) (packets) {};
-			\node[align=center, draw, minimum width=1.2cm, minimum height=1.2cm] at (8.4, 0) (pk) {$P_k$};
+			\node[align=center, draw, minimum width=2.4cm, minimum height=1.2cm] at (3.0, 0) (l) {$\text{L}$};
+			\node[align=center, draw, minimum width=1.2cm, minimum height=1.2cm] at (4.8, 0) (p1) {$\text{P}_1$};
+			\node[align=center, dashed, draw, minimum width=2.4cm, minimum height=1.2cm] at (6.6, 0) (packets) {...};
+			\node[align=center, draw, minimum width=1.2cm, minimum height=1.2cm] at (8.4, 0) (pk) {$\text{P}_\text{k}$};
+
+			\draw[line width=2pt]	(4.2, -0.6) rectangle ++(4.8, 1.2);
 		\end{tikzpicture}
 	\end{tabular}
-	\caption{Structure of the data packet.}
-	\label{fig:data_packet}
+	\caption{Structure of the control packet (\textit{a}) and the data packet (\textit{b})}
+	\label{fig:control_packet}
 \end{figure}
 
-The meaning of each field are as follows:
-
+The meaning of each field is as follows:
 \begin{itemize}
-	\item Control field (C): Takes over the value \texttt{0x01}.
-	\item Sequence number (N): Sequence number of the data chunk, which is a module of 255.
-	\item $L_2$ and $L_1$: Second and first byte of the number representing the size in bytes of the data field.
-	\item $P_1$ to $P_k$: K bytes of the file to be transmitted.
+	\itemsep0em
+	\item Control field (C): Determines the type of packet. Has value \texttt{0x02} for a start packet, \texttt{0x03} for an end packet, and \texttt{0x01} for a data packet.
+	\item Type ($\text{T}_i$), Length ($\text{L}_i$), Value ($\text{V}_i$): Encoding of parameter to be sent, includes its type (\texttt{0x00} for file size, or \texttt{0x01} for file name), length in bytes, and its value.
+	\item Sequence number (N): Sequence number of the data chunk, modulo 255.
+	\item Packet length ($\text{L}$): Number of bytes in the data field; uses two bytes, $\text{L}'_1$ and $\text{L}'_2$, where the length is $256*\text{L}'_1 + \text{L}'_2$.
+	\item $\text{P}_1$ to $\text{P}_K$: $K$ bytes of the file to be transmitted.
 \end{itemize}
 
 
@@ -583,63 +571,63 @@ During project development and evaluation the repository remained private, altho
 
 % TODO: files
 
-\newgeometry{top=24mm,bottom=24mm,left=14mm,right=14mm}
-\fancyhfoffset[E,O]{0pt}
+% \newgeometry{top=24mm,bottom=24mm,left=14mm,right=14mm}
+% \fancyhfoffset[E,O]{0pt}
 
-\section{Link Layer (LL)}
-\lstinputlisting[caption=\texttt{ll.h}, language=C]{../../include/ll.h}
-\lstinputlisting[caption=\texttt{ll.c}, language=C]{../../src/ll.c}
+% \section{Link Layer (LL)}
+% \lstinputlisting[caption=\texttt{ll.h}, language=C]{../../include/ll.h}
+% \lstinputlisting[caption=\texttt{ll.c}, language=C]{../../src/ll.c}
 
-\subsection{Internal code}
-\lstinputlisting[caption=\texttt{ll\_internal.h}, language=C]{../../include/ll_internal.h}
-\lstinputlisting[caption=\texttt{ll\_internal.c}, language=C]{../../src/ll_internal.c}
+% \subsection{Internal code}
+% \lstinputlisting[caption=\texttt{ll\_internal.h}, language=C]{../../include/ll_internal.h}
+% \lstinputlisting[caption=\texttt{ll\_internal.c}, language=C]{../../src/ll_internal.c}
 
-\subsection{Utilities}
-\lstinputlisting[caption=\texttt{ll\_utils.h}, language=C]{../../include/ll_utils.h}
-\lstinputlisting[caption=\texttt{ll\_utils.c}, language=C]{../../src/ll_utils.c}
+% \subsection{Utilities}
+% \lstinputlisting[caption=\texttt{ll\_utils.h}, language=C]{../../include/ll_utils.h}
+% \lstinputlisting[caption=\texttt{ll\_utils.c}, language=C]{../../src/ll_utils.c}
 
-\begin{landscape}
-\subsection{Flags}
-\lstinputlisting[caption=\texttt{ll\_flags.h}, language=C]{../../include/ll_flags.h}
-\end{landscape}
+% \begin{landscape}
+% \subsection{Flags}
+% \lstinputlisting[caption=\texttt{ll\_flags.h}, language=C]{../../include/ll_flags.h}
+% \end{landscape}
 
-\subsection{S-frame state machine}
-\lstinputlisting[caption=\texttt{ll\_s\_statemachine.h}, language=C]{../../include/ll_s_statemachine.h}
-\lstinputlisting[caption=\texttt{ll\_s\_statemachine.c}, language=C]{../../src/ll_s_statemachine.c}
+% \subsection{S-frame state machine}
+% \lstinputlisting[caption=\texttt{ll\_s\_statemachine.h}, language=C]{../../include/ll_s_statemachine.h}
+% \lstinputlisting[caption=\texttt{ll\_s\_statemachine.c}, language=C]{../../src/ll_s_statemachine.c}
 
-\subsection{U-frame state machine}
-\lstinputlisting[caption=\texttt{ll\_u\_statemachine.h}, language=C]{../../include/ll_u_statemachine.h}
-\lstinputlisting[caption=\texttt{ll\_u\_statemachine.c}, language=C]{../../src/ll_u_statemachine.c}
+% \subsection{U-frame state machine}
+% \lstinputlisting[caption=\texttt{ll\_u\_statemachine.h}, language=C]{../../include/ll_u_statemachine.h}
+% \lstinputlisting[caption=\texttt{ll\_u\_statemachine.c}, language=C]{../../src/ll_u_statemachine.c}
 
-\subsection{I-frame state machine}
-\lstinputlisting[caption=\texttt{ll\_i\_statemachine.h}, language=C]{../../include/ll_i_statemachine.h}
-\lstinputlisting[caption=\texttt{ll\_i\_statemachine.c}, language=C]{../../src/ll_i_statemachine.c}
+% \subsection{I-frame state machine}
+% \lstinputlisting[caption=\texttt{ll\_i\_statemachine.h}, language=C]{../../include/ll_i_statemachine.h}
+% \lstinputlisting[caption=\texttt{ll\_i\_statemachine.c}, language=C]{../../src/ll_i_statemachine.c}
 
-\section{Application}
-\lstinputlisting[caption=\texttt{application\_layer.h}, language=C]{../../include/app.h}
-\lstinputlisting[caption=\texttt{application\_layer.c}, language=C]{../../src/app.c}
+% \section{Application}
+% \lstinputlisting[caption=\texttt{application\_layer.h}, language=C]{../../include/app.h}
+% \lstinputlisting[caption=\texttt{application\_layer.c}, language=C]{../../src/app.c}
 
-\subsection{Argument parsing}
-\lstinputlisting[caption=\texttt{application\_layer.h}, language=C]{../../include/app_args.h}
-\lstinputlisting[caption=\texttt{application\_layer.c}, language=C]{../../src/app_args.c}
+% \subsection{Argument parsing}
+% \lstinputlisting[caption=\texttt{application\_layer.h}, language=C]{../../include/app_args.h}
+% \lstinputlisting[caption=\texttt{application\_layer.c}, language=C]{../../src/app_args.c}
 
-\subsection{Executables}
-\lstinputlisting[caption=\texttt{transmitter.c}, language=C]{../../src/transmitter.c}
-\lstinputlisting[caption=\texttt{receiver.c}, language=C]{../../src/receiver.c}
+% \subsection{Executables}
+% \lstinputlisting[caption=\texttt{transmitter.c}, language=C]{../../src/transmitter.c}
+% \lstinputlisting[caption=\texttt{receiver.c}, language=C]{../../src/receiver.c}
 
-\section{Statistics}
-\subsection{Integrated part}
-\lstinputlisting[caption=\texttt{stats.h}, language=C]{../../include/stats.h}
-\lstinputlisting[caption=\texttt{stats.c}, language=C]{../../src/stats.c}
+% \section{Statistics}
+% \subsection{Integrated part}
+% \lstinputlisting[caption=\texttt{stats.h}, language=C]{../../include/stats.h}
+% \lstinputlisting[caption=\texttt{stats.c}, language=C]{../../src/stats.c}
 
-\subsection{Separate part}
-\lstinputlisting[caption=\texttt{stats\_transmitter.c}, language=C]{../../stats/stats_transmitter.c}
-\lstinputlisting[caption=\texttt{stats\_receiver.c}   , language=C]{../../stats/stats_receiver.c}
-\lstinputlisting[caption=\texttt{vary-tau.txt}]{../../stats/vary-tau.txt}
+% \subsection{Separate part}
+% \lstinputlisting[caption=\texttt{stats\_transmitter.c}, language=C]{../../stats/stats_transmitter.c}
+% \lstinputlisting[caption=\texttt{stats\_receiver.c}   , language=C]{../../stats/stats_receiver.c}
+% \lstinputlisting[caption=\texttt{vary-tau.txt}]{../../stats/vary-tau.txt}
 
-\restoregeometry
+% \restoregeometry
 
-\chapter{State machines}
+\chapter{State machines} \label{ch:automatons}
 \section{U-frame state machine}
 
 A U-frame state machine must be ready to handle the following scenarios:
