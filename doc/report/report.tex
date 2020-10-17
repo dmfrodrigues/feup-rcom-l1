@@ -31,7 +31,7 @@
 \usepackage{tikz}
 \usepackage{tikz-qtree}
 \usetikzlibrary{automata, positioning, arrows}
-\usepackage[justification=centering]{caption}
+\usepackage[justification=centering,font=small,skip=0.5em]{caption}
 \usepackage{subcaption}
 \usepackage{float}
 
@@ -399,7 +399,7 @@ This protocol is suited with a mechanism that allows the receiver to identify if
 
 \begin{figure}[H]
 	\centering
-	\begin{tabular}{m{6mm} m{108mm}}
+	\begin{tabular}{m{6mm} m{120mm}}
 		(\textit{a}) & 
 		\begin{tikzpicture}[->,>=stealth',node distance=2cm,initial text=$ $,]
 			\small
@@ -455,7 +455,7 @@ The application protocol is used for file transfer using the methods offered by 
 
 \begin{figure}[H]
 	\centering
-	\begin{tabular}{m{6mm} m{108mm}}
+	\begin{tabular}{m{6mm} m{132mm}}
 		(\textit{a}) &
 		\begin{tikzpicture}[->,>=stealth',node distance=2cm,initial text=$ $,]
 			\small
@@ -522,7 +522,7 @@ The meaning of each field is as follows:
 
 \begin{center}
 	\small
-	\begin{tabular}{c | l | p{83mm} | c}
+	\begin{tabular}{c | l | p{81mm} | c}
 		\hline \hline
 		\textbf{Acronym} & \textbf{Name}             & \textbf{Definition}                                                                & I/O \\ \hline
 		$S$              & Efficiency                & Ratio of actual transfer rate to capacity                                          & D   \\
