@@ -79,5 +79,8 @@ int app_parse_args( int argc, char *argv[], int *com, ll_status_t status, char *
         }
     }
 
+    srand(*(int*)&stats_config.prob_error_head);
+    srand(*(int*)&stats_config.prob_error_data * rand());
+
     return res;
 }
