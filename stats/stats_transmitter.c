@@ -51,36 +51,27 @@ pid_t start_transmitter(
   int fd,
   const char *com,
   const char *filepath,
-  size_t baudrate,
-  float prob_data,
-  float prob_head,
-  size_t retransmissions,
-  size_t size,
-  size_t timeout,
-  size_t tau,
-  size_t verbosity){
+  const char *baud_rate,
+  const char *prob_data,
+  const char *prob_head,
+  const char *retransmissions,
+  const char *size,
+  const char *timeout,
+  const char *tau,
+  const char *verbosity){
     pid_t pid = fork();
     if(pid == 0) /* Child */{
         dup2(fd, STDOUT_FILENO);
 
-        char baud_rate_s      [64]; sprintf(baud_rate_s      , "%lu", baudrate       );
-        char prob_data_s      [64]; sprintf(prob_data_s      , "%f" , prob_data      );
-        char prob_head_s      [64]; sprintf(prob_head_s      , "%f" , prob_head      );
-        char retransmissions_s[64]; sprintf(retransmissions_s, "%lu", retransmissions);
-        char size_s           [64]; sprintf(size_s           , "%lu", size           );
-        char timeout_s        [64]; sprintf(timeout_s        , "%lu", timeout        );
-        char tau_s            [64]; sprintf(tau_s            , "%lu", tau            );
-        char verbosity_s      [64]; sprintf(verbosity_s      , "%lu", verbosity      );
-        
         execl("../transmitter", "../transmitter", com, filepath,
-            "-b", baud_rate_s,
-            "-d", prob_data_s,
-            "-h", prob_head_s,
-            "-r", retransmissions_s,
-            "-s", size_s,
-            "-t", timeout_s,
-            "-T", tau_s,
-            "-v", verbosity_s,
+            "-b", baud_rate,
+            "-d", prob_data,
+            "-h", prob_head,
+            "-r", retransmissions,
+            "-s", size,
+            "-t", timeout,
+            "-T", tau,
+            "-v", verbosity,
             NULL
         );
         perror("execl");
@@ -104,15 +95,15 @@ int main(int argc, char *argv[]){
     fprintf(stdout, "file,C,pd,ph,retransmissions,size,timeout,dtau,L,Lf,N,Ne,Nt,C,T\n");
 
     FILE *stats_file = fopen(stats_file_path, "r");
-    char filepath[1024];
-    size_t baudrate;
-    float prob_data;
-    float prob_head;
-    size_t retransmissions;
-    size_t size;
-    size_t timeout;
-    size_t tau;
-    size_t verbosity;
+    char filepath       [1024];
+    char baudrate       [1024];
+    char prob_data      [1024];
+    char prob_head      [1024];
+    char retransmissions[1024];
+    char size           [1024];
+    char timeout        [1024];
+    char tau            [1024];
+    char verbosity      [1024];
     fprintf(stderr, "                     File path   Rate  Pr data  Pr head "
                     "Try Size  Timeout    Tau V Ret        T\n");
     fprintf(stderr, "--------------------------------------------------------"
@@ -120,17 +111,17 @@ int main(int argc, char *argv[]){
 
     size_t idx_line = 0;
     struct timespec start; clock_gettime(CLOCK_REALTIME, &start);
-    while(fscanf(stats_file, "%s %lu %f %f %lu %lu %lu %lu %lu",
+    while(fscanf(stats_file, "%s %s %s %s %s %s %s %s %s",
       filepath,
-      &baudrate,
-      &prob_data,
-      &prob_head,
-      &retransmissions,
-      &size,
-      &timeout,
-      &tau,
-      &verbosity) == 9){
-        fprintf(stderr, "%30s %6lu %8f %8f %3lu %4lu %8lu %6lu %1lu ",
+      baudrate,
+      prob_data,
+      prob_head,
+      retransmissions,
+      size,
+      timeout,
+      tau,
+      verbosity) == 9){
+        fprintf(stderr, "%30s %6s %8s %8s %3s %4s %8s %6s %1s ",
             filepath,
             baudrate,
             prob_data,
@@ -186,7 +177,7 @@ int main(int argc, char *argv[]){
         size_t      C ; fscanf(pipe_transmitter_read, "%lu", &C );
         suseconds_t T ; fscanf(pipe_transmitter_read, "%lu", &T );
         fclose(pipe_transmitter_read);
-        fprintf(stdout, "%s,%lu,%.10f,%.10f,%lu,%lu,%lu,%lu,"
+        fprintf(stdout, "%s,%s,%s,%s,%s,%s,%s,%s,"
                         "%lu,%lu,%lu,%lu,%lu,%lu,%lu\n",
             filepath, baudrate, prob_data, prob_head, retransmissions, size, timeout, tau,
             L, Lf, N, Ne, Nt, C, T);

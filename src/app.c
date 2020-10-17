@@ -6,6 +6,8 @@
 
 #include "stats.h"
 
+#include "ll_utils.h"
+
 app_config_t app_config = {
     -1,
     LL_MAX_SIZE
@@ -133,6 +135,7 @@ int app_send_file(char *file_path){
 }
 
 int app_rcv_ctrl_packet(int ctrl, unsigned int * file_size, char * file_name){
+    ll_log(2, "APP: preparing to read ctrl packet\n");
 
     uint8_t *ctrl_packet = (uint8_t*)malloc(5+sizeof(unsigned int)+FILE_NAME_MAX_SIZE);
 
@@ -165,35 +168,50 @@ int app_rcv_ctrl_packet(int ctrl, unsigned int * file_size, char * file_name){
 
     free(ctrl_packet);
 
+    ll_log(2, "APP: successfully read ctrl packet\n");
+
     return 0;
 }
 
 int app_rcv_data_packet(char * data, int seq_number){
+    ll_log(2, "APP: preparing to read data packet\n");
 
     uint8_t * data_packet = (uint8_t*) malloc(app_config.packet_size);
     
     if(llread(app_config.fileDescriptor, data_packet) < 0){
         fprintf(stderr, "ERROR: unable to read data packet\n");
+        free(data_packet);
         return -1;
     }
 
     if(data_packet[0] != CTRL_DATA){
-        fprintf(stderr, "ERROR: data control is not correct\n"
-                        "data control=0x%02X (should be 0x%02X)\n",
-                        data_packet[0], CTRL_DATA);
+        ll_err("ERROR: data control is not correct\n"
+               "data control=0x%02X (should be 0x%02X)\n",
+               data_packet[0], CTRL_DATA);
+        free(data_packet);
         return -1;
     }
 
     if(data_packet[1] != seq_number){
-        fprintf(stderr, "ERROR: sequence number is not correct\n");
+        ll_err("ERROR: sequence number is not correct\n");
+        free(data_packet);
         return -1;
     }
 
-    int data_length = 256*data_packet[2] + data_packet[3];
+    size_t data_length = 256*data_packet[2] + data_packet[3];
+    
+    if(data_length > app_config.packet_size){
+        ll_err("ERROR: transmitted data length %d is larger than packet size %d\n",
+               data_length, app_config.packet_size);
+        free(data_packet);
+        return -1;
+    }
 
-    memcpy(data, data_packet + 4, data_length);
+    memcpy(data, data_packet + 4, data_length); ll_log(2, "APP: L201\n");
 
-    free(data_packet);
+    free(data_packet); ll_log(2, "APP: L203\n");
+
+    ll_log(2, "APP: successfully read data packet\n");
 
     return data_length;
 }
