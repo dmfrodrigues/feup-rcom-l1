@@ -339,6 +339,7 @@ ssize_t ll_expect_Iframe(int port_fd, uint8_t *buffer){
     uint8_t bcc2  = buffer[written_chars-1];
     uint8_t bcc2_ = ll_bcc(buffer, buffer+written_chars-1);
     if(bcc2 != bcc2_){
+        ADD_FRAME_ERROR();
         ll_err("ERROR: bcc2 incorrect (is 0x%02X, should be 0x%02X)\n", bcc2, bcc2_);
         return -1;
     }
