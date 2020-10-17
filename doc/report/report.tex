@@ -444,6 +444,125 @@ We applied the byte stuffing encoding method suggested in the project guidelines
 There is an additional issue, which was not mentioned in the guidelines: BCC2 can also take the same value as FLAG, if the data is for instance \texttt{0x70 0x0E}, in which case there is no way to distinguish BCC2 from FLAG. We have thus decided to extend byte stuffing encoding to BCC2.
 
 \section{Application protocol} \label{sec:AppProtocol}
+%Pretende-se desenvolver um protocolo de aplicação muito simples para
+%transferência de um ficheiro, usando o serviço fíável oferecido pelo protocolo
+%de ligação de dados
+%• A aplicação deve suportar dois tipos de pacotes enviados pelo Emissor
+%» Pacotes de controlo para sinalizar o início e o fim da transferência do ficheiro
+%» Pacotes de dados contendo fragmentos do ficheiro a transmitir
+%• O pacote de controlo que sinaliza o início da transmissão (start) deverá ter
+%obrigatoriamente um campo com o tamanho do ficheiro e opcionalmente um
+%campo com o nome do ficheiro (e eventualmente outros campos)
+%• O pacote de controlo que sinaliza o fim da transmissão (end) deverá repetir a
+%informação contida no pacote de início de transmissão
+%• Os pacotes de dados contêm obrigatoriamente um campo (um octeto) com um
+%número de sequência e um campo (dois octetos) que indica o tamanho do
+%respectivo campo de dados
+
+%C – campo de controlo (valores: 2 – start; 3 – end)
+%» Cada parâmetro (tamanho, nome do ficheiro, ou outro) é codificado na forma
+%TLV (Type, Length, Value)
+%– T (um octeto) – indica qual o parâmetro (0 – tamanho do ficheiro, 1 – nome do
+%ficheiro, outros valores – a definir, se necessário)
+%– L (um octeto) – indica o tamanho em octetos do campo V (valor do parâmetro)
+%– V (número de octetos indicado em L) – valor do parâmetro
+
+%» C – campo de controlo (valor: 1 – dados)
+%» N – número de sequência (módulo 255)
+%» L2 L1 – indica o número de octetos (K) do campo de dados
+%» P1 ... PK – campo de dados do pacote (K octetos)
+% (identificação dos principais aspectos funcionais; descrição da 
+%estratégia de implementação destes aspectos com apresentação de extractos de código)
+
+The application protocol is used for file transfer 
+using the methods offered by the link layer interface.
+It consists in reading the original file and sending it in smaller pieces
+to the receiver.
+This protocol utilizes the control packet, which is used to 
+signal the start and end of the file transmission, 
+and the data packet, which carries chunks of the file.
+
+Control packet:
+
+\begin{figure}[H]
+	\centering
+	\begin{tabular}{m{6mm} m{108mm}}
+		\centering &
+		\begin{tikzpicture}[->,>=stealth',node distance=2cm,initial text=$ $,]
+			\small
+			\node[align=center, draw, minimum width=1.2cm, minimum height=1.2cm] at (0, 0) (c) {C};
+			\node[align=center, draw, minimum width=1.2cm, minimum height=1.2cm] at (1.2, 0) (t1) {T1};
+			\node[align=center, draw, minimum width=1.2cm, minimum height=1.2cm] at (2.4, 0) (l1) {L1};
+			\node[align=center, draw, minimum width=1.2cm, minimum height=1.2cm] at (3.6, 0) (v1) {V1};
+			\node[align=center, draw, minimum width=1.2cm, minimum height=1.2cm] at (4.8, 0) (t2) {T2};
+			\node[align=center, draw, minimum width=1.2cm, minimum height=1.2cm] at (6.0, 0) (l2) {L2};
+			\node[align=center, draw, minimum width=1.2cm, minimum height=1.2cm] at (7.2, 0) (v2) {V2};
+			\node[align=center, dashed, draw, minimum width=2.4cm, minimum height=1.2cm] at (9.0, 0) (packets) {};
+		\end{tikzpicture}\\[10pt]
+	\end{tabular}
+	\caption{Structure of the control packet. Each parameter is represented by T (type), L (lenght in bytes) and V (value).}
+	\label{fig:frames}
+\end{figure}
+
+
+\begin{itemize}
+	\item Control field (C): Determine whether its a start or end control packet. Assumes the value 0x02 when its a start packet, and 0x03 when its an end packet.
+	\item Type (Tx): Indicates if the parameter is a file size, 0x0, or a file name, 0x01.
+	\item Lenght (Lx): Indicates de the size in bytes of the parameter value.
+	\item Value (Vx): The parameter value indicated by T and with the size indicated by L.
+\end{itemize} 
+
+Data packet:
+
+%» C – campo de controlo (valor: 1 – dados)
+%» N – número de sequência (módulo 255)
+%» L2 L1 – indica o número de octetos (K) do campo de dados
+%» P1 ... PK – campo de dados do pacote (K octetos)
+
+\begin{figure}[H]
+	\centering
+	\begin{tabular}{m{6mm} m{108mm}}
+		\centering & 
+		\begin{tikzpicture}[->,>=stealth',node distance=2cm,initial text=$ $,]
+			\small
+			\node[align=center, draw, minimum width=1.2cm, minimum height=1.2cm] at (0, 0) (c) {C};
+			\node[align=center, draw, minimum width=1.2cm, minimum height=1.2cm] at (1.2, 0) (n) {N};
+			\node[align=center, draw, minimum width=1.2cm, minimum height=1.2cm] at (2.4, 0) (l2) {L2};
+			\node[align=center, draw, minimum width=1.2cm, minimum height=1.2cm] at (3.6, 0) (l1) {L1};
+			\node[align=center, draw, minimum width=1.2cm, minimum height=1.2cm] at (4.8, 0) (p1) {P1};
+			\node[align=center, dashed, draw, minimum width=2.4cm, minimum height=1.2cm] at (6.6, 0) (packets) {};
+			\node[align=center, draw, minimum width=1.2cm, minimum height=1.2cm] at (8.4, 0) (pk) {PK};
+		\end{tikzpicture}
+	\end{tabular}
+	\caption{Structure of the data packet. Each square represents a byte, which can be F (flag), A (address), C (control), BCC (block check character) or D (data).}
+	\label{fig:frames}
+\end{figure}
+
+
+\begin{itemize}
+	\item Control field (C): Assumes the value 0x01.
+	\item Sequence number (N): Sequence number of the data chunk (module of 255).
+	\item L2: First byte of the number representing the size in bytes of the data field.
+	\item L1: Second byte of the number representing the size in bytes of the data field.
+	\item P1 to Pk: K bytes of the file to be transmitted.
+\end{itemize}
+
+
+\begin{figure}[H]
+	\centering
+	\begin{tikzpicture}[->,>=stealth',node distance=1.4cm,initial text=$ $,]
+		\node[align=center, draw, minimum width=7cm, minimum height=1.4cm] (app) {Start control packet};
+		\node[align=center, draw, minimum width=7cm, minimum height=1.4cm, fill=black!10, below of=app] (link) {Data packets};
+		\node[align=center, draw, minimum width=7cm, minimum height=1.4cm, fill=black!20, below of=link] (driver) {End control packet};
+	
+		\draw   (app) 		edge[align=center, left , bend right=88.5		] node{} (link)
+				(link) 		edge[align=center, left , bend right=88.5		] node{} (driver)
+			;
+	\end{tikzpicture}
+	\caption{Receiver read order}
+\end{figure}
+
+The receiver reconstructs the original file with the data packets.
 
 \section{Validation} \label{sec:Validation}
 
