@@ -9,7 +9,9 @@
 #include <time.h>
 #include <unistd.h>
 
-#define SECONDS_TO_NANOS 1000000000
+#define SECONDS_TO_NANOS  1000000000
+#define SECONDS_TO_MICROS 1000000
+#define BYTES_TO_BITS     8
 
 /**
  * @ingroup stats_separate
@@ -92,7 +94,7 @@ int main(int argc, char *argv[]){
 
     const size_t num_lines = count_lines(stats_file_path);
 
-    fprintf(stdout, "file,C,pd,ph,retransmissions,size,timeout,dtau,L,Lf,N,Ne,Nt,C,T\n");
+    fprintf(stdout, "file,C,pd,ph,retransmissions,size,timeout,dtau,L,Lf,N,Ne,Nt,T,a,Re,S\n");
 
     FILE *stats_file = fopen(stats_file_path, "r");
     char filepath       [1024];
@@ -176,11 +178,14 @@ int main(int argc, char *argv[]){
         size_t      Nt; fscanf(pipe_transmitter_read, "%lu", &Nt);
         size_t      C ; fscanf(pipe_transmitter_read, "%lu", &C );
         suseconds_t T ; fscanf(pipe_transmitter_read, "%lu", &T );
+        double      a  = (C*(T - Nt*atof(timeout))/SECONDS_TO_MICROS)/(2.0*L*BYTES_TO_BITS)-0.5;
+        double      Re = Ne/N;
+        double      S  = (Lf*BYTES_TO_BITS)/((T/SECONDS_TO_MICROS)*C);
         fclose(pipe_transmitter_read);
         fprintf(stdout, "%s,%s,%s,%s,%s,%s,%s,%s,"
-                        "%lu,%lu,%lu,%lu,%lu,%lu,%lu\n",
+                        "%lu,%lu,%lu,%lu,%lu,%lu,%.20f,%.20f,%.20f\n",
             filepath, baudrate, prob_data, prob_head, retransmissions, size, timeout, tau,
-            L, Lf, N, Ne, Nt, C, T);
+            L, Lf, N, Ne, Nt, T, a, Re, S);
         fprintf(stderr, "%8lu %6.2f%% (%6.1fs; %6.1fs left)\n",
             T, (100.0*idx_line)/num_lines, total_time, left_time);
 
