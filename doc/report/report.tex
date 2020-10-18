@@ -518,7 +518,18 @@ It is also possible to detect corrupted data and flaws in the transmission makin
 
 In order to validate the functionality of the protocols, the application was tested with a variety of files, distinguishing in type and size. 
 Furthermore, was introduced errors to check the robustness of the program, and delays in the $T_{prop}$.
-It was feasible to verify whether the files transmitted and the files received were equal with the aid of \texttt{cmp} command in Linux. 
+The protocol implemented demonstrated positive results with an error rate up to 65\%.
+
+\noindent
+To test the program, run the following command:
+
+\texttt{make test}
+
+\noindent
+These tests include running the transmitter alone and running the transmitter after and before the receiver.
+It was feasible to verify whether the files transmitted and the files received were equal with the aid of \texttt{cmp} command in Linux.
+
+
 
 \section{Efficiency of the data link protocol} \label{sec:Efficiency}
 
