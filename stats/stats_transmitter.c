@@ -179,8 +179,8 @@ int main(int argc, char *argv[]){
         size_t      C ; fscanf(pipe_transmitter_read, "%lu", &C );
         suseconds_t T ; fscanf(pipe_transmitter_read, "%lu", &T );
         double      a  = (C*(T - Nt*atof(timeout))/SECONDS_TO_MICROS)/(2.0*L*BYTES_TO_BITS)-0.5;
-        double      Re = Ne/N;
-        double      S  = (Lf*BYTES_TO_BITS)/((T/SECONDS_TO_MICROS)*C);
+        double      Re = (double)Ne/(double)N;
+        double      S  = (double)(Lf*BYTES_TO_BITS)/(double)(((double)T/SECONDS_TO_MICROS)*C);
         fclose(pipe_transmitter_read);
         fprintf(stdout, "%s,%s,%s,%s,%s,%s,%s,%s,"
                         "%lu,%lu,%lu,%lu,%lu,%lu,%.20f,%.20f,%.20f\n",
