@@ -35,6 +35,15 @@
 \usepackage{subcaption}
 \usepackage{float}
 
+\usepackage{siunitx}
+\usepackage{pgfplots}
+\pgfplotsset{compat=newest} % Allows to place the legend below plot
+\usepgfplotslibrary{units} % Allows to enter the units nicely
+\sisetup{
+  round-mode          = places,
+  round-precision     = 2,
+}
+
 % Encodings (to render letters with diacritics and special characters)
 \usepackage[utf8]{inputenc}
 
@@ -548,6 +557,57 @@ It is also possible to detect corrupted data and flaws in the transmission makin
 	S = \frac{L_f}{T C}
 \end{equation*}
 
+\begin{figure}[H]
+	\begin{center}
+		\begin{subfigure}[t]{0.53\textwidth}
+			\begin{tikzpicture}[baseline]
+				\footnotesize
+				\begin{axis}[
+					height=75mm,
+					grid=major,
+					grid style={dashed,black!50},
+					xlabel={$a=T_{prop}/T_f$}, % Set the labels
+					xmin=0, xmax=2.5,
+					ylabel={Efficiency $S$},
+					ymin=0, ymax=0.7,
+					ytick distance=0.1,
+					% x unit=\si{\volt}, % Set the respective units
+					% y unit=\si{\ampere},
+					% legend style={at={(0.5,-0.2)},anchor=north}, % Put the legend below the plot
+					x tick label style={rotate=90,anchor=east} % Display labels sideways
+				]
+					\addplot[blue, mark=*, mark options={mark size=1.5pt}] table[x=a,y=S,col sep=comma] {vary-tau-processed.csv};
+				\end{axis}
+			\end{tikzpicture}
+		\end{subfigure}
+		\begin{subfigure}[t]{0.46\textwidth}
+			\hspace{-1.5em}
+			\begin{tikzpicture}[baseline]
+				\footnotesize
+				\begin{axis}[
+					height=75mm,
+					grid=major,
+					grid style={dashed,black!50},
+					xlabel=Frame error rate $R_e$, % Set the labels
+					x tick label style={rotate=90,anchor=east}, % Display labels sideways
+					xmin=0, xmax=0.7,
+					% ylabel=Efficiency $S$,
+					ymin=0, ymax=0.7,
+					ytick distance=0.1,
+					yticklabels={,,}
+					% x unit=\si{\volt}, % Set the respective units
+					% y unit=\si{\ampere},
+					% legend style={at={(0.5,-0.2)},anchor=north}, % Put the legend below the plot
+				]
+					\addplot[only marks, blue, mark=*, mark options={mark size=1.5pt}] table[x=Re,y=S,col sep=comma] {vary-fre.csv};
+					\addplot[mark=none, black] {-0.65660553*x+0.64659037} node[right, align=left] at (0.23, 0.55) {$y=-0.656606x+0.0.646590$\\$r^2=0.999901$};
+				\end{axis}
+			\end{tikzpicture}
+		\end{subfigure}
+	  	\caption{Efficiency $S$ plotted against $a$ (on the left) and $R_e$ (right). On the left, $S$ is determined for each point from the average $T$ of four repetitions}
+	\end{center}
+\end{figure}
+
 \section{Conclusion} \label{sec:Conclusion}
 
 \pagebreak
@@ -560,8 +620,6 @@ It is also possible to detect corrupted data and flaws in the transmission makin
 The source code of this project can be obtained from \href{https://github.com/dmfrodrigues/feup-rcom-l1}{github.com/dmfrodrigues/feup-rcom-l1}. The source code is made available by \textcopyright~Diogo Rodrigues and Breno Pimentel under the \href{https://www.gnu.org/licenses/gpl-3.0.en.html}{GNU General Public License v3} (GPLv3), which you should have received together with the source code, or that you can otherwise obtain online.
 
 During project development and evaluation the repository remained private, although it can be shared with evaluators on request to clarify the development process or due to other justifiable reasons. It will be made public once all equivalent curricular unit projects have been evaluated in the present school year.
-
-% TODO: files
 
 \newgeometry{top=24mm,bottom=24mm,left=14mm,right=14mm}
 \fancyhfoffset[E,O]{0pt}
