@@ -90,6 +90,7 @@
 \usepackage{siunitx} %SI units
 \newcommand{\degree}{^{\circ}}
 \newcommand*\xor{\oplus}
+\newcommand\expected[1]{\mathbf{E}[#1]}
 
 % Headers and footers
 \usepackage{fancyhdr}
@@ -598,61 +599,62 @@ The source code of this project can be obtained from \href{https://github.com/dm
 
 During project development and evaluation the repository remained private, although it can be shared with evaluators on request to clarify the development process or due to other justifiable reasons. It will be made public once all equivalent curricular unit projects have been evaluated in the present school year.
 
-\newgeometry{top=24mm,bottom=24mm,left=14mm,right=14mm}
-\fancyhfoffset[E,O]{0pt}
+% \newgeometry{top=24mm,bottom=24mm,left=14mm,right=14mm}
+% \fancyhfoffset[E,O]{0pt}
 
-\section{Link Layer (LL)}
-\lstinputlisting[caption=\texttt{ll.h}, language=C]{../../include/ll.h}
-\lstinputlisting[caption=\texttt{ll.c}, language=C]{../../src/ll.c}
+% \section{Link Layer (LL)}
+% \lstinputlisting[caption=\texttt{ll.h}, language=C]{../../include/ll.h}
+% \lstinputlisting[caption=\texttt{ll.c}, language=C]{../../src/ll.c}
 
-\subsection{Internal code}
-\lstinputlisting[caption=\texttt{ll\_internal.h}, language=C]{../../include/ll_internal.h}
-\lstinputlisting[caption=\texttt{ll\_internal.c}, language=C]{../../src/ll_internal.c}
+% \subsection{Internal code}
+% \lstinputlisting[caption=\texttt{ll\_internal.h}, language=C]{../../include/ll_internal.h}
+% \lstinputlisting[caption=\texttt{ll\_internal.c}, language=C]{../../src/ll_internal.c}
 
-\subsection{Utilities}
-\lstinputlisting[caption=\texttt{ll\_utils.h}, language=C]{../../include/ll_utils.h}
-\lstinputlisting[caption=\texttt{ll\_utils.c}, language=C]{../../src/ll_utils.c}
+% \subsection{Utilities}
+% \lstinputlisting[caption=\texttt{ll\_utils.h}, language=C]{../../include/ll_utils.h}
+% \lstinputlisting[caption=\texttt{ll\_utils.c}, language=C]{../../src/ll_utils.c}
 
-\begin{landscape}
-\subsection{Flags}
-\lstinputlisting[caption=\texttt{ll\_flags.h}, language=C]{../../include/ll_flags.h}
-\end{landscape}
+% \begin{landscape}
+% \subsection{Flags}
+% \lstinputlisting[caption=\texttt{ll\_flags.h}, language=C]{../../include/ll_flags.h}
+% \end{landscape}
 
-\subsection{S-frame state machine}
-\lstinputlisting[caption=\texttt{ll\_s\_statemachine.h}, language=C]{../../include/ll_s_statemachine.h}
-\lstinputlisting[caption=\texttt{ll\_s\_statemachine.c}, language=C]{../../src/ll_s_statemachine.c}
+% \subsection{S-frame state machine}
+% \lstinputlisting[caption=\texttt{ll\_s\_statemachine.h}, language=C]{../../include/ll_s_statemachine.h}
+% \lstinputlisting[caption=\texttt{ll\_s\_statemachine.c}, language=C]{../../src/ll_s_statemachine.c}
 
-\subsection{U-frame state machine}
-\lstinputlisting[caption=\texttt{ll\_u\_statemachine.h}, language=C]{../../include/ll_u_statemachine.h}
-\lstinputlisting[caption=\texttt{ll\_u\_statemachine.c}, language=C]{../../src/ll_u_statemachine.c}
+% \subsection{U-frame state machine}
+% \lstinputlisting[caption=\texttt{ll\_u\_statemachine.h}, language=C]{../../include/ll_u_statemachine.h}
+% \lstinputlisting[caption=\texttt{ll\_u\_statemachine.c}, language=C]{../../src/ll_u_statemachine.c}
 
-\subsection{I-frame state machine}
-\lstinputlisting[caption=\texttt{ll\_i\_statemachine.h}, language=C]{../../include/ll_i_statemachine.h}
-\lstinputlisting[caption=\texttt{ll\_i\_statemachine.c}, language=C]{../../src/ll_i_statemachine.c}
+% \subsection{I-frame state machine}
+% \lstinputlisting[caption=\texttt{ll\_i\_statemachine.h}, language=C]{../../include/ll_i_statemachine.h}
+% \lstinputlisting[caption=\texttt{ll\_i\_statemachine.c}, language=C]{../../src/ll_i_statemachine.c}
 
-\section{Application}
-\lstinputlisting[caption=\texttt{application\_layer.h}, language=C]{../../include/app.h}
-\lstinputlisting[caption=\texttt{application\_layer.c}, language=C]{../../src/app.c}
+% \section{Application}
+% \lstinputlisting[caption=\texttt{application\_layer.h}, language=C]{../../include/app.h}
+% \lstinputlisting[caption=\texttt{application\_layer.c}, language=C]{../../src/app.c}
 
-\subsection{Argument parsing}
-\lstinputlisting[caption=\texttt{application\_layer.h}, language=C]{../../include/app_args.h}
-\lstinputlisting[caption=\texttt{application\_layer.c}, language=C]{../../src/app_args.c}
+% \subsection{Argument parsing}
+% \lstinputlisting[caption=\texttt{application\_layer.h}, language=C]{../../include/app_args.h}
+% \lstinputlisting[caption=\texttt{application\_layer.c}, language=C]{../../src/app_args.c}
 
-\subsection{Executables}
-\lstinputlisting[caption=\texttt{transmitter.c}, language=C]{../../src/transmitter.c}
-\lstinputlisting[caption=\texttt{receiver.c}, language=C]{../../src/receiver.c}
+% \subsection{Executables}
+% \lstinputlisting[caption=\texttt{transmitter.c}, language=C]{../../src/transmitter.c}
+% \lstinputlisting[caption=\texttt{receiver.c}, language=C]{../../src/receiver.c}
 
-\section{Statistics}
-\subsection{Integrated part}
-\lstinputlisting[caption=\texttt{stats.h}, language=C]{../../include/stats.h}
-\lstinputlisting[caption=\texttt{stats.c}, language=C]{../../src/stats.c}
+% \section{Statistics}
+% \subsection{Integrated part}
+% \lstinputlisting[caption=\texttt{stats.h}, language=C]{../../include/stats.h}
+% \lstinputlisting[caption=\texttt{stats.c}, language=C]{../../src/stats.c}
 
-\subsection{Separate part}
-\lstinputlisting[caption=\texttt{stats\_transmitter.c}, language=C]{../../stats/stats_transmitter.c}
-\lstinputlisting[caption=\texttt{stats\_receiver.c}   , language=C]{../../stats/stats_receiver.c}
-\lstinputlisting[caption=\texttt{vary-tau.txt}]{../../stats/vary-tau.txt}
+% \subsection{Separate part}
+% \lstinputlisting[caption=\texttt{stats\_transmitter.c}, language=C]{../../stats/stats_transmitter.c}
+% \lstinputlisting[caption=\texttt{stats\_receiver.c}   , language=C]{../../stats/stats_receiver.c}
+% \lstinputlisting[caption=\texttt{vary-tau.txt}]{../../stats/vary-tau.txt}
+% \lstinputlisting[caption=\texttt{vary-fre.txt}]{../../stats/vary-fre.txt}
 
-\restoregeometry
+% \restoregeometry
 
 \chapter{State machines} \label{ch:automatons}
 \section{U-frame state machine}
@@ -811,10 +813,12 @@ An I-frame state machine must be ready to handle to following scenarios:
 
 \section{Normalized propagation time}
 
-\begin{alignat}{2} \label{eq:T}
+\begin{equation} \label{eq:T}
+\begin{alignedat}{2}
 	T & = \sum_{i=1}^{N-N_t}{(2T_{prop}^i + T_f^i)} && + \sum_{i=1}^{N_t}{T_t} \\
 	  & = 2 (N-N_t) \overline{T_{prop}} + \sum_{i=1}^{N}{T_f^i} && + N_t T_t
-\end{alignat}
+\end{alignedat}
+\end{equation}
 
 Because $T_f = L/R$,
 \begin{equation} \label{eq:Tfsum}
@@ -832,14 +836,24 @@ As per equation \ref{eq:Tfsum}, the average frame time $\overline{T_f}$ is
 	\overline{T_f} = \frac{1}{N-N_t}\sum_{i=1}^{N-N_t}{T_f^i} = \frac{L}{(N-N_t) C}
 \end{equation}
 We can thus determine $a$ from
-\begin{alignat}{2}
+\begin{equation}
+\begin{alignedat}{2}
 	a
 	& = \frac{\overline{T_{prop}}}{\overline{T_f}} \\
 	& = \frac{\frac{T - L/C - N_t T_t}{2 (N-N_t)}}{\frac{L}{(N-N_t) C}} \\
 	& = \frac{C(T - N_t T_t)}{2 L} - \frac{1}{2}
-\end{alignat}
+\end{alignedat}
+\end{equation}
+
+\section{Frame error rate}
+
+\begin{equation} \label{eq:Re}
+	R_e = \frac{N_e}{N - N_t}
+\end{equation}
 
 \section{Efficiency}
+
+\subsection{Calculation}
 
 We can determine the efficiency $S$ by using 
 \begin{equation} \label{eq:S}
@@ -854,5 +868,54 @@ thus equation \ref{eq:S} becomes
 	S = \frac{L_f}{T C}
 \end{equation}
 and as such we can determine $S$ by varying $L$ and $C$ and measure $T$.
+
+\subsection{Expected relations}
+
+From \ref{eq:Re},
+\begin{equation}
+	1-R_e = \frac{N - N_t - N_e}{N-N_t} = \frac{N_{min}}{N-N_t}
+\end{equation}
+
+We also know $\expected{A} = 1/(1-p_e)$, and that $p_e$ can be estimated from $R_e$, thus
+\begin{alignat}{2}
+	\expected{A} &= \frac{1}{1-p_e} = \frac{1}{1-R_e} \iff \\
+	1 &= (1-R_e)\expected{A} = \frac{N_{min}}{N-N_t}\expected{A}
+\end{alignat}
+
+From \ref{eq:T2},
+\begin{equation}
+	\begin{alignedat}{5}
+		T
+		& = (N-N_t)                       &&              && (\overline{T_f} + 2\overline{T_{prop}}) + N_t T_t \\
+		& = (N-N_t) \frac{N_{min}}{N-N_t} && \expected{A} && (\overline{T_f} + 2\overline{T_{prop}}) + N_t T_t \\
+		& = N_{min}                       && \expected{A} && (\overline{T_f} + 2\overline{T_{prop}}) + N_t T_t
+	\end{alignedat}
+\end{equation}
+where $N-N_t-N_e$ is a constant, representing the minimum amount of frames that were required to transfer the message.
+
+Thus, we have
+\begin{equation} \label{eq:S_rel}
+\begin{alignedat}{2}
+	S
+	&= \frac{N_{min}\overline{T_f}}{T} \\
+	&= \frac{N_{min}\overline{T_f}}{N_{min} \expected{A}(\overline{T_f} + 2\overline{T_{prop}}) + N_t T_t} \\
+	&= \frac{\overline{T_f}}{\expected{A}(\overline{T_f} + 2a\overline{T_f}) + N_t T_t} \\
+	&= \frac{1}{\expected{A}(1 + 2a) + N_t T_t / \overline{T_f}} \\
+	&= \frac{1}{\frac{1}{1-R_e}(1 + 2a) + N_t T_t / \overline{T_f}} \\
+	&= \frac{1-R_e}{(1 + 2a) + (1-R_e) N_t T_t / \overline{T_f}} \\
+	&= \frac{1-R_e}{1 + 2a} + \frac{(1-R_e)^2 N_t T_t}{(1 + 2a)\overline{T_f} + (1-R_e) N_t T_t}
+\end{alignedat}
+\end{equation}
+
+There are two occasions under which a timeout can occur:
+\begin{itemize}
+	\itemsep0em
+	\item No program is listening on the receiving end or the receiver does not acknowledge the FLAG on the beginning or end of a frame due to communication media error; 
+	\item The receiver sends an acknowledgement, but it does not arrive or arrives with errors.
+\end{itemize}
+The first is not possible, because the communication media is always connected and there is always a receiver, and random errors are not being generated on the FLAG, but rather on the data and the other header bytes. The second is not possible either, since errors are only being generated in data and headers of I-frames (and it is reasonable to assume there are almost no errors in other frames, as they are considerably smaller than I-frames). Thus, we can consider timeouts do not occur when evaluating the performance of this protocol ($N_t=0$), and as such equation \ref{eq:S_rel} becomes
+\begin{equation}
+	S = \frac{1-R_e}{1 + 2a}
+\end{equation}
 
 \end{document}
