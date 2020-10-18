@@ -142,9 +142,9 @@ Our main conclusions were...
 
 \section{Introduction} \label{sec:Introduction}
 
-The present project aims at arriving at a design and implementation of a data link layer suited with its own data transfer protocol to allow communication between two computers physically connected through RS-232 serial ports with asynchronous communication. The resulting source code was developed in the C language, targetting Linux devices.
+The present project aims at arriving at a design and implementation of a data link layer suited with its own data transfer protocol to allow communication between two computers physically connected through RS-232 serial ports with asynchronous communication. The resulting source code was developed in the C language, targeting Linux devices.
 
-This report is an artifact of the corresponding project, with the purpose of guiding readers through the process that was used to arrive at the project's goals. As such, this report is divided into seven main sections (excluding the \hyperref[sec:Introduction]{introduction} and \hyperref[sec:Conclusion]{conclusion}). In section \ref{sec:Architecture} we start by describing the generic architecture our program will follow in terms of layers and generic interfaces between layers, to then specity in section \ref{sec:CodeStructure} which specific layers implement the generic blocks of the previous section, the APIs each block will make available for inter-layer communication, and data structures used in each layer. Specific information for the end user on the main ways to use the program is presented in section \ref{sec:UseCases}. In sections \ref{sec:LLProtocol} and \ref{sec:AppProtocol} we identify the main functional aspects and implementation details of the logical link and application protocols respectively. Finally, in section \ref{sec:Validation} we test the program to validate it in terms of efficacy and robustness in face of errors or faulty communication media, and in section \ref{sec:Efficiency} we statistically describe the protocols' experimental efficiency and compare it to a theoretical Stop\&Wait protocol.
+This report is an artifact of the corresponding project, with the purpose of guiding readers through the process that was used to arrive at the project's goals. As such, this report is divided into seven main sections (excluding the \hyperref[sec:Introduction]{introduction} and \hyperref[sec:Conclusion]{conclusion}). In section \ref{sec:Architecture} we start by describing the generic architecture our program will follow in terms of layers and generic interfaces between layers, to then specify in section \ref{sec:CodeStructure} which specific layers implement the generic blocks of the previous section, the APIs each block will make available for inter-layer communication, and data structures used in each layer. Specific information for the end user on the main ways to use the program is presented in section \ref{sec:UseCases}. In sections \ref{sec:LLProtocol} and \ref{sec:AppProtocol} we identify the main functional aspects and implementation details of the logical link and application protocols respectively. Finally, in section \ref{sec:Validation} we test the program to validate it in terms of efficacy and robustness in face of errors or faulty communication media, and in section \ref{sec:Efficiency} we statistically describe the protocols' experimental efficiency and compare it to a theoretical Stop\&Wait protocol.
 
 \section{Architecture} \label{sec:Architecture}
 
@@ -515,6 +515,10 @@ Meanwhile, the receiver gathers information about the file with the support of t
 It is also possible to detect corrupted data and flaws in the transmission making use of the sequence number and the file size.
 
 \section{Validation} \label{sec:Validation}
+
+In order to validate the functionality of the protocols, the application was tested with a variety of files, distinguishing in type and size. 
+Furthermore, was introduced errors to check the robustness of the program, and delays in the $T_{prop}$.
+It was feasible to verify whether the files transmitted and the files received were equal with the aid of \texttt{cmp} command in Linux. 
 
 \section{Efficiency of the data link protocol} \label{sec:Efficiency}
 
