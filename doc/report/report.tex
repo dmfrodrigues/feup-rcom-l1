@@ -147,7 +147,9 @@ Our main conclusions were...
 
 The present project aims at arriving at a design and implementation of a data link layer suited with its own data transfer protocol to allow communication between two computers physically connected through RS-232 serial ports with asynchronous communication. The resulting source code was developed in the C language, targeting Linux devices.
 
-This report is an artifact of the corresponding project, with the purpose of guiding readers through the process that was used to arrive at the project's goals. As such, this report is divided into seven main sections (excluding the \hyperref[sec:Introduction]{introduction} and \hyperref[sec:Conclusion]{conclusion}). In section \ref{sec:Architecture} we start by describing the generic architecture our program will follow in terms of layers and generic interfaces between layers, to then specify in section \ref{sec:CodeStructure} which specific layers implement the generic blocks of the previous section, the APIs each block will make available for inter-layer communication, and data structures used in each layer. Specific information for the end user on the main ways to use the program is presented in section \ref{sec:UseCases}. In sections \ref{sec:LLProtocol} and \ref{sec:AppProtocol} we identify the main functional aspects and implementation details of the logical link and application protocols respectively. Finally, in section \ref{sec:Validation} we test the program to validate it in terms of efficacy and robustness in face of errors or faulty communication media, and in section \ref{sec:Efficiency} we statistically describe the protocols' experimental efficiency and compare it to a theoretical Stop\&Wait protocol.
+This report is an artifact of the corresponding project, with the purpose of guiding readers through the process that was used to arrive at the project's goals. As such, this report is divided into seven main sections (excluding the \hyperref[sec:Introduction]{introduction} and \hyperref[sec:Conclusion]{conclusion}). In section \ref{sec:Architecture} we start by describing the generic architecture our program will follow in terms of layers and generic interfaces between layers, to then specify in section \ref{sec:CodeStructure} which specific layers implement the generic blocks of the previous section, the APIs each block will make available for inter-layer communication, and data structures used in each layer. Specific information for the end user on the main ways to use the program is presented in section \ref{sec:UseCases}. In sections \ref{sec:LLProtocol} and \ref{sec:AppProtocol} we identify the main functional aspects and implementation details of the logical link and application protocols respectively. Finally, in section \ref{sec:Validation} we test the program to validate it in terms of efficacy and robustness in face of errors or faulty communication media, and in section \ref{sec:Efficiency} we statistically describe the protocols' experimental efficiency and compare it to a theoretical Stop\&Wait protocol. This project was tested in the computers of FEUP, room I321, bench 3, where computer 3 of the rack served as transmitter and the computer with connection to the FEUP network as the receiver.
+
+In this project/report, a \textit{byte} always stands for an 8-bit byte.
 
 \section{Architecture} \label{sec:Architecture}
 
@@ -275,12 +277,12 @@ Assuming \texttt{COM11} of the transmitter computer and \texttt{COM12} of the re
 
 First, start the receiver and connect it to \texttt{COM12} to read the file by calling
 
-\begin{lstlisting}[frame=none, numbers=none]
+\begin{lstlisting}[frame=none, numbers=none, language=sh]
 ./receiver 12
 \end{lstlisting}
 Then, start the transmitter and connect it to \texttt{COM11} to write file \texttt{pinguim.gif} by calling
 
-\begin{lstlisting}[frame=none, numbers=none]
+\begin{lstlisting}[frame=none, numbers=none, language=sh]
 ./transmitter 11 pinguim.gif
 \end{lstlisting}
 	
@@ -312,7 +314,7 @@ Communication through this protocol is done by \textit{framing} messages in thre
 \begin{figure}[H]
 	\centering
 	\begin{tabular}{c p{8mm} c}
-		\begin{tikzpicture}[-triangle 90,>=stealth',node distance=2cm,initial text=$ $,]
+		\begin{tikzpicture}[-triangle 90,>=stealth',node distance=2cm,initial text=$ $,scale=0.95]
 			\scriptsize
 			\node[align=center, draw, minimum width=2.5cm, minimum height=1cm] at (-1.5, 0.8) (transmitter) {\small Transmitter};
 			\node[align=center, draw, minimum width=2.5cm, minimum height=1cm] at (+1.5, 0.8) (receiver)    {\small Receiver};
@@ -356,7 +358,7 @@ Communication through this protocol is done by \textit{framing} messages in thre
 					;
 
 		\end{tikzpicture} & &
-		\begin{tikzpicture}[-triangle 90,>=stealth',node distance=2cm,initial text=$ $,]
+		\begin{tikzpicture}[-triangle 90,>=stealth',node distance=2cm,initial text=$ $,scale=0.95]
 			\scriptsize
 			\node[align=center, draw, minimum width=2.5cm, minimum height=1cm] at (-1.5, 0.8) (transmitter) {\small Transmitter};
 			\node[align=center, draw, minimum width=2.5cm, minimum height=1cm] at (+1.5, 0.8) (receiver)    {\small Receiver};
@@ -523,85 +525,112 @@ In order to validate the functionality of the protocols, the application was tes
 Furthermore, was introduced errors to check the robustness of the program, and delays in the $T_{prop}$.
 The protocol implemented demonstrated positive results with an error rate up to 65\%.
 
-\noindent
-To test the program, run the following command:
-
-\texttt{make test}
-
-\noindent
+To test the program, run the following command: \texttt{make test}.
 These tests include running the transmitter alone and running the transmitter after and before the receiver.
 It was feasible to verify whether the files transmitted and the files received were equal with the aid of \texttt{cmp} command in Linux.
 
-
-
 \section{Efficiency of the data link protocol} \label{sec:Efficiency}
 
-\begin{equation*}
-	a = \frac{C(T - N_t T_t)}{2 L} - \frac{1}{2}
-\end{equation*}
+The efficiency $S$ of a communication protocol is defined as the ratio between the actual data transfer rate $R$ and the maximum rate the communication media supports $C$, or the ratio between the minimum time it takes to transfer a message at maximum rate $C$ and the actual time it takes to transfer that message: $S = R/C = N_{min}\overline{T_f}/T$. This protocol's efficiency was studied by varying the following parameters:
+\begin{itemize}
+	\itemsep0em
+	\item Ratio of propagation time to frame transfer time, $a = \overline{T_{prop}}/\overline{T_f}$;
+	\item Frame error rate (FER), $R_e = N_e/(N-N_t)$.
+\end{itemize}
 
-\begin{equation*}
-	R_e = \frac{N_e}{N}
-\end{equation*}
+All statistics were performed using the \texttt{stats} module. The values of the above parameters were experimentally determined using the following formulas, obtained from appendix \ref{ch:statistics}:
+\begin{center}
+	\vspace{-10pt}
+	\begin{tabular}{c c c}
+		\begin{minipage}{40mm}\begin{equation*}
+			a = \frac{C(T - N_t T_t)}{2 L} - \frac{1}{2}
+		\end{equation*}\end{minipage} &
+		\begin{minipage}{25mm}\begin{equation*}
+			R_e = \frac{N_e}{N}
+		\end{equation*}\end{minipage} &
+		\begin{minipage}{25mm}\begin{equation*}
+			S = \frac{L_f}{T C}
+		\end{equation*}\end{minipage}
+	\end{tabular}
+\end{center}
 
+The default parameter values are $\Delta \tau = 0$ and $p_d=p_h=0$. Parameter $a$ as varied by changing the artificial propagation delay $\Delta \tau$, and $R_e$ was varied by changing the probability of a data bit swap $p_d$.
+
+Parameters $a$ and $R_e$ were initially varied independently, Figure \ref{fig:S_a_Re}.
+
+\begin{figure}[H]
+	\centering
+	\begin{subfigure}[t]{0.53\textwidth}
+		\begin{tikzpicture}[baseline]
+			\footnotesize
+			\begin{axis}[
+				height=74mm,
+				grid=major,
+				grid style={dashed,black!50},
+				xlabel={$a=T_{prop}/T_f$}, % Set the labels
+				xmin=0, xmax=2.5,
+				ylabel={Efficiency $S$},
+				ymin=0, ymax=0.7,
+				ytick distance=0.1,
+			]
+				\addplot[blue, mark=*, mark options={mark size=1.5pt}] table[x=a,y=S,col sep=comma] {vary-tau-processed.csv};
+			\end{axis}
+		\end{tikzpicture}
+	\end{subfigure}
+	\begin{subfigure}[t]{0.46\textwidth}
+		\hspace{-1.5em}
+		\begin{tikzpicture}[baseline]
+			\footnotesize
+			\begin{axis}[
+				height=74mm,
+				grid=major,
+				grid style={dashed,black!50},
+				xmin=0, xmax=0.7, xlabel=Frame error rate $R_e$,
+				ymin=0, ymax=0.7, ytick distance=0.1, yticklabels={,,}
+			]
+				\addplot[only marks, blue, mark=*, mark options={mark size=1.5pt}] table[x=Re,y=S,col sep=comma] {vary-fre.csv};
+				\addplot[mark=none, black] {-0.65660553*x+0.64659037} node[right, align=left] at (0.23, 0.55) {$y=-0.656606x+0.0.646590$\\$r^2=0.999901$};
+			\end{axis}
+		\end{tikzpicture}
+	\end{subfigure}
+	\caption{Efficiency $S$ plotted against $a$ (on the left) and $R_e$ (right). On the left, $S$ is determined for each point from the average $T$ of four repetitions} \label{fig:S_a_Re}
+\end{figure}
+
+Theoretically, and as deduced from \ref{eq:Sfinal}, a \textit{stop-and-wait} protocol like ours has its performance given by the expression
 \begin{equation*}
-	S = \frac{L_f}{T C}
+	S = \frac{1-R_e}{1 + 2a}
 \end{equation*}
+Qualitatively, the graphs in Figure \ref{fig:S_a_Re} show $S$ depends inversely on $a$ and linearly on $R_e$, in agreement with the predictions. To formally evaluate the validity of this expression, parameters $a$ and $R_e$ were simultaneously varied to obtain the data in the graph of Figure \ref{fig:S_aRe}. Additionally, we calculated the RMSE between the experimentally obtained efficiency and the theoretically predicted efficiency, which is 0.029860; this is possibly caused by the fact there is a linear relation $S=0.916422\,S_{pred} - 0.003571$ with correlation coefficient $r^2 = 0.999707$, where the slope differs from $1$ because of some sort of additional work that causes $S$ to be smaller than predicted by around $8\%$.
 
 \begin{figure}[H]
 	\begin{center}
-		\begin{subfigure}[t]{0.53\textwidth}
-			\begin{tikzpicture}[baseline]
-				\footnotesize
-				\begin{axis}[
-					height=75mm,
-					grid=major,
-					grid style={dashed,black!50},
-					xlabel={$a=T_{prop}/T_f$}, % Set the labels
-					xmin=0, xmax=2.5,
-					ylabel={Efficiency $S$},
-					ymin=0, ymax=0.7,
-					ytick distance=0.1,
-					% x unit=\si{\volt}, % Set the respective units
-					% y unit=\si{\ampere},
-					% legend style={at={(0.5,-0.2)},anchor=north}, % Put the legend below the plot
-					x tick label style={rotate=90,anchor=east} % Display labels sideways
+		\begin{tikzpicture}
+			\footnotesize
+			\begin{axis}[
+				height=90mm,
+				grid=major,
+				grid style={dashed,black!50},
+				view={+110}{+30},
+				xmin=0, xmax=0.70, xtick distance=0.10, xlabel={Frame error rate $R_e$},
+				ymin=0, ymax=1.70, ylabel={$a=T_{prop}/T_f$},
+				zmin=0, zmax=0.70, ztick distance=0.10, zlabel={Efficiency $S$},
+			]
+				\addplot3[
+					surf,
+					mesh/rows=21,
+					opacity=1.00,
+					fill opacity=0.66
 				]
-					\addplot[blue, mark=*, mark options={mark size=1.5pt}] table[x=a,y=S,col sep=comma] {vary-tau-processed.csv};
-				\end{axis}
-			\end{tikzpicture}
-		\end{subfigure}
-		\begin{subfigure}[t]{0.46\textwidth}
-			\hspace{-1.5em}
-			\begin{tikzpicture}[baseline]
-				\footnotesize
-				\begin{axis}[
-					height=75mm,
-					grid=major,
-					grid style={dashed,black!50},
-					xlabel=Frame error rate $R_e$, % Set the labels
-					x tick label style={rotate=90,anchor=east}, % Display labels sideways
-					xmin=0, xmax=0.7,
-					% ylabel=Efficiency $S$,
-					ymin=0, ymax=0.7,
-					ytick distance=0.1,
-					yticklabels={,,}
-					% x unit=\si{\volt}, % Set the respective units
-					% y unit=\si{\ampere},
-					% legend style={at={(0.5,-0.2)},anchor=north}, % Put the legend below the plot
-				]
-					\addplot[only marks, blue, mark=*, mark options={mark size=1.5pt}] table[x=Re,y=S,col sep=comma] {vary-fre.csv};
-					\addplot[mark=none, black] {-0.65660553*x+0.64659037} node[right, align=left] at (0.23, 0.55) {$y=-0.656606x+0.0.646590$\\$r^2=0.999901$};
-				\end{axis}
-			\end{tikzpicture}
-		\end{subfigure}
-	  	\caption{Efficiency $S$ plotted against $a$ (on the left) and $R_e$ (right). On the left, $S$ is determined for each point from the average $T$ of four repetitions}
+				table[x=Re,y=a,z=S,col sep=comma] {vary-tau-fre-processed.csv};
+			\end{axis}
+		\end{tikzpicture}
+	  	\caption{Efficiency $S$ plotted against $R_e$ on the x-axis and $a$ on the y-axis. The value of $S$ in each point of the mesh is determined from the average $T$ of three repetitions} \label{fig:S_aRe}
 	\end{center}
 \end{figure}
 
 \section{Conclusion} \label{sec:Conclusion}
 
-\pagebreak
+% TODO
 
 \appendix
 \appendixpage
@@ -800,31 +829,35 @@ An I-frame state machine must be ready to handle to following scenarios:
 	\end{tikzpicture}
 \end{center}
 
-\chapter{Statistics}
+\chapter{Statistics} \label{ch:statistics}
+
+In the following table, the rightmost column stands for how one obtains the parameter: defined by the user (I), measured (O) or derived from I/O parameters (D).
 
 \begin{center}
 	\small
-	\begin{tabular}{c | l | p{81mm} | c}
+	\begin{tabular}{c | l | p{80mm} | c}
 		\hline \hline
-		\textbf{Acronym} & \textbf{Name}             & \textbf{Definition}                                                                & I/O \\ \hline
-		$S$              & Efficiency                & Ratio of actual transfer rate to capacity                                          & D   \\
-		$a$              & Norm. prop. time          & $a = T_{prop}/T_f$                                                                 & D   \\
-		$T_{prop}$       & Propagation time          & Time for a signal to propagate through the cable; $T_{prop} = \tau_0 + \Delta\tau$ & D   \\
-		$T_f$            & Frame time                & Time to transfer a frame                                                           & D   \\
-		$T_t$            & Timeout time              & Time to wait for answer                                                            & D   \\
-		$T$              & Total execution time      & Total execution time of the transmitter                                            & O   \\
-		$\Delta\tau$     & Added propagation time    & Additional propagation time                                                        & I   \\
-		$L$              & Total messages length     & Total message length, including retransmissions                                    & O   \\
-		$L_f$            & File length               & Message length excluding retransmissions                                           & I   \\
-		$N$				 & \# of frames              & Number of actually transferred frames                                              & O   \\
-		$N_e$            & \# of frames with errors  & Frames with errors, inc. during establishment                                      & O   \\
-		$N_t$            & \# of frames with timeout & Frames with timeout, inc. during establishment                                     & O   \\
-		$N_{min}$        & Minimum \# of frames      & Minimum number of frames required to transfer message; $N_{min} = N-N_t-N_e$       & D   \\
-		$R_e$            & Frame error rate          & Frames with errors per total frame number                                          & D   \\
-		$p_e$            & Frame error probability   & Estimated from $R_e$                                                               & I   \\
-		$A$              & Number of attempts        & $\expected{A} = 1/(1-p_e)$                                                         & D   \\
-		$C$              & Capacity                  & Capacity of the system (baud rate)                                                 & I   \\
-		$R$              & Data rate                 & Global data transfer rate                                                          & D   \\
+		\textbf{Symbol} & \textbf{Name}               & \textbf{Definition}                                                                & I/O \\ \hline
+		$S$              & Efficiency                  & Ratio of actual transfer rate to capacity                                          & D   \\
+		$a$              & Norm. prop. time            & $a = T_{prop}/T_f$                                                                 & D   \\
+		$T_{prop}$       & Propagation time            & Time for a signal to propagate through the cable; $T_{prop} = \tau_0 + \Delta\tau$ & D   \\
+		$T_f$            & Frame time                  & Time to transfer a frame                                                           & D   \\
+		$T_t$            & Timeout time                & Time to wait for answer                                                            & D   \\
+		$T$              & Total execution time        & Total execution time of the transmitter                                            & O   \\
+		$\Delta\tau$     & Added propagation time      & Additional propagation time                                                        & I   \\
+		$L$              & Total messages length       & Total message length, including retransmissions                                    & O   \\
+		$L_f$            & File length                 & Message length excluding retransmissions                                           & I   \\
+		$N$				 & \# of frames                & Number of actually transferred frames                                              & O   \\
+		$N_e$            & \# of frames with errors    & Frames with errors, inc. during establishment                                      & O   \\
+		$N_t$            & \# of frames with timeout   & Frames with timeout, inc. during establishment                                     & O   \\
+		$N_{min}$        & Minimum \# of frames        & Minimum number of frames required to transfer message; $N_{min} = N-N_t-N_e$       & D   \\
+		$p_d$            & Data bit swap probability   & Probability of a bit in a data byte to swap                                        & D   \\
+		$p_h$            & Header bit swap probability & Probability of a bit in a header byte to swap                                      & D   \\
+		$R_e$            & Frame error rate            & Frames with errors per total frame number                                          & D   \\
+		$p_e$            & Frame error probability     & Estimated from $R_e$                                                               & I   \\
+		$A$              & Number of attempts          & $\expected{A} = 1/(1-p_e)$                                                         & D   \\
+		$C$              & Capacity                    & Capacity of the system (baud rate)                                                 & I   \\
+		$R$              & Data rate                   & Global data transfer rate                                                          & D   \\
 		\hline \hline
 	\end{tabular}
 \end{center}
@@ -932,7 +965,7 @@ There are two occasions under which a timeout can occur:
 	\item The receiver sends an acknowledgement, but it does not arrive or arrives with errors.
 \end{itemize}
 The first is not possible, because the communication media is always connected and there is always a receiver, and random errors are not being generated on the FLAG, but rather on the data and the other header bytes. The second is not possible either, since errors are only being generated in data and headers of I-frames (and it is reasonable to assume there are almost no errors in other frames, as they are considerably smaller than I-frames). Thus, we can consider timeouts do not occur when evaluating the performance of this protocol ($N_t=0$), and as such equation \ref{eq:S_rel} becomes
-\begin{equation}
+\begin{equation} \label{eq:Sfinal}
 	S = \frac{1-R_e}{1 + 2a}
 \end{equation}
 
