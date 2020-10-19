@@ -56,9 +56,9 @@ stats_t stats;
  * @brief Statistics configuration structure.
  */
 typedef struct {
-    float prob_error_head;
-    float prob_error_data;
-    useconds_t dtau;
+    float prob_error_head;  ///< Probability of header bit randomly swapping
+    float prob_error_data;  ///< Probability of data bit randomly swapping
+    useconds_t dtau;        ///< Artificial signal propagation delay
 } stats_config_t;
 
 /**
@@ -129,25 +129,25 @@ void add_delay(useconds_t usec);
         #define GEN_FRAME_ERROR(prob, frame, frame_size)    {}
     #endif
 #else
-    ///< @ingroup stats_integrated Add to total message length
+    /// @ingroup stats_integrated @brief Add to total message length
     #define ADD_MESSAGE_LENGTH(length)                  {}
-    ///< @ingroup stats_integrated Add to file length
+    /// @ingroup stats_integrated @brief Add to file length
     #define ADD_FILE_LENGTH(length)                     {}
-    ///< @ingroup stats_integrated Increment number of frames
+    /// @ingroup stats_integrated @brief Increment number of frames
     #define ADD_FRAME()                                 {}
-    ///< @ingroup stats_integrated Increment number of frame errors
+    /// @ingroup stats_integrated @brief Increment number of frame errors
     #define ADD_FRAME_ERROR()                           {}
-    ///< @ingroup stats_integrated Increment number of frame timeouts
+    /// @ingroup stats_integrated @brief Increment number of frame timeouts
     #define ADD_FRAME_TIMEOUT()                         {}
-    ///< @ingroup stats_integrated Wrapper of tic()
+    /// @ingroup stats_integrated @brief Wrapper of tic()
     #define TIC()                                       {}
-    ///< @ingroup stats_integrated Wrapper of toc()
+    /// @ingroup stats_integrated @brief Wrapper of toc()
     #define TOC()                                       {}
-    ///< @ingroup stats_integrated Wrapper of print_stats()
+    /// @ingroup stats_integrated @brief Wrapper of print_stats()
     #define PRINT_STATS()                               {}
-    ///< @ingroup stats_integrated Wrapper of gen_frame_error(float, uint8_t*, size_t)
+    /// @ingroup stats_integrated @brief Wrapper of gen_frame_error(float, uint8_t*, size_t)
     #define GEN_FRAME_ERROR(prob, frame, frame_size)    {}
-    ///< @ingroup stats_integrated Wrapper of add_delay(useconds_t)
+    /// @ingroup stats_integrated @brief Wrapper of add_delay(useconds_t)
     #define ADD_DELAY(usec)                             {}
 #endif
 

@@ -14,20 +14,32 @@
 
 #include "ll_flags.h"
 
-#define LL_MAX_SIZE 4096    ///< @ingroup ll Maximum message size
+#define LL_MAX_SIZE 4096    ///< @ingroup ll @brief Maximum message size
 
+/**
+ * @ingroup ll
+ * @brief LL configuration structure.
+ */
 typedef struct {
-    size_t baud_rate;
-    struct itimerval timeout;
-    unsigned int retransmissions;
-    int verbosity;
+    size_t baud_rate;               ///< Baud rate, in bit/s
+    struct itimerval timeout;       ///< Timeout
+    unsigned int retransmissions;   ///< Retransmissions
+    int verbosity;                  ///< Verbosity, from 0 to 3
 } ll_config_t;
 
+/**
+ * @ingroup ll
+ * @brief LL status.
+ */
 typedef enum {
     TRANSMITTER,
     RECEIVER
 } ll_status_t;
 
+/**
+ * @ingroup ll
+ * @brief LL configuration object.
+ */
 ll_config_t ll_config;
 
 /**

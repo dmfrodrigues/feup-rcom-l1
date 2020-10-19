@@ -30,8 +30,8 @@
  * @brief App configuration structure
  */
 typedef struct {
-    int fileDescriptor;
-    size_t packet_size;
+    int fileDescriptor;     ///< Serial port file descriptor
+    size_t packet_size;     ///< Packet size
 } app_config_t;
 
 /**
@@ -58,7 +58,7 @@ int application(int com, ll_status_t status, char *file_path)
  * 
  * @param ctrl          Control field
  * @param file_size     Size of the file to be trasmitted
- * @param file_path     Path of the file to be transmitted
+ * @param file_name     Path of the file to be transmitted
  * @return int          0 on success; -1 on error
  */
 int app_send_ctrl_packet(int ctrl, uint32_t file_size, const char *file_name)
@@ -91,7 +91,7 @@ int app_send_file(char * file_path)
  * 
  * @param ctrl          Expected control field
  * @param file_size     Pointer where the file_size will be saved
- * @param file_path     Pointer where the file_name will be saved
+ * @param file_name     Pointer where the file_name will be saved
  * @return int          0 on success; -1 on error
  */
 int app_rcv_ctrl_packet(int ctrl, unsigned int * file_size, char * file_name)
