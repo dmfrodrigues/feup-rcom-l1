@@ -546,7 +546,7 @@ All statistics were performed using the \texttt{stats} module. The values of the
 			a = \frac{C(T - N_t T_t)}{2 L} - \frac{1}{2}
 		\end{equation*}\end{minipage} &
 		\begin{minipage}{25mm}\begin{equation*}
-			R_e = \frac{N_e}{N}
+			R_e = \frac{N_e}{N-N_t}
 		\end{equation*}\end{minipage} &
 		\begin{minipage}{25mm}\begin{equation*}
 			S = \frac{L_f}{T C}
@@ -589,11 +589,11 @@ Parameters $a$ and $R_e$ were initially varied independently, Figure \ref{fig:S_
 				ymin=0, ymax=0.7, ytick distance=0.1, yticklabels={,,}
 			]
 				\addplot[only marks, blue, mark=*, mark options={mark size=1.5pt}] table[x=Re,y=S,col sep=comma] {vary-fre.csv};
-				\addplot[mark=none, black] {-0.65660553*x+0.64659037} node[right, align=left] at (0.23, 0.55) {$y=-0.656606x+0.0.646590$\\$r^2=0.999901$};
+				\addplot[mark=none, black] {-0.64856632*x+0.63867854} node[right, align=left] at (0.23, 0.55) {$y=-0.64856632+0.63867854$\\$r^2=0.999914$};
 			\end{axis}
 		\end{tikzpicture}
 	\end{subfigure}
-	\caption{Efficiency $S$ plotted against $a$ (on the left) and $R_e$ (right). On the left, $S$ is determined for each point from the average $T$ of four repetitions} \label{fig:S_a_Re}
+	\caption{Efficiency $S$ plotted against $a$ (on the left) and $R_e$ (right). On both graphs, $S$ is determined for each point from the average run time $T$ of four repetitions} \label{fig:S_a_Re}
 \end{figure}
 
 Theoretically, and as deduced from \ref{eq:Sfinal}, a \textit{stop-and-wait} protocol like ours has its performance given by the expression
