@@ -216,9 +216,9 @@ int app_rcv_data_packet(char * data, int seq_number){
         return -1;
     }
 
-    memcpy(data, data_packet + 4, data_length); ll_log(2, "APP: L201\n");
+    memcpy(data, data_packet + 4, data_length);
 
-    free(data_packet); ll_log(2, "APP: L203\n");
+    free(data_packet);
 
     ll_log(2, "APP: successfully read data packet\n");
 
