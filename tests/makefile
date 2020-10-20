@@ -14,7 +14,7 @@ CALL_RECEIVER   =$(RECEIVER) $(RECEIVER_PORT)
 
 all:
 
-test: clean test1 test2 test3 test4
+test: clean test1 test2 test3 test4 test5 test6 test7
 
 test1: $(TRANSMITTER)
 	@echo ==================== $@ ====================
@@ -47,6 +47,36 @@ test4: $(TRANSMITTER) $(RECEIVER)
 	$(CALL_TRANSMITTER) &
 	sleep 1.5
 	$(CALL_RECEIVER)
+	sleep 2
+	cmp $(TRANSMITTER_FILE) $(RECEIVER_FILE)
+	@rm -f $(RECEIVER_FILE)
+
+test5: $(TRANSMITTER) $(RECEIVER)
+	@echo ==================== $@ ====================
+	@rm -f $(RECEIVER_FILE)
+	$(CALL_RECEIVER) -s 1024 &
+	sleep 1
+	$(CALL_TRANSMITTER)  -s 1024
+	sleep 2
+	cmp $(TRANSMITTER_FILE) $(RECEIVER_FILE)
+	@rm -f $(RECEIVER_FILE)
+
+test6: $(TRANSMITTER) $(RECEIVER)
+	@echo ==================== $@ ====================
+	@rm -f $(RECEIVER_FILE)
+	$(CALL_RECEIVER) -s 256 &
+	sleep 1
+	$(CALL_TRANSMITTER) -s 256
+	sleep 2
+	cmp $(TRANSMITTER_FILE) $(RECEIVER_FILE)
+	@rm -f $(RECEIVER_FILE)
+
+test7: $(TRANSMITTER) $(RECEIVER)
+	@echo ==================== $@ ====================
+	@rm -f $(RECEIVER_FILE)
+	$(CALL_RECEIVER) -b 115200 &
+	sleep 1
+	$(CALL_TRANSMITTER) -b 115200
 	sleep 2
 	cmp $(TRANSMITTER_FILE) $(RECEIVER_FILE)
 	@rm -f $(RECEIVER_FILE)
