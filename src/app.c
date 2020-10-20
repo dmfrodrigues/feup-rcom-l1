@@ -141,20 +141,29 @@ int app_rcv_ctrl_packet(int ctrl, unsigned int * file_size, char * file_name){
 
     if(llread(app_config.fileDescriptor, ctrl_packet) < 0){
         fprintf(stderr, "ERROR: unable to read ctrl packet\n");
+        free(ctrl_packet);
         return -1;
     }
 
     if(ctrl_packet[0] != ctrl || ctrl_packet[1] != T_FILE_SIZE){
         fprintf(stderr, "ERROR: control is not correct\n");
+        free(ctrl_packet);
         return -1;
     }
     
     int file_size_octets = ctrl_packet[2];
     
+    if(file_size_octets > 4){
+        ll_err("ERROR: file_size_octets > 4\n");
+        free(ctrl_packet);
+        return -1;
+    }
+    
     memcpy(file_size, ctrl_packet + 3, file_size_octets);
 
     if(ctrl_packet[7] != T_FILE_NAME){
         fprintf(stderr, "ERROR: unexpected byte in control packet\n");
+        free(ctrl_packet);
         return -1;
     }
 
