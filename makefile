@@ -25,11 +25,20 @@ else
 endif
 ifeq ($(STATISTICS),)
 else
-	DFLAGS +=-D STATISTICS
+	DFLAGS += -D STATISTICS
 endif
 ifeq ($(STATISTICS_DELAY),)
 else
-	DFLAGS +=-D STATISTICS_DELAY
+	DFLAGS += -D STATISTICS_DELAY
+endif
+ifeq ($(STATISTICS_ERRORS),)
+else
+	DFLAGS += -D STATISTICS_ERRORS
+endif
+
+ifeq ($(EVERYTHING),)
+else
+	DFLAGS = -D DEBUG -D STATISTICS -D STATISTICS_DELAY -D STATISTICS_ERRORS 
 endif
 
 TRANSMITTER_O_FILES=$(ODIR)/transmitter.o
@@ -65,5 +74,7 @@ doc/report/report.pdf: FORCE
 
 clean: FORCE
 	rm -f $(TRANSMITTER) $(RECEIVER)
+	rm -rf $(ODIR)
+	make -C stats clean
 
 FORCE:

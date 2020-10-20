@@ -20,7 +20,8 @@ int main(int argc, char** argv){
     char *file_path = NULL;
 
     if(app_parse_args(argc, argv, &com, TRANSMITTER, &file_path)){
-        printf("Usage:\tnserial SerialPort FileName\n\tex: ./transmitter 2 pinguim.gif\n");
+        printf("Usage:\tnserial SerialPort FileName\n"
+               "\tex: ./transmitter 2 pinguim.gif\n");
         exit(1);
     }
     

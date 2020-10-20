@@ -174,6 +174,7 @@ int llwrite(int port_fd, const uint8_t *buffer, int length){
                 ll_log(2, "    Got RR\n");
                 break;
             } else if(c_rcv == ll_get_expected_REJ()){
+                ADD_FRAME_ERROR();
                 ll_log(2, "    Got REJ\n");
             } else ll_err("Don't know what I got; a=0x%02X, c=0x%02X\n", a_rcv, c_rcv);
         } else{
@@ -211,7 +212,7 @@ int llread(int port_fd, uint8_t *buffer){
         // Validate I
         if(sz <= 0){
             if(ll_send_REJ(port_fd)) return -1;
-            break;
+            // break;
         } else {
             // Send RR
             if(ll_send_RR(port_fd)) return -1;

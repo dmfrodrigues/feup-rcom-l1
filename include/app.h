@@ -30,8 +30,8 @@
  * @brief App configuration structure
  */
 typedef struct {
-    int fileDescriptor;
-    size_t packet_size;
+    int fileDescriptor;     ///< Serial port file descriptor
+    size_t packet_size;     ///< Packet size
 } app_config_t;
 
 /**
@@ -41,6 +41,7 @@ typedef struct {
 app_config_t app_config;
 
 /**
+ * @ingroup app
  * @brief Initializes the application.
  * 
  * @param com           Port to connect to
@@ -52,17 +53,19 @@ int application(int com, ll_status_t status, char *file_path)
     __attribute__((warn_unused_result));
 
 /**
+ * @ingroup app
  * @brief Sends control packet, indicating the beginning or end of the file transfer.
  * 
  * @param ctrl          Control field
  * @param file_size     Size of the file to be trasmitted
- * @param file_path     Path of the file to be transmitted
+ * @param file_name     Path of the file to be transmitted
  * @return int          0 on success; -1 on error
  */
 int app_send_ctrl_packet(int ctrl, uint32_t file_size, const char *file_name)
     __attribute__((warn_unused_result));
 
 /**
+ * @ingroup app
  * @brief Sends data packet.
  * 
  * @param data          Piece of data from the file to be sent
@@ -74,6 +77,7 @@ int app_send_data_packet(char * data, unsigned int data_size, unsigned int seq_n
     __attribute__((warn_unused_result));
 
 /**
+ * @ingroup app
  * @brief Sends file.
  * 
  * @param file_path     Path of the file to be transmitted
@@ -82,17 +86,19 @@ int app_send_data_packet(char * data, unsigned int data_size, unsigned int seq_n
 int app_send_file(char * file_path)
     __attribute__((warn_unused_result));
 /**
+ * @ingroup app
  * @brief Receives control packet.
  * 
  * @param ctrl          Expected control field
  * @param file_size     Pointer where the file_size will be saved
- * @param file_path     Pointer where the file_name will be saved
+ * @param file_name     Pointer where the file_name will be saved
  * @return int          0 on success; -1 on error
  */
 int app_rcv_ctrl_packet(int ctrl, unsigned int * file_size, char * file_name)
     __attribute__((warn_unused_result));
 
 /**
+ * @ingroup app
  * @brief Receives data packet.
  * 
  * @param data          Pointer where the data will be stored
@@ -103,6 +109,7 @@ int app_rcv_data_packet(char * data, int seq_number)
     __attribute__((warn_unused_result));
 
 /**
+ * @ingroup app
  * @brief Receives file.
  * 
  * @return int          0 on success; -1 on error

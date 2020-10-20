@@ -1,3 +1,6 @@
+# Copyright (C) 2020 Diogo Rodrigues, Breno Pimentel
+# Distributed under the terms of the GNU General Public License, version 3
+
 CC		=gcc
 
 all: stats
@@ -6,7 +9,7 @@ stats: recompile stats_transmitter stats_receiver
 
 recompile: FORCE
 	make -C .. clean
-	make -C .. STATISTICS=1 STATISTICS_DELAY=1
+	make -C .. STATISTICS=1 STATISTICS_DELAY=1 STATISTICS_ERRORS=1
 
 stats_transmitter: stats_transmitter.c
 	$(CC) $^ -o $@
@@ -27,5 +30,6 @@ test: recompile stats_transmitter stats_receiver
 
 clean: FORCE
 	rm -f stats_receiver stats_transmitter
+	rm -f *.gif *.jpg *.png
 
 FORCE:
