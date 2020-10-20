@@ -192,7 +192,7 @@ int main(int argc, char *argv[]){
         fprintf(stderr, "%8lu %6.2f%% (%6.1fs; %6.1fs left)\n",
             T, (100.0*idx_line)/num_lines, total_time, left_time);
 
-        usleep(10000);
+        usleep(100000);
     }
 
     return 0;
