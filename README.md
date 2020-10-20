@@ -24,7 +24,11 @@ Distributed under the terms of the GNU General Public License, version 3
     - [Breno Accioly de Barros Pimentel](https://github.com/BrenoAccioly) (<up201800170@fe.up.pt>)
     - [Diogo Miguel Ferreira Rodrigues](https://github.com/dmfrodrigues) (<dmfrodrigues2000@gmail.com> / <diogo.rodrigues@fe.up.pt>)
 
-# The program
+## Computers
+
+FEUP, room I321, bench 3:
+- Computer connected to FEUP network: 192.168.109.129
+- Computer in rack: 192.168.109.222
 
 ## Compile
 
