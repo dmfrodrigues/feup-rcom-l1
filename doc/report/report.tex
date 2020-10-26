@@ -37,7 +37,7 @@
 \usepackage{subcaption}
 \usepackage{float}
 
-\usepackage{siunitx}
+\usepackage[binary-units=true]{siunitx} %SI units
 \usepackage{pgfplots}
 \pgfplotsset{compat=newest} % Allows to place the legend below plot
 \usepgfplotslibrary{units} % Allows to enter the units nicely
@@ -89,7 +89,6 @@
 % \usepackage{enumitem}
 % \usepackage{xcolor}
 \newcommand{\expnumber}[2]{{#1}\mathrm{e}{#2}} % scientific notation
-\usepackage{siunitx} %SI units
 \newcommand{\degree}{^{\circ}}
 \newcommand*\xor{\oplus}
 \newcommand\expected[1]{\mathbf{E}[#1]}
@@ -145,26 +144,33 @@ Our main conclusions were satisfactory and all the objectives were fulfilled, be
 
 \section{Introduction} \label{sec:Introduction}
 
-The present project aims at arriving at a design and implementation of a data link layer with its own data transfer protocol to allow communication between two computers physically connected through RS-232 serial ports with asynchronous communication, and an independent application layer with its own protocol to transfer a file between computers. The resulting source code was developed in the C language, targeting Linux devices.
+The present project aims at arriving at a design and implementation of a data link layer with its own data transfer protocol to allow communication between two computers physically connected through RS-232 serial ports with asynchronous communication in a Null-Modem configuration, and an independent application layer with its own protocol to transfer a file between computers. The resulting source code was developed in the C language, targeting Linux devices.
 
-This report is an artifact of the corresponding project, with the purpose of guiding readers through the process that was used to fulfill the project's goals. As such, this report is divided into seven main sections (excluding the \hyperref[sec:Introduction]{introduction} and \hyperref[sec:Conclusion]{conclusion}). In section \ref{sec:Architecture} we start by describing the generic architecture our program will follow in terms of layers and generic interfaces between layers, to then specify in section \ref{sec:CodeStructure} which specific layers implement the generic blocks of the previous section, the APIs each block will make available for inter-layer communication, and data structures used in each layer. Specific information for the end user on the main ways to use the program is presented in section \ref{sec:UseCases}. In sections \ref{sec:LLProtocol} and \ref{sec:AppProtocol} we identify the main functional aspects and implementation details of the logical link and application protocols respectively. Finally, in section \ref{sec:Validation} we test the program to validate it in terms of efficacy and robustness in face of errors or faulty communication media, and in section \ref{sec:Efficiency} we statistically describe the protocols' experimental efficiency and compare it to a theoretical \textit{stop-and-wait} protocol. This project was tested in the computers of FEUP, room I321, bench 3, where computer 3 of the rack served as transmitter and the computer with connection to the FEUP network as the receiver.
+This report has the purpose of guiding the reader through the process used to fulfill the project's goals. As such, this report is divided into seven sections (excluding \hyperref[sec:Introduction]{introduction} and \hyperref[sec:Conclusion]{conclusion}). In section \ref{sec:Architecture} we describe the layered architecture our program will follow in terms generic interfaces between layers, to then specify in section \ref{sec:CodeStructure} which specific layers implement the generic blocks of the previous section, and for each layer the data structures it uses and the interface it will make available for inter-layer communication. Specific information for the end user on the main ways to use the program is presented in section \ref{sec:UseCases}. In sections \ref{sec:LLProtocol} and \ref{sec:AppProtocol} we identify the main functional aspects and implementation details of the logical link and application protocols respectively. Finally, in section \ref{sec:Validation} we test the program to validate it in terms of efficacy and robustness, and in section \ref{sec:Efficiency} we statistically describe the protocol's experimental efficiency and compare it to a theoretical \textit{stop-and-wait} protocol. This project was tested in the computers of FEUP, room I321, bench 3, with rack computer 3 as transmitter and the computer with connection to FEUP network as receiver.
 
 In this project/report, a \textit{byte} always stands for an 8-bit byte.
 
 \section{Architecture} \label{sec:Architecture}
 
-First of all, we designed the generic architecture of our system. It essentially consists of a lower, data link layer, which is responsible for dealing with the serial port through its driver and the facilities of abstraction through files/terminals provided by a Linux operating system, providing a simple interface to allow synchronous communication between two computers, allowing to open/close ports and write/read generic data to them, and implementing some sort of error-control method; on top of that lower layer, is a high-level application made of two executable files, \texttt{transmitter} and \texttt{receiver}, which take advantage of the data link layer to transfer a file from the transmitter to the receiver, and provide a simple command line interface to the user.
-
+First of all, we designed the generic architecture of our system, Figure \ref{fig:architecture}. It consists of:
+\begin{itemize}
+	\itemsep0em
+	\item A data link layer, which deals with the serial port and exposes an interface (open/close serial ports, write/read) to allow a reasonably reliable, synchronous communication of framed data between two computers with basic error-checking. It does not directly interact with the physical layer, but rather with its driver through file/terminal abstractions.
+	\item An application layer, providing a command line interface to transfer a file in a set of packets through the data link layer. It formally implements an OSI network layer (to transfer packets) and an application layer (user interface) which is what is effectively required in this casebecause the computers are directly connected nodes.
+\end{itemize}
 \begin{figure}[H]
 	\centering
-	\begin{tikzpicture}[->,>=stealth',node distance=1.4cm,initial text=$ $,]
-		\node[align=center, draw, minimum width=7cm, minimum height=1.4cm] (app) {Application};
-		\node[align=center, draw, minimum width=7cm, minimum height=1.4cm, fill=black!10, below of=app] (link) {Data link};
-		\node[align=center, draw, minimum width=7cm, minimum height=1.4cm, fill=black!20, below of=link] (driver) {Serial port driver \\ {\footnotesize \texttt{/dev/ttyS0}}};
-		\node[align=center, draw, minimum width=7cm, minimum height=1.4cm, fill=black!30, below of=driver] (hardware) {Hardware \\ {\footnotesize RS-232 asynchronous serial port}};
+	\begin{tikzpicture}[-,>=stealth',node distance=1.4cm,initial text=$ $,]
+		\node[align=center, draw, minimum width=7cm, minimum height=1.4cm] (app) {Application layer};
+		\node[align=center, draw, minimum width=7cm, minimum height=1.4cm, fill=black!10, below of=app] (link) {Data link layer};
+		\node[align=center, minimum width=7cm, minimum height=1.4cm, fill=black!20, below of=link] (driver) {Serial port driver \\ {\footnotesize \texttt{/dev/ttyS0}}};
+		\node[align=center, minimum width=7cm, minimum height=1.4cm, fill=black!30, below of=driver] (hardware) {Physical layer \\ {\footnotesize RS-232 asynchronous serial port}};
 		\node[align=center, above of=app] at (0, +0.7) (user){\includegraphics[scale=0.2]{actor.png}};
 	
-		\draw   (app) 		edge[align=center, left , bend right=88.5		] node{\small open port \\[-0.2em] \small write to port \\[-0.2em] \small close port} (link)
+		\draw (-3.5, -2.1) rectangle ++(7, -2.8);
+		\draw[dashed] (-3.5, -3.5) -- ++(7, 0);
+
+		\draw[->](app) 		edge[align=center, left , bend right=88.5		] node{\small open port \\[-0.2em] \small write to port \\[-0.2em] \small close port} (link)
 				(link) 		edge[align=center, right, bend right=88.5		] node{\small read from port} (app)
 				(link) 		edge[align=center, left , bend right=88.5		] node{\small \texttt{open} \\[-0.2em] \small \texttt{tcsetattr} \\[-0.2em] \small \texttt{write}} (driver)
 				(driver) 	edge[align=center, right, bend right=88.5		] node{\small \texttt{tcgetattr} \\[-0.2em] \small \texttt{read}} (link)
@@ -172,7 +178,7 @@ First of all, we designed the generic architecture of our system. It essentially
 				(app) 		edge[align=center, right, bend right=60			] node{\small transferred file} (user)
 			;
 	\end{tikzpicture}
-	\caption{Architecture of the program to be developed}
+	\caption{Architecture of the program to be developed} \label{fig:architecture}
 \end{figure}
 
 \section{Code structure} \label{sec:CodeStructure}
@@ -194,7 +200,7 @@ First of all, we designed the generic architecture of our system. It essentially
 		\node[align=right] at (-8.3, -0.3) (app) {Application \\ layer};
 		\node[align=right] at (-8.15, -2.6) (ll) {Data link \\ layer};
 		\node[align=right] at (-8.25, -5.2) (app) {Serial port \\ drivers};
-		\node[align=right] at (-8.2, -7.2) (app) {Hardware};
+		\node[align=right] at (-8.2, -7.2) (app) {Physical \\ layer};
 		
 		\path   (-5, -3.25) 	edge[align=center, left		] node{\small \texttt{open}, \texttt{close} \\[-0.2em] \small \texttt{tcsetattr}} (-5, -4.55)
 				(+3.5, -3.25) 	edge[align=center, left		] node{\small \texttt{open}, \texttt{close} \\[-0.2em] \small \texttt{tcsetattr}} (+3.5, -4.55)
@@ -211,7 +217,7 @@ First of all, we designed the generic architecture of our system. It essentially
 				;
 
 		\draw	(actor-transmitter)		edge[								]	node{\small \texttt{./transmitter 1 pinguim.gif}}	(transmitter)
-				(receiver)				edge[								]	node{\small \texttt{./receiver 2 pinguim.gif}}	(actor-receiver)
+				(receiver)				edge[								]	node{\small \texttt{./receiver 2}}	(actor-receiver)
 
 				(transmitter)			edge[dashed, above					] node{\textit{transferring file...}} (receiver)
 
@@ -228,30 +234,27 @@ First of all, we designed the generic architecture of our system. It essentially
 	\caption{Specific code structure to be implemented for this project}
 \end{figure}
 
-We implemented two layers to satisfy the previously presented architecture: two executable files \texttt{transmitter} and \texttt{receiver} in module \texttt{app} as the application layer, and module \texttt{ll} (Link Layer) as the data link layer.
+We implemented two layers to satisfy the previously presented architecture: two executable files \texttt{transmitter} and \texttt{receiver} in module \texttt{app} as the application layer, and module \texttt{ll} (Link Layer, LL) as the data link layer.
 
 \subsection{App interface}
 
-The \texttt{app} module makes available two executable files, where \texttt{<COM>} is the communication port to be used (\texttt{COM1} corresponds to \texttt{ttyS0}, \texttt{COM2} to \texttt{ttyS1}, ...), and \texttt{<file>} is a file path:
+The \texttt{app} module makes available two executable files:
 \begin{itemize}
 	\itemsep0em
-	\item \texttt{./transmitter <COM> <file>}, to send \texttt{<file>} to port \texttt{<COM>}.
+	\item \texttt{./transmitter <COM> <file>}, to send file \texttt{<file>} to port \texttt{<COM>}.
 	\item \texttt{./receiver <COM>}, to receive a file from port \texttt{<COM>}.
 \end{itemize}
+where \texttt{<COM>} is the port to use (\texttt{COM1} corresponds to \texttt{ttyS0}, \texttt{COM2} to \texttt{ttyS1}, ...), and \texttt{<file>} is a file path. This module uses the LL interface to transfer a file in packets, not too large to reduce the frame error probability, and not too small to reduce the number of non-data bytes. Communication parameters can be customized using optional arguments, see appendix \ref{ch:optionalargs}.
 
-This module takes advantage of the link layer interface to transfer a file in chunks, that should be not too large to reduce the probability of having an error and requiring retransmission, and not too small as the total amount of non-data bytes is proportional to the number of frames.
-
-% TODO: How can I configure transmission from the command line?
-
-\subsection{Link layer interface}
+\subsection{LL interface}
 
 The \texttt{ll} module makes available the following C functions through file \texttt{ll.h}, which are meant to be used by the \texttt{app} module executable files:
 \begin{itemize}
 	\itemsep0em
-	\item \texttt{int llopen(int com, ll\_status\_t status)}, to open serial port \texttt{com} (1 for \texttt{COM1}, 2 for \texttt{COM2}, ...) with a certain \texttt{status} (\texttt{TRANSMITTER} or \texttt{RECEIVER}). Returns the connection ID (which is the file descriptor of the open port) if successful, or -1 if an error occured.
-	\item \texttt{int llwrite(int id, const char *buffer, int length)} writes the first \texttt{length} bytes of \texttt{buffer} (up to \texttt{LL\_MAX\_SIZE} bytes) to connection with ID \texttt{id}; returns the number of written bytes, or -1 if an error occured.
-	\item \texttt{int llread(int id, char *buffer)} reads from the connection with ID \texttt{id} to \texttt{buffer}; \texttt{buffer} must have a size of at least \texttt{LL\_MAX\_SIZE} bytes.
-	\item \texttt{int llclose(int id)} closes connection with ID \texttt{id}.
+	\item \texttt{int llopen(int com, ll\_status\_t status)}, to open serial port \texttt{com} (1 for \texttt{COM1}, 2 for \texttt{COM2}, ...) with a certain \texttt{status} (\texttt{TRANSMITTER} or \texttt{RECEIVER}). Returns the connection ID on success, and a negative if an error occured.
+	\item \texttt{int llwrite(int id, const char *buffer, int length)} writes the first \texttt{length} bytes of \texttt{buffer} (up to \texttt{LL\_MAX\_SIZE} bytes) to connection with ID \texttt{id}; returns the number of written bytes, or a negative if an error occured.
+	\item \texttt{int llread(int id, char *buffer)} reads from the connection with ID \texttt{id} to \texttt{buffer}; \texttt{buffer} must have a size of at least \texttt{LL\_MAX\_SIZE} bytes. Returns the number of written bytes, or a negative if an error occured.
+	\item \texttt{int llclose(int id)} closes connection with ID \texttt{id}. Returns 0 on success, or a negative otherwise.
 \end{itemize}
 
 To use these functions, one just needs to allocate the buffers with proper sizes. You can also configure the transmission by using custom values for \texttt{ll\_config}, of type \texttt{ll\_config\_t}.
@@ -307,17 +310,17 @@ For one call to \texttt{llopen} or \texttt{llclose} in the transmitter, there mu
 
 \section{Logical link protocol} \label{sec:LLProtocol}
 
-The link layer uses a logical link protocol that applies the automatic repeat request method for error-control, which consists of a transfer-acknowledgement process where the receiver only evaluates the consistency of a frame and does not try to correct it; instead it asks the transmitter to retransmit the whole frame. More specifically, a form of \textit{stop-and-wait} was implemented, in which a frame is only sent after the previous frame was sent and the respective acknowledgement was received. This allows synchronous communication over an unreliable transfer media.
+LL uses a logical link protocol that applies the automatic repeat request method for error-control, which consists of a transfer-acknowledgement process where the receiver only evaluates the consistency of a frame and does not try to correct it; instead it asks the transmitter to retransmit the whole frame. More specifically, a form of \textit{stop-and-wait} was implemented, in which a frame is only sent after the previous frame was sent and the respective acknowledgement was received. This allows synchronous communication over an unreliable transfer media.
 
-Communication through this protocol is done by \textit{framing} messages in three types of frames: supervisory frames (S-frames), which are used to supervise the communication; unnunbered frames (U-frames), which are used for other miscellaneous purposes, including to acknowledge the reception of a frame; and information frames (I-frames), which contain the actual data to be transferred, Figure \ref{fig:frames}. In particular, S-frames are used to transmit SET (set up), DISC (disconnect), RR (receiver ready) and REJ (rejected) commands, and U-frames for UA (unnumbered acknowledgement).
+Communication through this protocol is done by \textit{framing} messages in three types of frames: supervisory frames (S-frames), which are used to supervise the communication; unnumbered frames (U-frames), which are used for other miscellaneous purposes, including to acknowledge the reception of a non-data frame; and information frames (I-frames), which contain the actual data to be transferred, Figure \ref{fig:frames}. In particular, S-frames are used to transmit SET (set up), DISC (disconnect), RR (receiver ready) and REJ (rejected) commands, and U-frames for UA (unnumbered acknowledgement).
 
 \begin{figure}[H]
 	\centering
 	\begin{tabular}{c p{8mm} c}
 		\begin{tikzpicture}[-triangle 90,>=stealth',node distance=2cm,initial text=$ $,scale=0.95]
 			\scriptsize
-			\node[align=center, draw, minimum width=2.5cm, minimum height=1cm] at (-1.5, 0.8) (transmitter) {\small Transmitter};
-			\node[align=center, draw, minimum width=2.5cm, minimum height=1cm] at (+1.5, 0.8) (receiver)    {\small Receiver};
+			\node[align=center, draw, minimum width=2.5cm, minimum height=0.95cm] at (-1.5, 0.8) (transmitter) {\small Transmitter};
+			\node[align=center, draw, minimum width=2.5cm, minimum height=0.95cm] at (+1.5, 0.8) (receiver)    {\small Receiver};
 			\node[align=center] at (-2.4, -1.5) (establishment) {\footnotesize \textbf{\rotatebox{90}{Establishment}}};
 			\node[align=center] at (-2.4, -5.2) (establishment) {\footnotesize \textbf{\rotatebox{90}{Transmission}}};
 			\node[align=center] at (-2.4, -8.9) (establishment) {\footnotesize \textbf{\rotatebox{90}{Termination}}};
@@ -360,8 +363,8 @@ Communication through this protocol is done by \textit{framing} messages in thre
 		\end{tikzpicture} & &
 		\begin{tikzpicture}[-triangle 90,>=stealth',node distance=2cm,initial text=$ $,scale=0.95]
 			\scriptsize
-			\node[align=center, draw, minimum width=2.5cm, minimum height=1cm] at (-1.5, 0.8) (transmitter) {\small Transmitter};
-			\node[align=center, draw, minimum width=2.5cm, minimum height=1cm] at (+1.5, 0.8) (receiver)    {\small Receiver};
+			\node[align=center, draw, minimum width=2.5cm, minimum height=0.95cm] at (-1.5, 0.8) (transmitter) {\small Transmitter};
+			\node[align=center, draw, minimum width=2.5cm, minimum height=0.95cm] at (+1.5, 0.8) (receiver)    {\small Receiver};
 
 			\node[] at (+0.2, -1.2) (lightning-1)    {\includegraphics[scale=0.015]{lightning.png}};
 			\node[] at (-0.2, -5.4) (lightning-2)    {\includegraphics[scale=0.015]{lightning.png}};
@@ -405,7 +408,7 @@ Communication through this protocol is done by \textit{framing} messages in thre
 		\end{tikzpicture} \\
 		(\textit{a}) & & (\textit{b})
 	\end{tabular}
-	\caption{Sequence diagrams of communication through the LL protocol: \\ (\textit{a}) complete diagram without errors; (\textit{b}) transmission phase with errors}
+	\caption{Sequence diagrams of communication through LL: \\ (\textit{a}) complete diagram without errors; (\textit{b}) transmission phase with errors}
 	\label{fig:diagrams}
 \end{figure}
 
@@ -454,7 +457,7 @@ The meaning of the bytes that constitute the frames are as follows:
 	\item Data (D): data bytes, encoded using byte stuffing.
 \end{itemize}
 
-Frame reception was implemented using state machines. S-frame, U-frame and I-frame reception was implemented using different automatons (in appendix \ref{ch:automatons}), to save up space and allow for the right transitions in each situation.
+Frame reception was implemented using state machines. Frame reception was implemented using different automatons (in appendix \ref{ch:automatons}), to allow for the right transitions in each situation and to save up space, as an I-frame automaton requires a buffer but an S/U-frame does not.
 
 % TODO automata figures?
 % In appendices
@@ -465,7 +468,7 @@ We applied the byte stuffing encoding method suggested in the project guidelines
 
 \section{Application protocol} \label{sec:AppProtocol}
 
-The application protocol is used for file transfer using the methods offered by the link layer interface. It consists in reading the original file and sending it in smaller pieces to the receiver. This protocol utilizes the control packet, which is used to signal the start and end of the file transmission, and the data packet, which carries chunks of the file.
+The application protocol is used for file transfer using methods exposed by the LL interface. It consists of reading the original file and sending it in small packets to the receiver. This protocol uses control packets to signal the start and end of file transmission and transfer file metadata, and data packets to transfer file chunks.
 
 \begin{figure}[H]
 	\centering
@@ -493,7 +496,7 @@ The application protocol is used for file transfer using the methods offered by 
 			\node[align=center, draw, minimum width=2.4cm, minimum height=1.2cm] at (3.0, 0) (l) {$\text{L}$};
 			\node[align=center, minimum width=1.2cm, minimum height=1.2cm] at (4.8, 0) (p1) {$\text{P}_1$};
 			\node[align=center, dashed, draw, minimum width=2.4cm, minimum height=1.2cm] at (6.6, 0) (packets) {...};
-			\node[align=center, minimum width=1.2cm, minimum height=1.2cm] at (8.4, 0) (pk) {$\text{P}_\text{k}$};
+			\node[align=center, minimum width=1.2cm, minimum height=1.2cm] at (8.4, 0) (pk) {$\text{P}_K$};
 
 			\draw[line width=2pt]	(4.2, -0.6) rectangle ++(4.8, 1.2);
 		\end{tikzpicture}
@@ -505,29 +508,30 @@ The application protocol is used for file transfer using the methods offered by 
 The meaning of each field is as follows:
 \begin{itemize}
 	\itemsep0em
-	\item Control field (C): Determines the type of packet. Has value \texttt{0x02} for a start packet, \texttt{0x03} for an end packet, and \texttt{0x01} for a data packet.
+	\item Control field (C): Determines the type of packet. Has value \texttt{0x02} for a \textit{start} packet, \texttt{0x03} for an \textit{end} packet, and \texttt{0x01} for a data packet.
 	\item Type ($\text{T}_i$), Length ($\text{L}_i$), Value ($\text{V}_i$): Encoding of parameter to be sent, includes its type (\texttt{0x00} for file size, or \texttt{0x01} for file name), length in bytes, and its value.
 	\item Sequence number (N): Sequence number of the data chunk, modulo 255.
 	\item Packet length ($\text{L}$): Number of bytes in the data field; uses two bytes, $\text{L}'_1$ and $\text{L}'_2$, where the length is $256*\text{L}'_1 + \text{L}'_2$.
-	\item $\text{P}_1$ to $\text{P}_K$: $K$ bytes of the file to be transmitted.
+	\item $\text{P}_1$ to $\text{P}_K$: $K$ bytes of the data field, corresponding to a file chunk.
 \end{itemize}
 
-The transmitter sends one first control packet, with the name and size of the file.
-Then it sends the data packets with the sequential number and ends with another control packet,
+The transmitter first sends a \textit{start} control packet, with the name and size of the file.
+It then sends the data packets with the sequential number and ends with an \textit{end} control packet,
 this having the same data as the first one.
 
-Meanwhile, the receiver gathers information about the file with the support of the control packets and reconstructs the original file with data packets. 
-It is also possible to detect corrupted data and flaws in the transmission making use of the sequence number and the file size.
+Meanwhile, the receiver gathers information about the file with the support of the control packets and reconstructs the original file from the data packets. 
+It also detects corrupted data, in which case it exits with error as its protocol does not establish an error-control method.
 
 \section{Validation} \label{sec:Validation}
 
-In order to validate the implementation of the protocols, the application was tested with several files, of distinct types and sizes. 
+In order to validate the implementation of the protocols, the application was tested with several files, of distinct types and sizes, and different baud rates. 
 Furthermore, errors were artificially introduced to evaluate the program's robustness.
-The implementation showed positive results, being capable of withstanding frame error rates up to 65\% and still transfer the files.
+The implementation showed positive results, being capable of effectively transferring files with frame error rates up to 65\%.
 
-To test the program, run command \texttt{make test}.
-These tests include running the transmitter alone and running the transmitter after and before the receiver.
+To test the program, run command \texttt{make test} after creating virtual serial ports between \texttt{ttyS10} and \texttt{ttyS11}.
+These tests include running the transmitter alone, and running the transmitter after and before the receiver.
 Correct file transmission was verified using the \texttt{cmp} command.
+Similar procedures were followed in remote and local tests in the provided hardware.
 
 \section{Efficiency of the data link protocol} \label{sec:Efficiency}
 
@@ -554,7 +558,7 @@ All statistics were performed using the \texttt{stats} module. The values of the
 	\end{tabular}
 \end{center}
 
-The default parameter values are $\Delta \tau = 0$ and $p_d=p_h=0$. Parameter $a$ as varied by changing the artificial propagation delay $\Delta \tau$, and $R_e$ was varied by changing the probability of a data bit swap $p_d$.
+The default parameter values are $\Delta \tau = 0$ and $p_d=p_h=0$. Parameter $a$ as varied by changing the artificial propagation delay $\Delta \tau$, and $R_e$ was varied by changing the probability of a data bit swap $p_d$. $C$ was kept at the highest value that yielded decent results, $C=\SI{115200}{\bit/\second}$.
 
 Parameters $a$ and $R_e$ were initially varied independently, Figure \ref{fig:S_a_Re}.
 
@@ -600,7 +604,7 @@ Theoretically, and as deduced from \ref{eq:Sfinal}, a \textit{stop-and-wait} pro
 \begin{equation*}
 	S = \frac{1-R_e}{1 + 2a}
 \end{equation*}
-Qualitatively, the graphs in Figure \ref{fig:S_a_Re} show $S$ depends inversely on $a$ and linearly on $R_e$, in agreement with the predictions. To formally evaluate the validity of this expression, parameters $a$ and $R_e$ were simultaneously varied to obtain the data in the graph of Figure \ref{fig:S_aRe}. Additionally, we calculated the RMSE between the experimentally obtained efficiency and the theoretically predicted efficiency, which is 0.029860; this is possibly caused by the fact there is a linear relation $S=0.916512\,S_{pred} - 0.003564$ with correlation coefficient $r^2 = 0.999707$, where the slope differs from $1$ because of some sort of additional work that causes $S$ to be smaller than predicted by around $8\%$.
+Qualitatively, the graphs in Figure \ref{fig:S_a_Re} show $S$ depends inversely on $a$ and linearly on $R_e$, in agreement with the predictions. To formally evaluate the validity of this expression, parameters $a$ and $R_e$ were simultaneously varied to obtain the data in the graph of Figure \ref{fig:S_aRe}. Additionally, we calculated the RMSE between the experimentally obtained efficiency and the theoretically predicted efficiency, which is 0.029860; this is possibly caused by the fact there is a linear relation $S=0.916512\,S_{pred} - 0.003564$ with very high correlation coefficient $r^2 = 0.999707$, where the slope differs from $1$ because of some sort of additional work that causes $S$ to be smaller than predicted by around $8\%$.
 
 \begin{figure}[H]
 	\begin{center}
@@ -630,9 +634,10 @@ Qualitatively, the graphs in Figure \ref{fig:S_a_Re} show $S$ depends inversely 
 
 \section{Conclusion} \label{sec:Conclusion}
 
-This project aimed at implementing a reliable protocol, consisting of two independent layers (a link layer and an application layer), to transfer a file between two computers connected through serial ports. The proposed \textit{stop-and-wait} protocol was successfully implemented in C using makefiles to build it, and tests were applied to evaluate its robustness to error and efficiency.
+This project aimed at implementing a reliable protocol, consisting of a data link layer and an application layer, to transfer a file between two computers connected through serial ports. The proposed \textit{stop-and-wait} protocol was successfully implemented in the C language, and tests were applied to evaluate its robustness to error and efficiency. This report was elaborated to convey the knowledge and methods used in this project.
+Thus, all objectives of this project were met.
 
-We had the opportunity to put into practice the theoretical concepts learned in RCOM curricular unit, and to develop these teachings even further by doing analysis and debating ways to build the program.
+We had the opportunity to put into practice the theoretical concepts learned in RCOM curricular unit, as well as to discuss our learnings and deepen our knowledge from a practical point of view during the design, implementation and analysis phases of this project.
 
 \appendix
 \appendixpage
@@ -830,6 +835,38 @@ An I-frame state machine must be ready to handle to following scenarios:
 		
 	\end{tikzpicture}
 \end{center}
+
+\chapter{App arguments} \label{ch:args}
+
+The transmitter and receiver can be used in the following ways (also available in \texttt{README.md}):
+\begin{lstlisting}[numbers=none, frame=]
+transmitter COM FILE <-b baudrate> <-d pd> <-h ph> <-r retransmissions>
+	<-s size> <-t timeout> <-T tau> <-v verbosity>
+
+receiver    COM      <-b baudrate> <-d pd> <-h ph> <-r retransmissions>
+	<-s size> <-t timeout> <-T tau> <-v verbosity>
+
+COM                     Communications channel to use
+						(COM1 - ttyS0, COM2 - ttyS1, ...)
+FILE                    Path to file to be transferred by the transmitter
+
+-b, --baudrate          Baud rate; bit per second (default is 38400)
+-d, --prob-error-data   Data error probability
+-h, --prob-error-head   Header error probability
+-r, --retransmissions   Retransmissions (default is 3)
+-s, --size              Block size, in bytes
+						(default is LL_MAX_SIZE, which is 4096)
+-t, --timeout           Timeout, in seconds (default is 3)
+-T, --tau               Tau; extra time before analysing, in microseconds
+						(default is 0)
+-v, --verbosity         Verbosity of debug mode (0 to 4):
+							0 - Only errors
+							1 - Global LL workings
+							2 - Specific LL workings (received frames, ...)
+							3 - Everything, including written and read bytes
+\end{lstlisting}
+
+% TODO: How can I configure transmission from the command line?
 
 \chapter{Statistics} \label{ch:statistics}
 
