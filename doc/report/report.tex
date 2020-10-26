@@ -138,9 +138,7 @@ Class 2, group 4 \vspace{0.5em} \\
 
 This project was elaborated as the first laboratory project in the context of the curricular unit Computer Networks (\textit{Redes de Computadores} - RCOM), part of the Integrated Master in Informatics and Computing Engineering (\textit{Mestrado Integrado em Engenharia Informática e Computação} - MIEIC) lectured at the Faculty of Engineering of the University of Porto (FEUP). It concerns the design and implementation of a data link layer/protocol to allow two computers to communicate in a reliable way through serial ports. An application was developed on top of that layer, to allow a computer to transfer a file to another.
 
-Our main conclusions were satisfactory and all the objectives were fulfilled, being successfully able to implement a reliable protocol for transmitting files without data loss, and always checking for potential errors in the connection.
-
-% TODO
+All objectives were fulfilled, as we successfully implemented in C a reliable protocol for transmitting files, with proven efficacy and robustness; we additionally analysed experimental data related to this protocol's efficiency and compared it to expected theoretical results.
 
 \section{Introduction} \label{sec:Introduction}
 
@@ -458,9 +456,6 @@ The meaning of the bytes that constitute the frames are as follows:
 \end{itemize}
 
 Frame reception was implemented using state machines. Frame reception was implemented using different automatons (in appendix \ref{ch:automatons}), to allow for the right transitions in each situation and to save up space, as an I-frame automaton requires a buffer but an S/U-frame does not.
-
-% TODO automata figures?
-% In appendices
 
 \subsection{Byte stuffing}
 
@@ -865,8 +860,6 @@ FILE                    Path to file to be transferred by the transmitter
 							2 - Specific LL workings (received frames, ...)
 							3 - Everything, including written and read bytes
 \end{lstlisting}
-
-% TODO: How can I configure transmission from the command line?
 
 \chapter{Statistics} \label{ch:statistics}
 
