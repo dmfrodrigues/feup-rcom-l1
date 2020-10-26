@@ -58,7 +58,11 @@ FILE                    Path to file to be transferred by the transmitter
 -s, --size              Block size, in bytes (default is LL_MAX_SIZE, which is 4096)
 -t, --timeout           Timeout, in seconds (default is 3)
 -T, --tau               Tau; extra time before analysing, in microseconds (default is 0)
--v, --verbosity         Verbosity (0 to 4)
+-v, --verbosity         Verbosity (0 to 4):
+                            0 - Only errors
+							1 - Global app workings
+							2 - Specific app workings (received frames, ...)
+							3 - Everything, including written and read bytes
 ```
 
 # License
