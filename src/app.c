@@ -10,7 +10,7 @@
 
 app_config_t app_config = {
     -1,
-    LL_MAX_SIZE/2
+    LL_MAX_SIZE
 };
 
 int application(int com, ll_status_t status, char *file_path){
