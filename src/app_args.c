@@ -50,6 +50,7 @@ int app_parse_args( int argc, char *argv[], int *com, ll_status_t status, char *
                 break;
             case 's':
                 if(sscanf(optarg, "%lu", &app_config.packet_size      ) != 1) res = 1;
+                if(app_config.packet_size > APP_MAX_SIZE)                     res = 1;
                 break;
             case 't':
                 if(sscanf(optarg, "%llu", &timeout_val                ) != 1) res = 1;

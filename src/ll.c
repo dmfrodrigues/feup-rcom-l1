@@ -138,6 +138,11 @@ int llopen(int com, ll_status_t status){
 }
 
 int llwrite(int port_fd, const uint8_t *buffer, int length){
+    if(length > LL_MAX_SIZE){
+        ll_err("ERROR: length=%d larger than LL_MAX_SIZE=%d\n", length, LL_MAX_SIZE);
+        return -1;
+    }
+
     ll_log(1, "Preparing to write\n");
 
     if(ll_status == RECEIVER) return -1;
