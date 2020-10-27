@@ -175,6 +175,7 @@ int app_rcv_ctrl_packet(int ctrl, unsigned int * file_size, char * file_name){
     }
     file_name[i] = '\0';
 
+    ll_log(2, "About to free ctrl_packet\n");
     free(ctrl_packet);
 
     ll_log(2, "APP: successfully read ctrl packet\n");
@@ -217,6 +218,8 @@ int app_rcv_data_packet(char * data, int seq_number){
     }
 
     memcpy(data, data_packet + 4, data_length);
+
+    ll_log(2, "About to free data_packet, data_length=%lu\n", data_length);
 
     free(data_packet);
 
