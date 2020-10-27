@@ -553,7 +553,7 @@ All statistics were performed using the \texttt{stats} module. The values of the
 	\end{tabular}
 \end{center}
 
-The default parameter values are $\Delta \tau = 0$ and $p_d=p_h=0$. Parameter $a$ as varied by changing the artificial propagation delay $\Delta \tau$, and $R_e$ was varied by changing the probability of a data bit swap $p_d$. $C$ was kept at the highest value that yielded decent results, $C=\SI{115200}{\bit/\second}$.
+The default parameter values are $\Delta \tau = 0$, $p_d=p_h=0$, $C=\SI{115200}{\bit/\second}$ and packet size $\SI{128}{\byte}$. Parameter $a$ as varied by changing the artificial propagation delay $\Delta \tau$, and $R_e$ was varied by changing the probability of a data bit swap $p_d$.
 
 Parameters $a$ and $R_e$ were initially varied independently, Figure \ref{fig:S_a_Re}.
 
@@ -849,8 +849,8 @@ FILE                    Path to file to be transferred by the transmitter
 -d, --prob-error-data   Data error probability
 -h, --prob-error-head   Header error probability
 -r, --retransmissions   Retransmissions (default is 3)
--s, --size              Block size, in bytes
-						(default is LL_MAX_SIZE, which is 4096)
+-s, --size              Packet size (# of data bytes in a packet), in bytes
+						(default is APP_MAX_SIZE, which is 4092)
 -t, --timeout           Timeout, in seconds (default is 3)
 -T, --tau               Tau; extra time before analysing, in microseconds
 						(default is 0)
