@@ -219,7 +219,7 @@ int app_rcv_data_packet(char * data, int seq_number){
 
     memcpy(data, data_packet + 4, data_length);
 
-    ll_log(2, "About to free data_packet, data_length=%lu\n", data_length);
+    ll_log(2, "About to free data_packet, data_length=%lu, app_config.packet_size=%lu\n", data_length, app_config.packet_size);
 
     free(data_packet);
 
