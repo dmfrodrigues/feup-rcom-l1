@@ -10,7 +10,7 @@
 
 app_config_t app_config = {
     -1,
-    LL_MAX_SIZE
+    LL_MAX_SIZE/2
 };
 
 int application(int com, ll_status_t status, char *file_path){
@@ -175,6 +175,7 @@ int app_rcv_ctrl_packet(int ctrl, unsigned int * file_size, char * file_name){
     }
     file_name[i] = '\0';
 
+    ll_log(2, "About to free ctrl_packet\n");
     free(ctrl_packet);
 
     ll_log(2, "APP: successfully read ctrl packet\n");
@@ -217,6 +218,8 @@ int app_rcv_data_packet(char * data, int seq_number){
     }
 
     memcpy(data, data_packet + 4, data_length);
+
+    ll_log(2, "About to free data_packet, data_length=%lu, app_config.packet_size=%lu\n", data_length, app_config.packet_size);
 
     free(data_packet);
 
@@ -261,6 +264,8 @@ int app_receive_file(){
         seq_number++;
     }
 
+    free(buf);
+
     fclose(file);
 
     unsigned int file_size_;
@@ -276,6 +281,9 @@ int app_receive_file(){
                         file_name, file_name_);
         return -1;
     }
+
+    free(file_name);
+    free(file_name_);
 
     return 0;
 }

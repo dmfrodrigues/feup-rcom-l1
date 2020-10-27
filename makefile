@@ -15,7 +15,7 @@ CFLAGS_PARANOID =-pedantic -Wall -Wbad-function-cast -Wcast-align -Wcast-qual -W
 				 -Wpointer-arith -Wshadow -Wstrict-prototypes -Wundef -Wunused-parameter -Wunused-result -Wwrite-strings
 
 #CFLAGS=-Wall -g #-O3
-CFLAGS=$(CFLAGS_PARANOID)
+CFLAGS=-g $(CFLAGS_PARANOID)
 
 # DFLAGS
 DFLAGS=

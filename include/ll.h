@@ -84,7 +84,7 @@ int llread(int id, uint8_t *buffer)
  * @brief Close serial port.
  * 
  * @param id        Port to close.
- * @return int      positive value if successful, negative otherwise
+ * @return int      0 if successful, negative value otherwise
  */
 int llclose(int id)
     __attribute__((warn_unused_result));
