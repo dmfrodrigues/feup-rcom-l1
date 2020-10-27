@@ -185,7 +185,7 @@ int llwrite(int port_fd, const uint8_t *buffer, int length){
         }
     }
     if(attempts == ll_config.retransmissions){
-        ll_err("WARNING: gave up due to timeout\n");
+        ll_err("ERROR: gave up due to timeout\n");
         return -1;
     }
     setitimer(ITIMER_REAL, &ll_timer_reset, NULL);
