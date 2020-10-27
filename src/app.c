@@ -138,17 +138,15 @@ int app_send_file(char *file_path){
 int app_rcv_ctrl_packet(int ctrl, unsigned int * file_size, char * file_name){
     ll_log(2, "APP: preparing to read ctrl packet\n");
 
-    uint8_t *ctrl_packet = (uint8_t*)malloc(5+sizeof(unsigned int)+NAME_MAX);
+    uint8_t ctrl_packet[5+sizeof(unsigned int)+NAME_MAX];
 
     if(llread(app_config.fileDescriptor, ctrl_packet) < 0){
         fprintf(stderr, "ERROR: unable to read ctrl packet\n");
-        free(ctrl_packet);
         return -1;
     }
 
     if(ctrl_packet[0] != ctrl || ctrl_packet[1] != T_FILE_SIZE){
         fprintf(stderr, "ERROR: control is not correct\n");
-        free(ctrl_packet);
         return -1;
     }
     
@@ -156,7 +154,6 @@ int app_rcv_ctrl_packet(int ctrl, unsigned int * file_size, char * file_name){
     
     if(file_size_octets > 4){
         ll_err("ERROR: file_size_octets > 4\n");
-        free(ctrl_packet);
         return -1;
     }
     
@@ -164,7 +161,6 @@ int app_rcv_ctrl_packet(int ctrl, unsigned int * file_size, char * file_name){
 
     if(ctrl_packet[7] != T_FILE_NAME){
         fprintf(stderr, "ERROR: unexpected byte in control packet\n");
-        free(ctrl_packet);
         return -1;
     }
 
@@ -175,9 +171,6 @@ int app_rcv_ctrl_packet(int ctrl, unsigned int * file_size, char * file_name){
         file_name[i] = (char)ctrl_packet[9+i];
     }
     file_name[i] = '\0';
-
-    ll_log(2, "About to free ctrl_packet\n");
-    free(ctrl_packet);
 
     ll_log(2, "APP: successfully read ctrl packet\n");
 
@@ -232,7 +225,7 @@ int app_rcv_data_packet(char * data, int seq_number){
 int app_receive_file(){
     
     unsigned int file_size;
-    char *file_name = (char*) malloc(NAME_MAX);
+    char file_name[NAME_MAX];
 
     if(app_rcv_ctrl_packet(CTRL_START, &file_size, file_name) < 0){
         return -1;
@@ -270,7 +263,7 @@ int app_receive_file(){
     fclose(file);
 
     unsigned int file_size_;
-    char *file_name_ = (char*) malloc(NAME_MAX);
+    char file_name_[NAME_MAX];
 
     if(app_rcv_ctrl_packet(CTRL_END, &file_size_, file_name_) < 0){
         return -1;
@@ -282,9 +275,6 @@ int app_receive_file(){
                         file_name, file_name_);
         return -1;
     }
-
-    free(file_name);
-    free(file_name_);
 
     return 0;
 }
