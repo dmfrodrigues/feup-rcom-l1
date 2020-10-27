@@ -185,7 +185,7 @@ int app_rcv_ctrl_packet(int ctrl, unsigned int * file_size, char * file_name){
 int app_rcv_data_packet(char * data, int seq_number){
     ll_log(2, "APP: preparing to read data packet\n");
 
-    uint8_t * data_packet = (uint8_t*) malloc(app_config.packet_size);
+    uint8_t * data_packet = (uint8_t*) malloc(app_config.packet_size + 4);
     
     if(llread(app_config.fileDescriptor, data_packet) < 0){
         fprintf(stderr, "ERROR: unable to read data packet\n");
