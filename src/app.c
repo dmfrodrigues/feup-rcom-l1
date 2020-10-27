@@ -264,6 +264,8 @@ int app_receive_file(){
         seq_number++;
     }
 
+    free(buf);
+
     fclose(file);
 
     unsigned int file_size_;
@@ -279,6 +281,9 @@ int app_receive_file(){
                         file_name, file_name_);
         return -1;
     }
+
+    free(file_name);
+    free(file_name_);
 
     return 0;
 }
