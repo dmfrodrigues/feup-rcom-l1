@@ -23,8 +23,6 @@
 #define T_FILE_SIZE 0
 #define T_FILE_NAME 1
 
-#define FILE_NAME_MAX_SIZE 255
-
 /**
  * @ingroup app
  * @brief App configuration structure

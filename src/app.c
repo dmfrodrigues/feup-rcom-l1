@@ -3,6 +3,7 @@
 
 #include "app.h"
 #include <time.h>
+#include <limits.h>
 
 #include "stats.h"
 
@@ -137,7 +138,7 @@ int app_send_file(char *file_path){
 int app_rcv_ctrl_packet(int ctrl, unsigned int * file_size, char * file_name){
     ll_log(2, "APP: preparing to read ctrl packet\n");
 
-    uint8_t *ctrl_packet = (uint8_t*)malloc(5+sizeof(unsigned int)+FILE_NAME_MAX_SIZE);
+    uint8_t *ctrl_packet = (uint8_t*)malloc(5+sizeof(unsigned int)+NAME_MAX);
 
     if(llread(app_config.fileDescriptor, ctrl_packet) < 0){
         fprintf(stderr, "ERROR: unable to read ctrl packet\n");
@@ -231,7 +232,7 @@ int app_rcv_data_packet(char * data, int seq_number){
 int app_receive_file(){
     
     unsigned int file_size;
-    char *file_name = (char*) malloc(FILE_NAME_MAX_SIZE);
+    char *file_name = (char*) malloc(NAME_MAX);
 
     if(app_rcv_ctrl_packet(CTRL_START, &file_size, file_name) < 0){
         return -1;
@@ -269,7 +270,7 @@ int app_receive_file(){
     fclose(file);
 
     unsigned int file_size_;
-    char *file_name_ = (char*) malloc(FILE_NAME_MAX_SIZE);
+    char *file_name_ = (char*) malloc(NAME_MAX);
 
     if(app_rcv_ctrl_packet(CTRL_END, &file_size_, file_name_) < 0){
         return -1;
