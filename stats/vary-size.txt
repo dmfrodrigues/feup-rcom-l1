@@ -23,6 +23,11 @@
 ../testfiles/pinguim.gif 115200 0.0 0.0 100  300 10000000 0 1
 ../testfiles/pinguim.gif 115200 0.0 0.0 100  200 10000000 0 1
 ../testfiles/pinguim.gif 115200 0.0 0.0 100  100 10000000 0 1
+../testfiles/pinguim.gif 115200 0.0 0.0 100   90 10000000 0 1
+../testfiles/pinguim.gif 115200 0.0 0.0 100   80 10000000 0 1
+../testfiles/pinguim.gif 115200 0.0 0.0 100   70 10000000 0 1
+../testfiles/pinguim.gif 115200 0.0 0.0 100   60 10000000 0 1
+../testfiles/pinguim.gif 115200 0.0 0.0 100   50 10000000 0 1
 
 ../testfiles/pinguim.gif 115200 0.0 0.0 100 4000 10000000 0 1
 ../testfiles/pinguim.gif 115200 0.0 0.0 100 3800 10000000 0 1
@@ -49,6 +54,11 @@
 ../testfiles/pinguim.gif 115200 0.0 0.0 100  300 10000000 0 1
 ../testfiles/pinguim.gif 115200 0.0 0.0 100  200 10000000 0 1
 ../testfiles/pinguim.gif 115200 0.0 0.0 100  100 10000000 0 1
+../testfiles/pinguim.gif 115200 0.0 0.0 100   90 10000000 0 1
+../testfiles/pinguim.gif 115200 0.0 0.0 100   80 10000000 0 1
+../testfiles/pinguim.gif 115200 0.0 0.0 100   70 10000000 0 1
+../testfiles/pinguim.gif 115200 0.0 0.0 100   60 10000000 0 1
+../testfiles/pinguim.gif 115200 0.0 0.0 100   50 10000000 0 1
 
 ../testfiles/pinguim.gif 115200 0.0 0.0 100 4000 10000000 0 1
 ../testfiles/pinguim.gif 115200 0.0 0.0 100 3800 10000000 0 1
@@ -75,6 +85,11 @@
 ../testfiles/pinguim.gif 115200 0.0 0.0 100  300 10000000 0 1
 ../testfiles/pinguim.gif 115200 0.0 0.0 100  200 10000000 0 1
 ../testfiles/pinguim.gif 115200 0.0 0.0 100  100 10000000 0 1
+../testfiles/pinguim.gif 115200 0.0 0.0 100   90 10000000 0 1
+../testfiles/pinguim.gif 115200 0.0 0.0 100   80 10000000 0 1
+../testfiles/pinguim.gif 115200 0.0 0.0 100   70 10000000 0 1
+../testfiles/pinguim.gif 115200 0.0 0.0 100   60 10000000 0 1
+../testfiles/pinguim.gif 115200 0.0 0.0 100   50 10000000 0 1
 
 ../testfiles/pinguim.gif 115200 0.0 0.0 100 4000 10000000 0 1
 ../testfiles/pinguim.gif 115200 0.0 0.0 100 3800 10000000 0 1
@@ -101,3 +116,8 @@
 ../testfiles/pinguim.gif 115200 0.0 0.0 100  300 10000000 0 1
 ../testfiles/pinguim.gif 115200 0.0 0.0 100  200 10000000 0 1
 ../testfiles/pinguim.gif 115200 0.0 0.0 100  100 10000000 0 1
+../testfiles/pinguim.gif 115200 0.0 0.0 100   90 10000000 0 1
+../testfiles/pinguim.gif 115200 0.0 0.0 100   80 10000000 0 1
+../testfiles/pinguim.gif 115200 0.0 0.0 100   70 10000000 0 1
+../testfiles/pinguim.gif 115200 0.0 0.0 100   60 10000000 0 1
+../testfiles/pinguim.gif 115200 0.0 0.0 100   50 10000000 0 1
