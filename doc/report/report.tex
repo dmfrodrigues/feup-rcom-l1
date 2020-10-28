@@ -530,7 +530,9 @@ Similar procedures were followed in remote and local tests in the provided hardw
 
 \section{Efficiency of the data link protocol} \label{sec:Efficiency}
 
-The efficiency $S$ of a communication protocol is defined as the ratio between the actual data transfer rate $R$ and the maximum rate the communication media supports $C$, or the ratio between the minimum time it takes to transfer a message at maximum rate $C$ and the actual time it takes to transfer that message: $S = R/C = N_{min}\overline{T_f}/T$. This protocol's efficiency was studied by varying the following parameters:
+% The efficiency $S$ of a communication protocol is defined as the ratio between the actual data transfer rate $R$ and the maximum rate the communication media supports $C$, or the ratio between the minimum time it takes to transfer a message at maximum rate $C$ and the actual time it takes to transfer that message: $S = R/C = N_{min}\overline{T_f}/T$.
+
+This protocol's efficiency was studied by varying the following parameters:
 \begin{itemize}
 	\itemsep0em
 	\item Ratio of propagation time to frame transfer time, $a = \overline{T_{prop}}/\overline{T_f}$;
@@ -553,60 +555,81 @@ All statistics were performed using the \texttt{stats} module. The values of the
 	\end{tabular}
 \end{center}
 
-The default parameter values are $\Delta \tau = 0$ and $p_d=p_h=0$. Parameter $a$ as varied by changing the artificial propagation delay $\Delta \tau$, and $R_e$ was varied by changing the probability of a data bit swap $p_d$. $C$ was kept at the highest value that yielded decent results, $C=\SI{115200}{\bit/\second}$.
+The default parameter values are $\Delta \tau = 0$, $p_d=p_h=0$, $C=\SI{115200}{\bit/\second}$ and packet size $\SI{128}{\byte}$. Parameter $a$ as varied by changing the artificial propagation delay $\Delta \tau$, and $R_e$ was varied by changing the probability of a data bit swap $p_d$. $C$ and packet size were directly varied, but in the case of packet size we chose to plot efficiency versus number of frames $N$, because it has a much clearer linear relation with $S$.
 
-Parameters $a$ and $R_e$ were initially varied independently, Figure \ref{fig:S_a_Re}.
+Parameters $a$, $R_e$, $C$ and packet size were initially varied independently, Figure \ref{fig:S_a_Re}.
 
 \begin{figure}[H]
 	\centering
-	\begin{subfigure}[t]{0.53\textwidth}
+	\begin{subfigure}[t]{0.38\textwidth}
 		\begin{tikzpicture}[baseline]
-			\footnotesize
+			\scriptsize
 			\begin{axis}[
 				height=74mm,
+				width=63.5mm,
 				grid=major,
 				grid style={dashed,black!50},
 				xlabel={$a=T_{prop}/T_f$}, % Set the labels
-				xmin=0, xmax=2.5,
+				xmin=0, xmax=2.5, xtick distance=0.5, x tick label style={rotate=90},
 				ylabel={Efficiency $S$},
-				ymin=0, ymax=0.7,
+				ymin=0, ymax=0.8,
 				ytick distance=0.1,
 			]
 				\addplot[blue, mark=*, mark options={mark size=1.5pt}] table[x=a,y=S,col sep=comma] {vary-tau-processed.csv};
 			\end{axis}
 		\end{tikzpicture}
-	\end{subfigure}
-	\begin{subfigure}[t]{0.46\textwidth}
-		\hspace{-1.5em}
+	\end{subfigure}%
+	\begin{subfigure}[t]{0.31\textwidth}
+		\hspace{-1.45em}
 		\begin{tikzpicture}[baseline]
-			\footnotesize
+			\scriptsize
 			\begin{axis}[
 				height=74mm,
+				width=63.5mm,
 				grid=major,
 				grid style={dashed,black!50},
-				xmin=0, xmax=0.7, xlabel=Frame error rate $R_e$,
-				ymin=0, ymax=0.7, ytick distance=0.1, yticklabels={,,}
+				xmin=0, xmax=0.7, xtick distance=0.1, xlabel=Frame error rate $R_e$, x tick label style={rotate=90},
+				ymin=0, ymax=0.8, ytick distance=0.1, yticklabels={,,}
 			]
 				\addplot[only marks, blue, mark=*, mark options={mark size=1.5pt}] table[x=Re,y=S,col sep=comma] {vary-fre.csv};
-				\addplot[mark=none, black] {-0.64856632*x+0.63867854} node[right, align=left] at (0.23, 0.55) {$y=-0.64856632+0.63867854$\\$r^2=0.999914$};
+				\addplot[mark=none, black] {-0.64856632*x+0.63867854} node[right, align=left] at (0.13, 0.65) {$y=-0.6485663+0.6386785$\\$r^2=0.999914$};
+			\end{axis}
+		\end{tikzpicture}
+	\end{subfigure}%
+	\begin{subfigure}[t]{0.31\textwidth}
+		\hspace{-1.35em}
+		\begin{tikzpicture}[baseline]
+			\scriptsize
+			\begin{axis}[
+				height=74mm,
+				width=63.5mm,
+				grid=major,
+				grid style={dashed,black!50},
+				xmin=0, xmax=260, xtick distance=50, xlabel=Number of frames $N$, x tick label style={rotate=90},
+				ymin=0, ymax=0.8, ytick distance=0.1, yticklabels={,,}
+			]
+				\addplot[only marks, blue, mark=*, mark options={mark size=1.5pt}] table[x=N,y=S,col sep=comma] {vary-size.csv};
+				\addplot[mark=none, black, domain=-100:300] {-0.00090564*x+0.77701351} node[right, align=left] at (10, 0.45) {$y=-0.00090564x+0.77701351$\\$r^2=0.991153$};
 			\end{axis}
 		\end{tikzpicture}
 	\end{subfigure}
-	\caption{Efficiency $S$ plotted against $a$ (on the left) and $R_e$ (right). On both graphs, $S$ is determined for each point from the average run time $T$ of four repetitions} \label{fig:S_a_Re}
+	\caption{Efficiency $S$ plotted against $a$ (left), $R_e$ (center) and $N$ (right). On all graphs, $S$ is determined for each point from the average run time $T$ of four repetitions} \label{fig:S_a_Re}
 \end{figure}
 
-Theoretically, and as deduced from \ref{eq:Sfinal}, a \textit{stop-and-wait} protocol like ours has its performance given by the expression
+As deduced from \ref{eq:Sfinal}, a \textit{stop-and-wait} protocol has its efficiency given by the expression
 \begin{equation*}
 	S = \frac{1-R_e}{1 + 2a}
 \end{equation*}
-Qualitatively, the graphs in Figure \ref{fig:S_a_Re} show $S$ depends inversely on $a$ and linearly on $R_e$, in agreement with the predictions. To formally evaluate the validity of this expression, parameters $a$ and $R_e$ were simultaneously varied to obtain the data in the graph of Figure \ref{fig:S_aRe}. Additionally, we calculated the RMSE between the experimentally obtained efficiency and the theoretically predicted efficiency, which is 0.029860; this is possibly caused by the fact there is a linear relation $S=0.916512\,S_{pred} - 0.003564$ with very high correlation coefficient $r^2 = 0.999707$, where the slope differs from $1$ because of some sort of additional work that causes $S$ to be smaller than predicted by around $8\%$.
+When varying $C$, $S$ has average value and standard deviation $S=0.701459\pm0.006869$, thus $C$ does not influence $S$ as expected from \ref{eq:Sfinal}. The graphs in Figure \ref{fig:S_a_Re} (left, center) show $S$ depends inversely on $a$ and linearly on $R_e$, in agreement with the predictions. However, the linear dependence between $S$ and $N$ is rather unexpected when one takes equation \ref{eq:Sfinal} alone; this linear dependence is explained by the reduction in packet size translating to an increase in the number of header bytes, which was not considered when deducing expression \ref{eq:Sfinal}.
+
+To formally evaluate the validity of this expression, parameters $a$ and $R_e$ were simultaneously varied to obtain the data in the graph of Figure \ref{fig:S_aRe}. We also calculated the RMSE between the experimentally obtained efficiency and the theoretically predicted efficiency, which is 0.029860; this is possibly caused by the fact there is a linear relation $S=0.916512\,S_{pred} - 0.003564$ with very high correlation coefficient $r^2 = 0.999707$, where the slope differs from $1$ possibly due to header bytes and driver overhead that causes $S$ to be smaller than predicted by around $8\%$.
 
 \begin{figure}[H]
 	\begin{center}
 		\begin{tikzpicture}
 			\footnotesize
 			\begin{axis}[
-				height=90mm,
+				height=89mm,
 				grid=major,
 				grid style={dashed,black!50},
 				view={+110}{+30},
@@ -849,8 +872,8 @@ FILE                    Path to file to be transferred by the transmitter
 -d, --prob-error-data   Data error probability
 -h, --prob-error-head   Header error probability
 -r, --retransmissions   Retransmissions (default is 3)
--s, --size              Block size, in bytes
-						(default is LL_MAX_SIZE, which is 4096)
+-s, --size              Packet size (# of data bytes in a packet), in bytes
+						(default is APP_MAX_SIZE, which is 4092)
 -t, --timeout           Timeout, in seconds (default is 3)
 -T, --tau               Tau; extra time before analysing, in microseconds
 						(default is 0)

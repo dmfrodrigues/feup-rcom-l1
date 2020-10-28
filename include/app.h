@@ -23,7 +23,7 @@
 #define T_FILE_SIZE 0
 #define T_FILE_NAME 1
 
-#define FILE_NAME_MAX_SIZE 255
+#define APP_MAX_SIZE (LL_MAX_SIZE-4)
 
 /**
  * @ingroup app

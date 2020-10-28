@@ -333,16 +333,19 @@ ssize_t ll_expect_Iframe(int port_fd, uint8_t *buffer){
         }
     } while(machine.state != LL_I_STOP);
 
-    ssize_t written_chars = ll_destuffing(buffer, machine.data, machine.length);
+    uint8_t buffer_destuffed[LL_MAX_SIZE+1];
+    ssize_t written_chars = ll_destuffing(buffer_destuffed, machine.data, machine.length);
     if(written_chars <= 0) return -1;
 
-    uint8_t bcc2  = buffer[written_chars-1];
-    uint8_t bcc2_ = ll_bcc(buffer, buffer+written_chars-1);
+    uint8_t bcc2  = buffer_destuffed[written_chars-1];
+    uint8_t bcc2_ = ll_bcc(buffer_destuffed, buffer_destuffed+written_chars-1);
     if(bcc2 != bcc2_){
         ADD_FRAME_ERROR();
         ll_err("ERROR: bcc2 incorrect (is 0x%02X, should be 0x%02X)\n", bcc2, bcc2_);
         return -1;
     }
+
+    memcpy(buffer, buffer_destuffed, written_chars-1);
 
     return written_chars-1;
 }

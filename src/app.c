@@ -3,6 +3,7 @@
 
 #include "app.h"
 #include <time.h>
+#include <limits.h>
 
 #include "stats.h"
 
@@ -10,7 +11,7 @@
 
 app_config_t app_config = {
     -1,
-    LL_MAX_SIZE
+    APP_MAX_SIZE
 };
 
 int application(int com, ll_status_t status, char *file_path){
@@ -72,6 +73,10 @@ int app_send_ctrl_packet(int ctrl, uint32_t file_size, const char *file_name){
 
 
 int app_send_data_packet(char *data, unsigned int data_size, unsigned int seq_number){
+    if(data_size > APP_MAX_SIZE){
+        ll_err("ERROR: data_size=%d larger than LL_MAX_SIZE=%d\n", data_size, APP_MAX_SIZE);
+        return -1;
+    }
 
     unsigned int packet_size = 4 + data_size;
     uint8_t *data_packet = (uint8_t*) malloc(packet_size);
@@ -137,17 +142,15 @@ int app_send_file(char *file_path){
 int app_rcv_ctrl_packet(int ctrl, unsigned int * file_size, char * file_name){
     ll_log(2, "APP: preparing to read ctrl packet\n");
 
-    uint8_t *ctrl_packet = (uint8_t*)malloc(5+sizeof(unsigned int)+FILE_NAME_MAX_SIZE);
+    uint8_t ctrl_packet[5+sizeof(unsigned int)+NAME_MAX];
 
     if(llread(app_config.fileDescriptor, ctrl_packet) < 0){
         fprintf(stderr, "ERROR: unable to read ctrl packet\n");
-        free(ctrl_packet);
         return -1;
     }
 
     if(ctrl_packet[0] != ctrl || ctrl_packet[1] != T_FILE_SIZE){
         fprintf(stderr, "ERROR: control is not correct\n");
-        free(ctrl_packet);
         return -1;
     }
     
@@ -155,7 +158,6 @@ int app_rcv_ctrl_packet(int ctrl, unsigned int * file_size, char * file_name){
     
     if(file_size_octets > 4){
         ll_err("ERROR: file_size_octets > 4\n");
-        free(ctrl_packet);
         return -1;
     }
     
@@ -163,7 +165,6 @@ int app_rcv_ctrl_packet(int ctrl, unsigned int * file_size, char * file_name){
 
     if(ctrl_packet[7] != T_FILE_NAME){
         fprintf(stderr, "ERROR: unexpected byte in control packet\n");
-        free(ctrl_packet);
         return -1;
     }
 
@@ -175,8 +176,6 @@ int app_rcv_ctrl_packet(int ctrl, unsigned int * file_size, char * file_name){
     }
     file_name[i] = '\0';
 
-    free(ctrl_packet);
-
     ll_log(2, "APP: successfully read ctrl packet\n");
 
     return 0;
@@ -185,7 +184,7 @@ int app_rcv_ctrl_packet(int ctrl, unsigned int * file_size, char * file_name){
 int app_rcv_data_packet(char * data, int seq_number){
     ll_log(2, "APP: preparing to read data packet\n");
 
-    uint8_t * data_packet = (uint8_t*) malloc(app_config.packet_size);
+    uint8_t * data_packet = (uint8_t*) malloc(app_config.packet_size + 4);
     
     if(llread(app_config.fileDescriptor, data_packet) < 0){
         fprintf(stderr, "ERROR: unable to read data packet\n");
@@ -218,6 +217,8 @@ int app_rcv_data_packet(char * data, int seq_number){
 
     memcpy(data, data_packet + 4, data_length);
 
+    ll_log(2, "About to free data_packet, data_length=%lu, app_config.packet_size=%lu\n", data_length, app_config.packet_size);
+
     free(data_packet);
 
     ll_log(2, "APP: successfully read data packet\n");
@@ -228,7 +229,7 @@ int app_rcv_data_packet(char * data, int seq_number){
 int app_receive_file(){
     
     unsigned int file_size;
-    char *file_name = (char*) malloc(FILE_NAME_MAX_SIZE);
+    char file_name[NAME_MAX];
 
     if(app_rcv_ctrl_packet(CTRL_START, &file_size, file_name) < 0){
         return -1;
@@ -261,10 +262,12 @@ int app_receive_file(){
         seq_number++;
     }
 
+    free(buf);
+
     fclose(file);
 
     unsigned int file_size_;
-    char *file_name_ = (char*) malloc(FILE_NAME_MAX_SIZE);
+    char file_name_[NAME_MAX];
 
     if(app_rcv_ctrl_packet(CTRL_END, &file_size_, file_name_) < 0){
         return -1;
