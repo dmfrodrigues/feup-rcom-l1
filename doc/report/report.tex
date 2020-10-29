@@ -626,9 +626,7 @@ When varying $C$ from $\SI{2400}{\bit/\second}$ to $\SI{115200}{\bit/\second}$, 
 The graphs in Figure \ref{fig:S_a_Re} (left, center) show $S$ depends inversely on $a$ and linearly on $R_e$, in agreement with the predictions.
 However, the linear dependence between $S$ and $1/\overline{L_p}$ reveals a detail that was not contemplated in \ref{eq:Sfinal}: the relation $L_f/\overline{L_p} = N$ means a decrease in $\overline{L_p}$ translates to an increase in $N$, and thus in the number of header bytes, which were not taken into consideration.
 
-To formally evaluate the validity of this expression, parameters $a$ and $R_e$ were simultaneously varied to obtain the data in the graph of Figure \ref{fig:S_aRe}.
-We also calculated the RMSE between the experimentally obtained efficiency and the theoretically predicted efficiency, which is 0.029860;
-this is possibly caused by the fact there is a linear relation $S=0.916512\,S_{pred} - 0.003564$ with very high correlation coefficient $r^2 = 0.999707$, where the slope differs from $1$ possibly due to header bytes and driver overhead that causes $S$ to be smaller than predicted by around $8\%$.
+To formally evaluate the validity of this expression, parameters $a$ and $R_e$ were simultaneously varied to obtain the data in the graph of Figure \ref{fig:S_aRe}. We found there is a linear relation $S=0.916512\,S_{pred} - 0.003564$ with very high correlation coefficient $r^2 = 0.999707$ between the theoretical and experimental efficiencies. The slope differs from $1$ by $8.35\%$ due in a lesser part to driver overhead, but mostly to not accounting for header bytes, as in these conditions header bytes account for $1-10968/11965=8.33\%$ of transferred bytes.
 
 \begin{figure}[H]
 	\centering
