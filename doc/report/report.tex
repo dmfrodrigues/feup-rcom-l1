@@ -22,7 +22,7 @@
 % Decent underlines
 \usepackage[normalem]{ulem}
 
-% Hyperreferences
+% Hyper-references
 \usepackage{hyperref}
 
 % Imports
@@ -136,7 +136,9 @@ Class 2, group 4 \vspace{0.5em} \\
 
 \section*{Summary}
 
-This project was elaborated as the first laboratory project in the context of the curricular unit Computer Networks (\textit{Redes de Computadores} - RCOM), part of the Integrated Master in Informatics and Computing Engineering (\textit{Mestrado Integrado em Engenharia Informática e Computação} - MIEIC) lectured at the Faculty of Engineering of the University of Porto (FEUP). It concerns the design and implementation of a data link layer/protocol to allow two computers to communicate in a reliable way through serial ports. An application was developed on top of that layer, to allow a computer to transfer a file to another.
+This project was elaborated as the first project in the context of the curricular unit Computer Networks (RCOM), part of the Integrated Master in Informatics and Computing Engineering (MIEIC) at the Faculty of Engineering of the University of Porto (FEUP).
+It concerns the design and implementation of a data link protocol to allow two computers to communicate in a reliable way through serial ports, and subsequent testing using a simple file transfer application.
+The implementation was also statistically analysed to determine which parameters affect the protocol's efficiency.
 
 All objectives were fulfilled, as we successfully implemented in C a reliable protocol for transmitting files, with proven efficacy and robustness; we additionally analysed experimental data related to this protocol's efficiency and compared it to expected theoretical results.
 
@@ -154,7 +156,7 @@ First of all, we designed the generic architecture of our system, Figure \ref{fi
 \begin{itemize}
 	\itemsep0em
 	\item A data link layer, which deals with the serial port and exposes an interface (open/close serial ports, write/read) to allow a reasonably reliable, synchronous communication of framed data between two computers with basic error-checking. It does not directly interact with the physical layer, but rather with its driver through file/terminal abstractions.
-	\item An application layer, providing a command line interface to transfer a file in a set of packets through the data link layer. It formally implements an OSI network layer (to transfer packets) and an application layer (user interface) which is what is effectively required in this casebecause the computers are directly connected nodes.
+	\item An application layer, providing a command line interface to transfer a file in a set of packets through the data link layer. It formally implements an OSI network layer (to transfer packets) and an application layer (user interface) which is what is effectively required in this case because the computers are directly connected nodes.
 \end{itemize}
 \begin{figure}[H]
 	\centering
@@ -242,16 +244,16 @@ The \texttt{app} module makes available two executable files:
 	\item \texttt{./transmitter <COM> <file>}, to send file \texttt{<file>} to port \texttt{<COM>}.
 	\item \texttt{./receiver <COM>}, to receive a file from port \texttt{<COM>}.
 \end{itemize}
-where \texttt{<COM>} is the port to use (\texttt{COM1} corresponds to \texttt{ttyS0}, \texttt{COM2} to \texttt{ttyS1}, ...), and \texttt{<file>} is a file path. This module uses the LL interface to transfer a file in packets, not too large to reduce the frame error probability, and not too small to reduce the number of non-data bytes. Communication parameters can be customized using optional arguments, see appendix \ref{ch:optionalargs}.
+where \texttt{<COM>} is the port to use (\texttt{COM1} corresponds to \texttt{ttyS0}, \texttt{COM2} to \texttt{ttyS1}, ...), and \texttt{<file>} is a file path. This module uses the LL interface to transfer a file in packets, not too large to reduce the frame error probability, and not too small to reduce the number of non-data bytes. Communication parameters can be customized using optional arguments, see appendix \ref{ch:args}.
 
 \subsection{LL interface}
 
 The \texttt{ll} module makes available the following C functions through file \texttt{ll.h}, which are meant to be used by the \texttt{app} module executable files:
 \begin{itemize}
 	\itemsep0em
-	\item \texttt{int llopen(int com, ll\_status\_t status)}, to open serial port \texttt{com} (1 for \texttt{COM1}, 2 for \texttt{COM2}, ...) with a certain \texttt{status} (\texttt{TRANSMITTER} or \texttt{RECEIVER}). Returns the connection ID on success, and a negative if an error occured.
-	\item \texttt{int llwrite(int id, const char *buffer, int length)} writes the first \texttt{length} bytes of \texttt{buffer} (up to \texttt{LL\_MAX\_SIZE} bytes) to connection with ID \texttt{id}; returns the number of written bytes, or a negative if an error occured.
-	\item \texttt{int llread(int id, char *buffer)} reads from the connection with ID \texttt{id} to \texttt{buffer}; \texttt{buffer} must have a size of at least \texttt{LL\_MAX\_SIZE} bytes. Returns the number of written bytes, or a negative if an error occured.
+	\item \texttt{int llopen(int com, ll\_status\_t status)}, to open serial port \texttt{com} (1 for \texttt{COM1}, 2 for \texttt{COM2}, ...) with a certain \texttt{status} (\texttt{TRANSMITTER} or \texttt{RECEIVER}). Returns the connection ID on success, and a negative if an error occurred.
+	\item \texttt{int llwrite(int id, const char *buffer, int length)} writes the first \texttt{length} bytes of \texttt{buffer} (up to \texttt{LL\_MAX\_SIZE} bytes) to connection with ID \texttt{id}; returns the number of written bytes, or a negative if an error occurred.
+	\item \texttt{int llread(int id, char *buffer)} reads from the connection with ID \texttt{id} to \texttt{buffer}; \texttt{buffer} must have a size of at least \texttt{LL\_MAX\_SIZE} bytes. Returns the number of written bytes, or a negative if an error occurred.
 	\item \texttt{int llclose(int id)} closes connection with ID \texttt{id}. Returns 0 on success, or a negative otherwise.
 \end{itemize}
 
@@ -530,8 +532,6 @@ Similar procedures were followed in remote and local tests in the provided hardw
 
 \section{Efficiency of the data link protocol} \label{sec:Efficiency}
 
-% The efficiency $S$ of a communication protocol is defined as the ratio between the actual data transfer rate $R$ and the maximum rate the communication media supports $C$, or the ratio between the minimum time it takes to transfer a message at maximum rate $C$ and the actual time it takes to transfer that message: $S = R/C = N_{min}\overline{T_f}/T$.
-
 This protocol's efficiency was studied by varying the following parameters:
 \begin{itemize}
 	\itemsep0em
@@ -672,7 +672,7 @@ The source code of this project can be obtained from \href{https://github.com/dm
 During project development and evaluation the repository remained private, although it can be shared with evaluators on request to clarify the development process or due to other justifiable reasons. It will be made public once all equivalent curricular unit projects have been evaluated in the present school year.
 
 \newgeometry{top=24mm,bottom=24mm,left=14mm,right=14mm}
-\fancyhfoffset[E,O]{0pt}
+\fancyhfoffset{0pt}
 
 \section{Link Layer (LL)}
 \lstinputlisting[caption=\texttt{ll.h}, language=C]{../../include/ll.h}
@@ -880,7 +880,7 @@ FILE                    Path to file to be transferred by the transmitter
 -s, --size              Packet size (# of data bytes in a packet), in bytes
 						(default is APP_MAX_SIZE, which is 4092)
 -t, --timeout           Timeout, in seconds (default is 3)
--T, --tau               Tau; extra time before analysing, in microseconds
+-T, --tau               Tau; extra time before analyzing, in microseconds
 						(default is 0)
 -v, --verbosity         Verbosity of debug mode (0 to 4):
 							0 - Only errors
