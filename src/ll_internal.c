@@ -304,7 +304,7 @@ ssize_t ll_expect_Iframe(int port_fd, uint8_t *buffer){
     ll_log(2, "    Expecting I-frame\n");
     ll_i_statemachine_t machine;
     do{
-        machine.state = LL_I_START;
+        machine.state = LL_I_FLAG_RCV;
         machine.length = 0;
         do {
             uint8_t byte;
