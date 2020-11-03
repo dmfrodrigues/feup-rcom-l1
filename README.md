@@ -57,7 +57,7 @@ FILE                    Path to file to be transferred by the transmitter
 -r, --retransmissions   Retransmissions (default is 3)
 -s, --size              Packet size (# of data bytes in a packet), in bytes (default is APP_MAX_SIZE, which is 4092)
 -t, --timeout           Timeout, in seconds (default is 3)
--T, --tau               Tau; extra time before analysing, in microseconds (default is 0)
+-T, --tau               Tau; extra time before analyzing, in microseconds (default is 0)
 -v, --verbosity         Verbosity (0 to 4):
                             0 - Only errors
 							1 - Global app workings
