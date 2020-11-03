@@ -23,8 +23,7 @@
  * I-frame: information frames
  */
 typedef enum {
-    LL_I_START,      ///< Start state
-    LL_I_FLAG_RCV,   ///< Received flag
+    LL_I_START,      ///< Start state (received flag)
     LL_I_A_RCV,      ///< Received address
     LL_I_C_RCV,      ///< Received control byte
     LL_I_DATA,       ///< Received BCC1, and it is correct; going for data now

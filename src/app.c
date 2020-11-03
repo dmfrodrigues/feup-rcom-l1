@@ -74,7 +74,8 @@ int app_send_ctrl_packet(int ctrl, uint32_t file_size, const char *file_name){
 
 int app_send_data_packet(char *data, unsigned int data_size, unsigned int seq_number){
     if(data_size > APP_MAX_SIZE){
-        ll_err("ERROR: data_size=%d larger than LL_MAX_SIZE=%d\n", data_size, APP_MAX_SIZE);
+        ll_err("ERROR: data_size=%d larger than LL_MAX_SIZE=%d\n",
+            data_size, APP_MAX_SIZE);
         return -1;
     }
 
@@ -216,8 +217,6 @@ int app_rcv_data_packet(char * data, int seq_number){
     }
 
     memcpy(data, data_packet + 4, data_length);
-
-    ll_log(2, "About to free data_packet, data_length=%lu, app_config.packet_size=%lu\n", data_length, app_config.packet_size);
 
     free(data_packet);
 

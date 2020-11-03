@@ -14,18 +14,13 @@ int ll_i_state_update(ll_i_statemachine_t *m, uint8_t b){
     switch (m->state) {
     case LL_I_START:
         switch(b){
-            case LL_FLAG  : m->state = LL_I_FLAG_RCV; break;
-            default       : m->state = LL_I_START   ; break;
-        } break;
-    case LL_I_FLAG_RCV:
-        switch(b){
             case LL_A_SEND: m->state = LL_I_A_RCV   ; break;
-            case LL_FLAG  : m->state = LL_I_FLAG_RCV; break;
+            case LL_FLAG  : m->state = LL_I_START   ; break;
             default       : m->state = LL_I_START   ; break;
         } break;
     case LL_I_A_RCV:
         switch(b){
-            case LL_FLAG  : m->state = LL_I_FLAG_RCV; break;
+            case LL_FLAG  : m->state = LL_I_START   ; break;
             default       :
                 if     (b == ll_get_expected_Iframe_C  ()) m->state = LL_I_C_RCV;
                 else if(b == ll_get_unexpected_Iframe_C()) m->state = LL_I_C_UNXP_RCV;
@@ -35,7 +30,7 @@ int ll_i_state_update(ll_i_statemachine_t *m, uint8_t b){
         } break;
     case LL_I_C_RCV:
         switch(b){
-            case LL_FLAG  : m->state = LL_I_FLAG_RCV; break;
+            case LL_FLAG  : m->state = LL_I_START   ; break;
             default       :
                 m->state = (
                     b == (LL_A_SEND^ll_get_expected_Iframe_C()) ?
