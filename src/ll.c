@@ -114,22 +114,44 @@ int llopen(int com, ll_status_t status){
         }
         setitimer(ITIMER_REAL, &ll_timer_reset, NULL);
     } else if(status == RECEIVER){
-        // Get SET
-        uint8_t a_rcv, c_rcv;
-        res = ll_expect_Sframe(port_fd, &a_rcv, &c_rcv);
-        if(res){
-            perror("read");
-            return -1;
-        } else if(a_rcv == LL_A_SEND && c_rcv == LL_C_SET){
-            ll_log(2, "    Got SET\n");
-            res = ll_send_UA(port_fd);
-            if(res < 0) return -1;
-        } else {
-            ll_err("ERROR: c_rcv or a_rcv are not correct\n");
-            ll_err("a_rcv=0x%02X (should be 0x%02X)\n", a_rcv, LL_A_SEND);
-            ll_err("c_rcv=0x%02X (should be 0x%02X)\n", c_rcv, LL_C_SET);
+        struct sigaction action;
+        action.sa_handler = alarmHandler;
+        sigemptyset(&action.sa_mask);
+        action.sa_flags = 0;
+        sigaction(SIGALRM, &action, NULL);
+
+        unsigned attempts;
+            for(attempts = 0; attempts < ll_config.retransmissions; ++attempts){
+            timeout = 0;
+            setitimer(ITIMER_REAL, &ll_config.timeout, NULL);
+
+            // Get SET
+            uint8_t a_rcv, c_rcv;
+            res = ll_expect_Sframe(port_fd, &a_rcv, &c_rcv);
+            if(res){
+                if(errno == EINTR){
+                    if(timeout){
+                        ll_err("WARNING: timeout waiting for SET\n");
+                        ADD_FRAME_TIMEOUT();
+                    } else        ll_err("ERROR: receiver was interrupted\n");
+                } else perror("read");
+            } else if(a_rcv == LL_A_SEND && c_rcv == LL_C_SET){
+                ll_log(2, "    Got SET\n");
+                res = ll_send_UA(port_fd);
+                if(res < 0) return -1;
+                break;
+            } else {
+                ll_err("ERROR: c_rcv or a_rcv are not correct\n");
+                ll_err("a_rcv=0x%02X (should be 0x%02X)\n", a_rcv, LL_A_SEND);
+                ll_err("c_rcv=0x%02X (should be 0x%02X)\n", c_rcv, LL_C_SET);
+                return -1;
+            }
+        }
+        if(attempts == ll_config.retransmissions){
+            if(timeout) ll_err("WARNING: gave up due to timeout\n");
             return -1;
         }
+        setitimer(ITIMER_REAL, &ll_timer_reset, NULL);
     }
 
     ll_log(1, "Successfully opened\n");
@@ -211,20 +233,30 @@ int llread(int port_fd, uint8_t *buffer){
 
     unsigned attempts;
     for(attempts = 0; attempts < ll_config.retransmissions; ++attempts){
+        timeout = 0;
+        setitimer(ITIMER_REAL, &ll_config.timeout, NULL);
+
         // Get I
         sz = ll_expect_Iframe(port_fd, (uint8_t*)buffer);
 
         // Validate I
         if(sz <= 0){
+            if(errno == EINTR){
+                ll_err("WARNING: timeout waiting for I-frame\n");
+                ADD_FRAME_TIMEOUT();
+            } else
             if(ll_send_REJ(port_fd)) return -1;
-            // break;
         } else {
             // Send RR
             if(ll_send_RR(port_fd)) return -1;
             break;
         }
     }
-    if(attempts == ll_config.retransmissions) return -1;
+    if(attempts == ll_config.retransmissions){
+        ll_err("ERROR: gave up due to timeout\n");
+        return -1;
+    }
+    setitimer(ITIMER_REAL, &ll_timer_reset, NULL);
 
     ll_log(1, "Successfully read\n");
 
